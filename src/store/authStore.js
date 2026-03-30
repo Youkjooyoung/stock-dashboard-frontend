@@ -8,7 +8,7 @@ const useAuthStore = create((set) => ({
     try {
       const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
-        await fetch('https://localhost:8443/api/auth/logout', {
+        await fetch('https://api.jyyouk.shop/api/auth/logout', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ refreshToken }),

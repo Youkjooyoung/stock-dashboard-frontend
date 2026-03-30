@@ -10,7 +10,7 @@ export default function useAlertSocket(userId, onAlert) {
 
     const token = localStorage.getItem('accessToken') || '';
     const client = new Client({
-      webSocketFactory: () => new SockJS('https://localhost:8443/ws'),
+      webSocketFactory: () => new SockJS('https://api.jyyouk.shop/ws'),
       connectHeaders: { Authorization: `Bearer ${token}` },
       onConnect: () => {
         client.subscribe(`/topic/alert/${userId}`, msg => {
