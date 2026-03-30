@@ -1,0 +1,54 @@
+.candle-wrap {
+  width: 100%;
+}
+
+.candle-container {
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* 호버 툴팁 */
+.candle-tooltip {
+  display: none;
+  position: absolute;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  z-index: 10;
+  min-width: 135px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.tt-date {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.tt-table {
+  border-collapse: collapse;
+  font-size: 12px;
+  width: 100%;
+}
+
+.tt-table td {
+  padding: 2px 0;
+  color: var(--text-1);
+}
+
+.tt-table td:first-child {
+  color: var(--text-3);
+  padding-right: 12px;
+  white-space: nowrap;
+}
+
+.tt-table td:last-child {
+  text-align: right;
+}
+
+.tt-up   { color: var(--up); }
+.tt-down { color: var(--down); }

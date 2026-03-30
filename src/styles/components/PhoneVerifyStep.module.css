@@ -1,0 +1,91 @@
+.card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    padding: 40px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin: 0;
+    letter-spacing: -0.04em;
+}
+
+.desc {
+    font-size: 14px;
+    color: var(--text-2);
+    text-align: center;
+    margin: 0;
+    line-height: 1.65;
+}
+
+.icon {
+    font-size: 48px;
+    margin: 8px 0;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.list li {
+    font-size: 13px;
+    color: var(--text-2);
+    padding-left: 18px;
+    position: relative;
+}
+
+.list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--success);
+    font-weight: 700;
+}
+
+.button {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, box-shadow 0.2s;
+    font-family: var(--font-sans);
+    letter-spacing: -0.01em;
+}
+
+.button:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 14px rgba(59, 91, 219, 0.28);
+}
+
+.link {
+    font-size: 13px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link:hover {
+    text-decoration: underline;
+}

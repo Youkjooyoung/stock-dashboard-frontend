@@ -1,0 +1,272 @@
+.card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    padding: 40px 36px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin: 0 0 4px;
+    text-align: center;
+    letter-spacing: -0.04em;
+}
+
+.desc {
+    font-size: 13px;
+    color: var(--text-3);
+    text-align: center;
+    margin: 0 0 28px;
+    line-height: 1.6;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+}
+
+.required {
+    color: var(--danger);
+}
+
+.input {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-1);
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    font-family: var(--font-sans);
+}
+
+.input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(59, 91, 219, 0.10);
+}
+
+.input::placeholder {
+    color: var(--text-4);
+}
+
+.inputError {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 3px rgba(224, 49, 49, 0.10) !important;
+}
+
+.inputSuccess {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 0 3px rgba(47, 158, 68, 0.10) !important;
+}
+
+.inputDisabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: var(--surface-2);
+}
+
+.row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.row .input {
+    flex: 1;
+}
+
+.pwWrap {
+    position: relative;
+}
+
+.pwWrap .input {
+    padding-right: 68px;
+}
+
+.eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-3);
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.15s;
+    font-family: inherit;
+}
+
+.eye:hover {
+    color: var(--text-1);
+}
+
+.checkBtn {
+    padding: 0 16px;
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+}
+
+.checkBtn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.strengthWrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.strengthBars {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+}
+
+.strengthBar {
+    height: 3px;
+    flex: 1;
+    border-radius: 2px;
+    transition: background 0.3s;
+}
+
+.strengthLabel {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 56px;
+    text-align: right;
+    transition: color 0.3s;
+}
+
+.msgOk {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--success);
+}
+
+.msgErr {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--danger);
+}
+
+.hint {
+    font-size: 11px;
+    color: var(--text-3);
+    line-height: 1.5;
+}
+
+.terms {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.checkLabel {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+}
+
+.checkLabel input[type='checkbox'] {
+    margin-top: 2px;
+    accent-color: var(--primary);
+    flex-shrink: 0;
+}
+
+.termsLink {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.termsLink:hover {
+    text-decoration: underline;
+}
+
+.submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    font-family: inherit;
+    letter-spacing: -0.01em;
+}
+
+.submit:hover:not(:disabled) {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 14px rgba(59, 91, 219, 0.28);
+    transform: translateY(-1px);
+}
+
+.submit:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.loginLink {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-3);
+    text-decoration: none;
+    transition: color 0.15s;
+    margin-top: 4px;
+}
+
+.loginLink:hover {
+    color: var(--primary);
+}
+
+@media (max-width: 520px) {
+    .card {
+        padding: 32px 22px;
+        border-radius: var(--radius-lg);
+    }
+}

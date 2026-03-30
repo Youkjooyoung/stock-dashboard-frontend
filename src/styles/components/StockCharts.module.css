@@ -1,0 +1,54 @@
+/* ===================================================================
+   StockCharts — 차트 컴포넌트
+   =================================================================== */
+
+.charts-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chart-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: -0.02em;
+}
+
+.chart-canvas-wrap {
+  position: relative;
+}
+
+.chart-skeleton-title {
+  height: 14px;
+  width: 120px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+.chart-skeleton-canvas {
+  min-height: 180px;
+}
+.chart-skeleton-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 160px;
+  padding: 0 4px;
+}
+.chart-skeleton-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  min-height: 20px;
+}

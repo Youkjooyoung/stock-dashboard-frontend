@@ -1,0 +1,123 @@
+/* ===================================================================
+   SummaryCards — 상단 요약 카드 (인스타그램 감성)
+   =================================================================== */
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 20px 18px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition), transform var(--transition);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* 상단 accent 라인 */
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.summary-card.color-green::before  { background: linear-gradient(90deg, var(--primary), #6c8ef7); }
+.summary-card.color-up::before     { background: linear-gradient(90deg, var(--up), #f87171); }
+.summary-card.color-down::before   { background: linear-gradient(90deg, var(--down), #60a5fa); }
+.summary-card.color-warning::before { background: linear-gradient(90deg, var(--warning), #fbbf24); }
+
+.summary-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.summary-label {
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.summary-icon {
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.summary-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1.2;
+  margin-bottom: 6px;
+  word-break: break-all;
+  letter-spacing: -0.03em;
+}
+
+.summary-value.color-green  { color: var(--primary); }
+.summary-value.color-up     { color: var(--up); }
+.summary-value.color-down   { color: var(--down); }
+.summary-value.color-warning { color: var(--warning); }
+
+.summary-sub {
+  font-size: 11px;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.summary-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.summary-stat-up   { color: var(--up); }
+.summary-stat-flat { color: var(--flat); font-size: 14px; font-weight: 400; }
+.summary-stat-down { color: var(--down); }
+
+.summary-stat-sep {
+  color: var(--text-4);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.summary-cards-skeleton {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 1024px) {
+  .summary-cards { grid-template-columns: repeat(2, 1fr); }
+  .summary-cards-skeleton { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .summary-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .summary-card { padding: 16px 16px 14px; }
+  .summary-value { font-size: 19px; }
+}

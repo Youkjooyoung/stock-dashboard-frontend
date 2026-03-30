@@ -1,0 +1,78 @@
+.card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    padding: 48px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.icon  { font-size: 52px; }
+
+.title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin: 0;
+    letter-spacing: -0.04em;
+}
+
+.desc {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.65;
+    margin: 0;
+}
+
+.email { color: var(--primary); font-weight: 600; }
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    width: 100%;
+}
+
+.list li {
+    font-size: 13px;
+    color: var(--text-2);
+    padding: 5px 0 5px 20px;
+    position: relative;
+}
+
+.list li::before {
+    content: '•';
+    position: absolute;
+    left: 6px;
+    color: var(--primary);
+}
+
+.button {
+    display: inline-block;
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+    margin-top: 8px;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    letter-spacing: -0.01em;
+}
+
+.button:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 14px rgba(59, 91, 219, 0.28);
+}

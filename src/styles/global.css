@@ -1,0 +1,498 @@
+
+/* ===================================================================
+   Design Tokens — Instagram 감성 / 차분한 모노크롬 + 소프트 블루
+   =================================================================== */
+:root {
+  /* 메인 액션 컬러 (차분한 인디고 블루) */
+  --primary:          #3b5bdb;
+  --primary-dark:     #2f4ac7;
+  --primary-light:    #eef2ff;
+  --primary-text:     #ffffff;
+
+  /* 주식 등락 (한국 증시 컨벤션 — 부드럽게 조정) */
+  --up:               #e03131;   /* 상승 - 빨강 */
+  --up-light:         #fff5f5;
+  --down:             #1971c2;   /* 하락 - 파랑 */
+  --down-light:       #e7f5ff;
+  --flat:             #adb5bd;
+
+  /* 위험 / 성공 */
+  --danger:           #e03131;
+  --danger-light:     #fff5f5;
+  --success:          #2f9e44;
+  --warning:          #e67700;
+
+  /* 소셜 로그인 */
+  --kakao:            #FEE500;
+  --kakao-text:       #3C1E1E;
+  --google:           #4285F4;
+
+  /* 배경 — 인스타그램 특유의 fafafa */
+  --bg:               #fafafa;
+  --surface:          #ffffff;
+  --surface-2:        #f5f5f5;
+  --surface-hover:    #efefef;
+
+  /* 테두리 — 아주 연하게 */
+  --border:           #dbdbdb;
+  --border-strong:    #b0b0b0;
+  --border-focus:     #3b5bdb;
+
+  /* 텍스트 */
+  --text-1:           #262626;
+  --text-2:           #6b7280;
+  --text-3:           #a0a0a0;
+  --text-4:           #c7c7c7;
+
+  /* 반지름 — 더 크고 부드럽게 */
+  --radius-xs:        4px;
+  --radius-sm:        8px;
+  --radius-md:        12px;
+  --radius-lg:        16px;
+  --radius-xl:        24px;
+  --radius-full:      9999px;
+  --radius:           8px; /* 레거시 alias */
+
+  /* 그림자 — 아주 가볍게 */
+  --shadow-sm:        0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md:        0 4px 16px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg:        0 8px 32px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+
+  /* 폰트 */
+  --font-sans:        'Noto Sans KR', -apple-system, BlinkMacSystemFont,
+                      'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+
+  /* 트랜지션 — 살짝 더 부드럽게 */
+  --transition:       0.2s ease;
+
+  /* 최대 너비 */
+  --max-width:        1440px;
+
+  /* 헤더 높이 */
+  --header-h:         60px;
+  --subnav-h:         44px;
+}
+
+/* ===================================================================
+   Reset
+   =================================================================== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-1);
+  overflow-y: scroll;
+  line-height: 1.65;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: var(--font-sans); }
+input, select, textarea { font-family: var(--font-sans); }
+img { max-width: 100%; }
+
+/* ===================================================================
+   공통 레이아웃
+   =================================================================== */
+.page-wrapper {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===================================================================
+   카드
+   =================================================================== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===================================================================
+   버튼
+   =================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  transition: all var(--transition);
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-text);
+  border-color: var(--primary);
+}
+.btn-primary:hover  { background: var(--primary-dark); border-color: var(--primary-dark); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.btn-outline:hover { background: var(--primary-light); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border-color: var(--border);
+}
+.btn-ghost:hover { background: var(--surface-hover); color: var(--text-1); }
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+.btn-danger:hover { background: #c82333; border-color: #c82333; }
+
+.btn-kakao {
+  background: var(--kakao);
+  color: var(--kakao-text);
+  border-color: var(--kakao);
+}
+.btn-kakao:hover { filter: brightness(0.97); }
+
+.btn-sm  { padding: 6px 12px; font-size: 12px; }
+.btn-lg  { padding: 12px 26px; font-size: 15px; }
+.btn-full { width: 100%; }
+
+/* ===================================================================
+   인풋
+   =================================================================== */
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  background: var(--surface);
+  color: var(--text-1);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+  line-height: 1.4;
+}
+.input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59,91,219,0.10);
+}
+.input::placeholder { color: var(--text-4); }
+
+/* ===================================================================
+   배지
+   =================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.badge-green   { background: var(--primary-light); color: var(--primary); }
+.badge-up      { background: var(--up-light);      color: var(--up); }
+.badge-down    { background: var(--down-light);    color: var(--down); }
+.badge-kakao   { background: var(--kakao);         color: var(--kakao-text); }
+.badge-neutral { background: var(--surface-2);     color: var(--text-2); }
+
+/* ===================================================================
+   등락 색상
+   =================================================================== */
+.up   { color: var(--up);   font-weight: 600; }
+.down { color: var(--down); font-weight: 600; }
+.zero { color: var(--flat); }
+
+/* ===================================================================
+   시장 배지 (공용)
+   =================================================================== */
+.market-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--surface-2);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
+
+/* ===================================================================
+   구분선
+   =================================================================== */
+.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ===================================================================
+   메시지 (에러/성공)
+   =================================================================== */
+.msg {
+  font-size: 13px;
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+.msg-error   { background: var(--danger-light); color: var(--danger); }
+.msg-success { background: var(--primary-light); color: var(--primary); }
+
+.error-msg    { font-size: 13px; color: var(--danger); background: var(--danger-light); padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 12px; text-align: center; }
+.feedback-msg { font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 12px; text-align: center; }
+.feedback-msg.success { background: var(--primary-light); color: var(--primary); }
+.feedback-msg.error   { background: var(--danger-light);  color: var(--danger); }
+
+/* ===================================================================
+   폼 공통
+   =================================================================== */
+.form-group   { margin-bottom: 18px; }
+.form-label   { font-size: 13px; color: var(--text-2); font-weight: 500; display: block; margin-bottom: 6px; }
+.form-input   {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 14px; font-family: var(--font-sans);
+  background: var(--surface); color: var(--text-1);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59,91,219,0.10);
+}
+.form-input::placeholder { color: var(--text-4); }
+
+.input-wrap       { position: relative; }
+.pw-toggle        {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; font-size: 12px; color: var(--text-3);
+  font-weight: 500; cursor: pointer;
+}
+.pw-toggle:hover  { color: var(--text-1); }
+
+.check-label {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; font-size: 13px; color: var(--text-2);
+  user-select: none;
+}
+.check-label input[type="checkbox"] { accent-color: var(--primary); width: 14px; height: 14px; }
+
+/* ===================================================================
+   로딩 스피너
+   =================================================================== */
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  vertical-align: middle; margin-right: 5px;
+}
+.spinner-green {
+  border-color: rgba(59,91,219,0.15);
+  border-top-color: var(--primary);
+}
+.spinner-dark {
+  border-color: rgba(0,0,0,0.10);
+  border-top-color: var(--text-2);
+}
+
+/* ===================================================================
+   로딩 스켈레톤
+   =================================================================== */
+.skeleton {
+  background: linear-gradient(90deg, #ebebeb 25%, #f5f5f5 50%, #ebebeb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+.skeleton-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+}
+.skeleton-line { height: 12px; margin-bottom: 8px; }
+.skeleton-val  { height: 26px; width: 55%; }
+
+/* ===================================================================
+   빈 상태
+   =================================================================== */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-3);
+  font-size: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* ===================================================================
+   탭 그룹
+   =================================================================== */
+.tab-group {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 10px 18px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  position: relative;
+  transition: color var(--transition);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tab-btn:hover  { color: var(--text-1); }
+.tab-btn.active { color: var(--primary); font-weight: 700; border-bottom-color: var(--primary); }
+
+/* 박스형 탭 (소형) */
+.tab-box-group {
+  display: flex;
+  gap: 2px;
+  background: var(--surface-2);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.tab-box-btn {
+  padding: 5px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-2);
+  transition: all var(--transition);
+}
+.tab-box-btn.active {
+  background: var(--surface);
+  color: var(--text-1);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===================================================================
+   섹션 제목 스타일
+   =================================================================== */
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 16px;
+  line-height: 1.4;
+  letter-spacing: -0.03em;
+}
+
+.section-title-sm {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+/* ===================================================================
+   애니메이션
+   =================================================================== */
+@keyframes fadeIn    { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp   { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slideDown { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes spin      { to { transform: rotate(360deg); } }
+@keyframes shimmer   { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes pulse     { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* ===================================================================
+   반응형
+   =================================================================== */
+@media (max-width: 1024px) {
+  .page-wrapper { padding: 0 20px; }
+}
+@media (max-width: 768px) {
+  .page-wrapper { padding: 0 14px; }
+}
+@media (max-width: 480px) {
+  .page-wrapper { padding: 0 10px; }
+}
+
+/* ===================================================================
+   다크 모드 — 인스타그램 다크 감성
+   =================================================================== */
+[data-theme="dark"] {
+  --primary:          #4c6ef5;
+  --primary-dark:     #3b5bdb;
+  --primary-light:    #1a2040;
+
+  --up:               #f03e3e;
+  --up-light:         #2d1515;
+  --down:             #339af0;
+  --down-light:       #0d2040;
+
+  --bg:               #000000;
+  --surface:          #121212;
+  --surface-2:        #1c1c1c;
+  --surface-hover:    #262626;
+
+  --border:           #262626;
+  --border-strong:    #363636;
+  --border-focus:     #4c6ef5;
+
+  --text-1:           #fafafa;
+  --text-2:           #a8a8a8;
+  --text-3:           #737373;
+  --text-4:           #3d3d3d;
+
+  --shadow-sm:        0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:        0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:        0 8px 32px rgba(0,0,0,0.6);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: var(--surface-2);
+  color: var(--text-1);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-hover) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+}

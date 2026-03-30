@@ -1,0 +1,180 @@
+/* ===================================================================
+   StockChat — 실시간 채팅 (모달 내부)
+   =================================================================== */
+
+.chat-wrap {
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+  padding-top: 16px;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.chat-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.chat-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.chat-status-dot.connected    { background: var(--primary); }
+.chat-status-dot.disconnected { background: var(--text-4); }
+
+.chat-status-text {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.chat-message-list {
+  height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 0 8px;
+  margin-bottom: 10px;
+}
+
+.chat-message-list::-webkit-scrollbar { width: 3px; }
+.chat-message-list::-webkit-scrollbar-track { background: transparent; }
+.chat-message-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.chat-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+.chat-msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.chat-msg-row.mine  { justify-content: flex-end; }
+.chat-msg-row.other { justify-content: flex-start; }
+
+.chat-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.chat-avatar.mine {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.chat-msg-body {
+  max-width: 68%;
+}
+
+.chat-msg-nickname {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-bottom: 3px;
+  padding-left: 2px;
+}
+
+.chat-bubble {
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.chat-bubble.mine {
+  background: var(--primary);
+  color: white;
+  border-bottom-right-radius: 3px;
+}
+
+.chat-bubble.other {
+  background: var(--surface-2);
+  color: var(--text-1);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 3px;
+}
+
+.chat-msg-time {
+  font-size: 10px;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+
+.chat-msg-time.mine  { text-align: right; }
+.chat-msg-time.other { text-align: left; }
+
+.chat-input-row {
+  display: flex;
+  gap: 7px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  outline: none;
+  font-family: var(--font-sans);
+  background: var(--surface);
+  color: var(--text-1);
+  transition: border-color var(--transition);
+}
+
+.chat-input:focus {
+  border-color: var(--border-focus);
+}
+
+.chat-input:disabled {
+  background: var(--surface-2);
+  color: var(--text-3);
+}
+
+.chat-send-btn {
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: background var(--transition), opacity var(--transition);
+  white-space: nowrap;
+}
+
+.chat-send-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

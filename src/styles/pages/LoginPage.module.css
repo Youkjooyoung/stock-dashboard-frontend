@@ -1,0 +1,210 @@
+/* ===================================================================
+   LoginPage — 인스타그램 감성 로그인
+   =================================================================== */
+
+.login-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.login-page-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.login-page-logo {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--primary), #6c8ef7);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  color: white;
+  box-shadow: 0 2px 10px rgba(59,91,219,0.25);
+}
+
+.login-page-brand {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.04em;
+}
+
+.login-page-brand span {
+  color: var(--primary);
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 40px 36px 36px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow-md);
+}
+
+.login-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-1);
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: -0.04em;
+}
+
+.login-card-subtitle {
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.divider-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  font-size: 12px;
+  color: var(--text-3);
+  letter-spacing: 0.05em;
+}
+
+.divider-or::before,
+.divider-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.social-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.btn-kakao-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 13px;
+  background: var(--kakao);
+  color: var(--kakao-text);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: filter var(--transition);
+  letter-spacing: -0.01em;
+}
+
+.btn-kakao-login:hover {
+  filter: brightness(0.96);
+}
+
+.btn-kakao-login .kakao-icon {
+  font-size: 18px;
+}
+
+.kakao-icon {
+  font-size: 18px;
+}
+
+.btn-google-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 13px;
+  background: var(--surface);
+  color: #3c4043;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+  letter-spacing: -0.01em;
+}
+
+.btn-google-login:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+.btn-login-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 13px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.btn-login-submit:hover:not(:disabled) {
+  background: var(--primary-dark);
+  box-shadow: 0 4px 14px rgba(59,91,219,0.3);
+}
+
+.btn-login-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.login-toggle {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.login-toggle-link {
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-toggle-link:hover {
+  text-decoration: underline;
+}
+
+.remember-row {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 22px 28px;
+  }
+}

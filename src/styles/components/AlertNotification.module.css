@@ -1,0 +1,113 @@
+/* ===================================================================
+   AlertNotification — 실시간 알림 토스트
+   =================================================================== */
+
+.alert-notifications {
+  position: fixed;
+  top: calc(var(--header-h) + 12px);
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.alert-toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  box-shadow: var(--shadow-lg);
+  min-width: 290px;
+  max-width: 340px;
+  animation: slideDown 0.25s ease;
+  pointer-events: all;
+  position: relative;
+  overflow: hidden;
+}
+
+.alert-toast::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.alert-toast:global(.up)::before   { background: var(--up); }
+.alert-toast:global(.down)::before { background: var(--down); }
+
+.alert-toast-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 5px;
+  padding-left: 4px;
+}
+
+.alert-toast-body {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+  padding-left: 4px;
+}
+
+.alert-toast-highlight {
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.alert-toast-rate {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 5px;
+  padding-left: 4px;
+}
+
+.alert-toast-rate:global(.up)   { color: var(--up); }
+.alert-toast-rate:global(.down) { color: var(--down); }
+
+.alert-toast-price {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 3px;
+  padding-left: 4px;
+}
+
+.alert-toast-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition), background var(--transition);
+}
+
+.alert-toast-close:hover {
+  color: var(--text-1);
+  background: var(--surface-hover);
+}
+
+@media (max-width: 480px) {
+  .alert-notifications {
+    right: 10px;
+    left: 10px;
+  }
+
+  .alert-toast {
+    min-width: unset;
+    max-width: unset;
+    width: 100%;
+  }
+}

@@ -1,0 +1,129 @@
+/* ===================================================================
+   AiAnalysis — AI 분석 컴포넌트
+   =================================================================== */
+
+.ai-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.ai-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.ai-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.ai-icon {
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.ai-btn {
+  padding: 7px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: background var(--transition), opacity var(--transition);
+  white-space: nowrap;
+}
+
+.ai-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+.ai-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── 로딩 ──────────────────────────── */
+.ai-loading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 18px;
+}
+
+.ai-loading-text {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-left: 4px;
+}
+
+.ai-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: inline-block;
+  animation: ai-bounce 1.2s infinite ease-in-out;
+}
+
+.ai-dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes ai-bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+  40%           { transform: scale(1);   opacity: 1;   }
+}
+
+/* ── 결과 ──────────────────────────── */
+.ai-result {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ai-para {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-1);
+  margin: 0 0 14px;
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+.ai-para:last-child {
+  margin-bottom: 0;
+  font-size: 12px;
+  color: var(--text-3);
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
+/* ── 에러 / 플레이스홀더 ───────────── */
+.ai-error {
+  padding: 16px 18px;
+  font-size: 13px;
+  color: var(--danger);
+  background: var(--danger-light);
+  border-top: 1px solid var(--border);
+}
+
+.ai-placeholder {
+  padding: 28px 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-3);
+}
