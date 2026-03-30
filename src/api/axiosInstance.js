@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE = 'https://localhost:8443/api';
+const BASE = 'https://api.jyyouk.shop/api';
 
 const api = axios.create({
   baseURL:         BASE,

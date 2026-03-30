@@ -15,8 +15,8 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(!!localStorage.getItem('savedEmail'));
   const [showPw, setShowPw]         = useState(false);
 
-  const handleGoogleLogin = () => { window.location.href = 'https://localhost:8443/api/auth/google/login'; };
-  const handleKakaoLogin  = () => { window.location.href = 'https://localhost:8443/api/auth/kakao/login'; };
+  const handleGoogleLogin = () => { window.location.href = 'https://api.jyyouk.shop/api/auth/google/login'; };
+  const handleKakaoLogin  = () => { window.location.href = 'https://api.jyyouk.shop/api/auth/kakao/login'; };
 
   const handleLogin = async () => {
     setError('');
