@@ -23,7 +23,7 @@ export default function StockChat({ ticker, stockName }) {
 
   useEffect(() => {
     const client = new Client({
-      webSocketFactory: () => new SockJS('https://api.jyyouk.shop/ws'),
+      webSocketFactory: () => new SockJS(import.meta.env.VITE_API_BASE_URL + '/ws'),
       connectHeaders: { Authorization: `Bearer ${token}` },
       onConnect: () => {
         setConnected(true);

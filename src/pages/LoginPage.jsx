@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import useAuthStore from '../store/authStore';
@@ -14,6 +14,14 @@ export default function LoginPage() {
   const [password, setPassword]     = useState('');
   const [rememberMe, setRememberMe] = useState(!!localStorage.getItem('savedEmail'));
   const [showPw, setShowPw]         = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendStatus, setResendStatus] = useState(null);
+  const [cooldown, setCooldown]     = useState(0);
+  const cooldownRef                 = useRef(null);
+
+  useEffect(() => {
+    return () => clearInterval(cooldownRef.current);
+  }, []);
 
   const handleGoogleLogin = () => {
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/auth/google/login`;
@@ -25,6 +33,7 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     setError('');
+    setShowResend(false);
     if (!email || !password) { setError('이메일과 비밀번호를 입력해주세요.'); return; }
     setLoading(true);
     try {
@@ -35,9 +44,29 @@ export default function LoginPage() {
       else localStorage.removeItem('savedEmail');
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || '로그인에 실패했습니다.');
+      const msg = err.response?.data?.message || '로그인에 실패했습니다.';
+      setError(msg);
+      if (msg === '이메일 인증이 필요합니다.') setShowResend(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (cooldown > 0 || resendStatus === 'loading') return;
+    setResendStatus('loading');
+    try {
+      await api.post('/auth/resend-verify', { email });
+      setResendStatus('sent');
+      setCooldown(60);
+      cooldownRef.current = setInterval(() => {
+        setCooldown(prev => {
+          if (prev <= 1) { clearInterval(cooldownRef.current); return 0; }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      setResendStatus('error');
     }
   };
 
@@ -48,7 +77,6 @@ export default function LoginPage() {
 
   return (
     <div className={styles['login-page']}>
-
       <div className={styles['login-page-header']}>
         <div className={styles['login-page-logo']}>S</div>
         <span className={styles['login-page-brand']}>주식<span>대시보드</span></span>
@@ -100,6 +128,29 @@ export default function LoginPage() {
           </div>
 
           {error && <p className="error-msg">{error}</p>}
+
+          {showResend && (
+            <div className={styles['resend-box']}>
+              <p className={styles['resend-desc']}>인증 메일을 받지 못하셨나요?</p>
+              <button
+                className={styles['btn-resend']}
+                type="button"
+                onClick={handleResend}
+                disabled={cooldown > 0 || resendStatus === 'loading'}>
+                {resendStatus === 'loading'
+                  ? '발송 중...'
+                  : cooldown > 0
+                  ? `재발송 (${cooldown}초)`
+                  : '인증 메일 재발송'}
+              </button>
+              {resendStatus === 'sent' && (
+                <p className={styles['resend-msg-success']}>인증 메일을 재발송했습니다. 받은 편지함을 확인해주세요.</p>
+              )}
+              {resendStatus === 'error' && (
+                <p className={styles['resend-msg-error']}>발송에 실패했습니다. 잠시 후 다시 시도해주세요.</p>
+              )}
+            </div>
+          )}
 
           <button
             className={styles['btn-login-submit']}
