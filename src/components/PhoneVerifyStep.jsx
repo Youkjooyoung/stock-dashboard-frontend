@@ -14,7 +14,7 @@ export default function PhoneVerifyStep({ onCertified }) {
 
     const handleVerify = () => {
         const { IMP } = window;
-        if (!IMP) return alert('본인인증 모듈 로딩 중입니다. 잠시 후 다시 시도해 주세요.');
+        if (!IMP) return alert('본인인증 모듈 로딩 중입니다. 잠시 후 다시 시도해주세요.');
 
         IMP.init(import.meta.env.VITE_PORTONE_IMP_KEY);
         IMP.certification({
@@ -22,11 +22,11 @@ export default function PhoneVerifyStep({ onCertified }) {
             channel_key: 'channel-key-9d22f33f-5c96-4c09-ace1-957763da1b9e',
             popup: true
         }, async (rsp) => {
-            if (!rsp.success) return alert('본인인증에 실패했습니다.');
+            if (!rsp.success) return alert('본인인증이 실패했습니다.');
 
             try {
                 const { data } = await axios.post(
-                    'https://localhost:8443/api/auth/certify',
+                    `${import.meta.env.VITE_API_BASE_URL}/api/auth/certify`,
                     { impUid: rsp.imp_uid },
                     { withCredentials: true }
                 );
@@ -41,12 +41,12 @@ export default function PhoneVerifyStep({ onCertified }) {
         <div className={styles.card}>
             <h2 className={styles.title}>본인인증</h2>
             <p className={styles.desc}>
-                회원가입을 시작하려면 휴대폰 본인인증이 필요합니다.
+                회원가입을 시작하려면 먼저 본인인증이 필요합니다.
             </p>
             <div className={styles.icon}>📱</div>
             <ul className={styles.list}>
-                <li>통신사 선택 후 본인인증을 진행합니다.</li>
-                <li>인증된 휴대폰 번호는 자동으로 입력됩니다.</li>
+                <li>휴대폰 택을 통해 본인인증을 진행합니다.</li>
+                <li>인증 후 휴대폰 번호가 자동으로 입력됩니다.</li>
                 <li>본인 명의의 휴대폰이 필요합니다.</li>
             </ul>
             <button className={styles.button} onClick={handleVerify}>

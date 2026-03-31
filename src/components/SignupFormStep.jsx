@@ -3,7 +3,7 @@ import axios from 'axios';
 import AddressSearch from './AddressSearch';
 import styles from '../styles/components/SignupFormStep.module.css';
 
-const API = 'https://localhost:8443/api/auth';
+const API = `${import.meta.env.VITE_API_BASE_URL}/api/auth`;
 
 const STRENGTH_COLORS = ['', '#ff4d4d', '#ff9800', '#8bc34a', '#00e676'];
 const STRENGTH_LABELS = ['', '약함', '보통', '강함', '매우 강함'];
@@ -65,10 +65,10 @@ export default function SignupFormStep({ certInfo, onComplete }) {
         nickname: '', residentNo: '',
         address: '', addressDetail: '', agreedTerms: false,
     });
-    const [loading, setLoading]   = useState(false);
-    const [showPw, setShowPw]     = useState(false);
-    const [showPwC, setShowPwC]   = useState(false);
-    const [touched, setTouched]   = useState({});
+    const [loading, setLoading] = useState(false);
+    const [showPw, setShowPw]   = useState(false);
+    const [showPwC, setShowPwC] = useState(false);
+    const [touched, setTouched] = useState({});
 
     const change = (e) => {
         const { name, value, type, checked } = e.target;
@@ -107,7 +107,7 @@ export default function SignupFormStep({ certInfo, onComplete }) {
 
         if (name === 'agreedTerms') {
             if (val) delete next.agreedTerms;
-            else next.agreedTerms = '이용약관에 동의해 주세요.';
+            else next.agreedTerms = '이용약관에 동의해주세요.';
         }
 
         setErrors(next);
@@ -161,7 +161,7 @@ export default function SignupFormStep({ certInfo, onComplete }) {
 
         if (!validateResidentNo(form.residentNo)) errs.residentNo = '유효하지 않은 주민등록번호입니다.';
         if (!form.address)     errs.address     = '주소를 검색해 주세요.';
-        if (!form.agreedTerms) errs.agreedTerms = '이용약관에 동의해 주세요.';
+        if (!form.agreedTerms) errs.agreedTerms = '이용약관에 동의해주세요.';
 
         setErrors(errs);
         if (Object.keys(errs).length > 0) return;
@@ -200,7 +200,7 @@ export default function SignupFormStep({ certInfo, onComplete }) {
     return (
         <div className={styles.card}>
             <h2 className={styles.title}>정보 입력</h2>
-            <p className={styles.desc}>계정을 만들고 주식 대시보드를 시작하세요</p>
+            <p className={styles.desc}>계정을 만들고 주식 정보보기를 시작하세요</p>
 
             <form className={styles.form} onSubmit={handleSubmit} noValidate>
 
@@ -210,13 +210,13 @@ export default function SignupFormStep({ certInfo, onComplete }) {
                 </div>
 
                 <div className={styles.group}>
-                    <label className={styles.label}>휴대폰번호</label>
+                    <label className={styles.label}>핸드폰 번호</label>
                     <input className={`${styles.input} ${styles.inputDisabled}`} value={certInfo.phone} disabled />
                 </div>
 
                 <div className={styles.group}>
                     <label className={styles.label}>
-                        이메일 (아이디) <span className={styles.required}>*</span>
+                        이메일(아이디) <span className={styles.required}>*</span>
                     </label>
                     <div className={styles.row}>
                         <input
@@ -291,7 +291,7 @@ export default function SignupFormStep({ certInfo, onComplete }) {
                     </div>
                     {form.passwordConfirm && (
                         <span className={pwMatch ? styles.msgOk : styles.msgErr}>
-                            {pwMatch ? '✓ 비밀번호가 일치합니다.' : '✕ 비밀번호가 일치하지 않습니다.'}
+                            {pwMatch ? '✓ 비밀번호가 일치합니다.' : '✗ 비밀번호가 일치하지 않습니다.'}
                         </span>
                     )}
                 </div>
@@ -308,7 +308,7 @@ export default function SignupFormStep({ certInfo, onComplete }) {
                         value={form.nickname}
                         onChange={change}
                     />
-                    <p className={styles.hint}>특수문자 불가 / 한글만: 2~8자 / 혼합: 4~8자</p>
+                    <p className={styles.hint}>특수문자 불가 / 한글만 2~8자 / 혼합: 4~8자</p>
                     {errors.nickname && <span className={styles.msgErr}>{errors.nickname}</span>}
                     {touched.nickname && !errors.nickname && form.nickname &&
                         <span className={styles.msgOk}>✓ 사용 가능한 닉네임입니다.</span>}
@@ -329,7 +329,7 @@ export default function SignupFormStep({ certInfo, onComplete }) {
                     {errors.residentNo && <span className={styles.msgErr}>{errors.residentNo}</span>}
                     {touched.residentNo && !errors.residentNo && rrnComplete &&
                         <span className={styles.msgOk}>✓ 확인됐습니다.</span>}
-                    <span className={styles.hint}>🔒 주민등록번호는 암호화되어 안전하게 저장됩니다.</span>
+                    <span className={styles.hint}>귀하의 주민등록번호는 암호화되어 안전하게 저장됩니다.</span>
                 </div>
 
                 <div className={styles.group}>
@@ -354,7 +354,7 @@ export default function SignupFormStep({ certInfo, onComplete }) {
                     <input
                         className={styles.input}
                         name="addressDetail"
-                        placeholder="상세주소 입력 (선택)"
+                        placeholder="세부주소 입력 (선택)"
                         style={{ marginTop: 6 }}
                         value={form.addressDetail}
                         onChange={change}
@@ -371,7 +371,7 @@ export default function SignupFormStep({ certInfo, onComplete }) {
                         />
                         <span>
                             <a href="/terms" target="_blank" rel="noreferrer" className={styles.termsLink}>이용약관</a>{' '}및{' '}
-                            <a href="/privacy" target="_blank" rel="noreferrer" className={styles.termsLink}>개인정보처리방침</a>에 동의합니다.{' '}
+                            <a href="/privacy" target="_blank" rel="noreferrer" className={styles.termsLink}>개인정보처리방침</a>에 동의합니다{' '}
                             <span className={styles.required}>(필수)</span>
                         </span>
                     </label>

@@ -76,3 +76,40 @@
     background: var(--primary-dark);
     box-shadow: 0 4px 14px rgba(59, 91, 219, 0.28);
 }
+
+.btn-resend {
+    width: 100%;
+    padding: 11px;
+    background: transparent;
+    color: var(--text-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition);
+    box-sizing: border-box;
+}
+
+.btn-resend:hover:not(:disabled) {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-resend:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.resend-msg-success {
+    font-size: 13px;
+    color: var(--success, #16a34a);
+    margin: 0;
+}
+
+.resend-msg-error {
+    font-size: 13px;
+    color: var(--danger, #dc2626);
+    margin: 0;
+}

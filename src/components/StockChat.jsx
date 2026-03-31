@@ -23,7 +23,7 @@ export default function StockChat({ ticker, stockName }) {
 
   useEffect(() => {
     const client = new Client({
-      webSocketFactory: () => new SockJS('https://localhost:8443/ws'),
+      webSocketFactory: () => new SockJS('https://api.jyyouk.shop/ws'),
       connectHeaders: { Authorization: `Bearer ${token}` },
       onConnect: () => {
         setConnected(true);
@@ -69,14 +69,12 @@ export default function StockChat({ ticker, stockName }) {
 
   return (
     <div className={styles['chat-wrap']}>
-      {/* 헤더 */}
       <div className={styles['chat-header']}>
         <span className={styles['chat-title']}>💬 {stockName} 토론</span>
         <span className={`${styles['chat-status-dot']} ${connected ? styles.connected : styles.disconnected}`} />
-        <span className={styles['chat-status-text']}>{connected ? '연결됨' : '연결 중...'}</span>
+        <span className={styles['chat-status-text']}>{connected ? '연결됨' : '연결 중..'}</span>
       </div>
 
-      {/* 메시지 목록 */}
       <div className={styles['chat-message-list']}>
         {messages.length === 0 && (
           <div className={styles['chat-empty']}>첫 번째 의견을 남겨보세요!</div>
@@ -110,11 +108,10 @@ export default function StockChat({ ticker, stockName }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* 입력창 */}
       <div className={styles['chat-input-row']}>
         <input
           className={styles['chat-input']}
-          placeholder="의견을 입력하세요... (Enter로 전송)"
+          placeholder="의견을 입력하세요.. (Enter로 전송)"
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}

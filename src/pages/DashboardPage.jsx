@@ -67,10 +67,9 @@ export default function DashboardPage() {
   const { data: watchlist = [] } = useWatchlist();
   const toggleWatchMutation = useToggleWatchlist();
 
-  // WebSocket — /topic/prices 구독: 백엔드 수집 완료 시 캐시 무효화
   useEffect(() => {
     const client = new Client({
-      webSocketFactory: () => new SockJS('https://localhost:8443/ws'),
+      webSocketFactory: () => new SockJS('https://api.jyyouk.shop/ws'),
       reconnectDelay: 5000,
       onConnect: () => {
         client.subscribe('/topic/prices', () => {
@@ -78,13 +77,13 @@ export default function DashboardPage() {
         });
       },
       onStompError: (frame) => {
-        console.warn('[WebSocket] STOMP 오류:', frame.headers?.message);
+        console.warn('[WebSocket] STOMP error:', frame.headers?.message);
       },
       onDisconnect: () => {
-        console.info('[WebSocket] 연결 끊김 — 5초 후 재연결 시도');
+        console.info('[WebSocket] disconnected, reconnecting in 5s');
       },
       onWebSocketError: (e) => {
-        console.warn('[WebSocket] 소켓 오류:', e);
+        console.warn('[WebSocket] socket error:', e);
       },
     });
     client.activate();
@@ -92,7 +91,7 @@ export default function DashboardPage() {
     return () => { client.deactivate(); };
   }, [queryClient]);
 
-  // 자동갱신 인터벌 (WebSocket 미연결 시 폴백)
+  // ?�동갱신 ?�터�?(WebSocket 미연�????�백)
   useEffect(() => {
     if (autoRefresh) {
       intervalRef.current = setInterval(() => refetchStocks(), 30000);
@@ -114,7 +113,7 @@ export default function DashboardPage() {
 
   const openModal = (stock) => setModal(stock);
 
-  // 전체 과거 데이터 수집
+  // ?�체 과거 ?�이???�집
   function toYYYYMMDD(date) {
     return date.toISOString().slice(0, 10).replace(/-/g, '');
   }
@@ -128,7 +127,7 @@ export default function DashboardPage() {
     setBulkOpen(false);
     setBulkStatus({ status: 'running', current: 0, total: 0 });
 
-    // 진행 상태 폴링
+    // 진행 ?�태 ?�링
     bulkPollRef.current = setInterval(async () => {
       try {
         const res = await api.get('/stock/collect/history/status');
@@ -140,7 +139,7 @@ export default function DashboardPage() {
     }, 2000);
   }
 
-  // 마운트 시 수집이 이미 진행 중이면 자동으로 폴링 시작
+  // 마운?????�집???��? 진행 중이�??�동?�로 ?�링 ?�작
   useEffect(() => {
     api.get('/stock/collect/history/status').then(res => {
       if (res.data.status === 'running') {
@@ -163,13 +162,13 @@ export default function DashboardPage() {
     <div>
       <AlertNotification userId={userId} />
 
-      {/* 전체 과거 데이터 수집 UI */}
+      {/* ?�체 과거 ?�이???�집 UI */}
       <div className={styles['bulk-bar']}>
         {bulkStatus && bulkStatus.status === 'running' ? (
           <div className={styles['bulk-progress']}>
             <span className="spinner" style={{ width: 14, height: 14 }} />
             <span>
-              전체 과거 데이터 수집 중…&nbsp;
+              전체 과거 데이터 수집 중&nbsp;
               {bulkStatus.total > 0
                 ? `${bulkStatus.current} / ${bulkStatus.total} 종목`
                 : '준비 중'}
@@ -183,7 +182,7 @@ export default function DashboardPage() {
         ) : (
           <div className={styles['bulk-wrap']}>
             <button className={styles['btn-bulk']} onClick={() => setBulkOpen(v => !v)}>
-              📦 전체 과거 데이터 수집
+              📥 전체 과거 데이터 수집
             </button>
             {bulkOpen && (
               <div className={styles['bulk-dropdown']}>
