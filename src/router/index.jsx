@@ -6,6 +6,8 @@ import SignupPage from '../pages/SignupPage';
 import DashboardPage from '../pages/DashboardPage';
 import ProfilePage from '../pages/ProfilePage';
 import OAuthCallbackPage from '../pages/OAuthCallbackPage';
+import OAuthLinkCallbackPage from '../pages/OAuthLinkCallbackPage';
+import VerifyEmailPage from '../pages/VerifyEmailPage';
 import ComparePage from '../pages/ComparePage';
 
 export default function AppRouter() {
@@ -18,6 +20,8 @@ export default function AppRouter() {
         <Route path="/oauth"        element={<OAuthCallbackPage />} />
         <Route path="/oauth/kakao"  element={<OAuthCallbackPage />} />
         <Route path="/oauth/google" element={<OAuthCallbackPage />} />
+        <Route path="/oauth/link"      element={<OAuthLinkCallbackPage />} />
+        <Route path="/verify-email"    element={<VerifyEmailPage />} />
 
         {/* 공유 레이아웃: Header + StockTicker (로그인 필요) */}
         <Route element={<AppLayout />}>

@@ -1,6 +1,5 @@
-import { useState, useRef } from 'react';
-// useEffect 제거 — 데이터 페칭은 React Query 훅으로 대체됨
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS, CategoryScale, LinearScale,
@@ -12,7 +11,7 @@ import {
   useWatchlist, useWatchlistDetail, useAlerts,
   useDeleteAlert, useUserInfo,
   usePortfolio, useAddPortfolio, useDeletePortfolio,
-  useStockPrices,
+  useStockPrices, useSocialLinks, useUnlinkSocial,
 } from '../hooks/useQueries';
 import AiAnalysis from '../components/AiAnalysis';
 import styles from '../styles/pages/ProfilePage.module.css';
@@ -66,6 +65,7 @@ function getCooldownDays() {
 /* ── 컴포넌트 ────────────────────────────────── */
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuthStore();
   const fileRef = useRef(null);
 
@@ -124,6 +124,46 @@ export default function ProfilePage() {
   const { data: stockPrices = [] }   = useStockPrices();
   const addPortfolioMutation         = useAddPortfolio();
   const deletePortfolioMutation      = useDeletePortfolio();
+
+  /* ── 소셜 연동 ── */
+  const { data: socialLinks = [] }  = useSocialLinks();
+  const unlinkSocialMutation        = useUnlinkSocial();
+  const kakaoLink  = socialLinks.find(s => s.provider === 'KAKAO');
+  const googleLink = socialLinks.find(s => s.provider === 'GOOGLE');
+  const [socialMsg, setSocialMsg]     = useState('');
+  const [socialMsgType, setSocialMsgType] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('linked')) {
+      const p = params.get('linked');
+      setSocialMsg(`${p === 'kakao' ? '카카오' : '구글'} 계정 연동이 완료됐습니다.`);
+      setSocialMsgType('success');
+    } else if (params.get('linkError')) {
+      setSocialMsg('소셜 계정 연동에 실패했습니다.');
+      setSocialMsgType('error');
+    }
+  }, [location.search]);
+
+  const handleLinkKakao = () => {
+    const token = localStorage.getItem('accessToken');
+    window.location.href = `${api.defaults.baseURL}/auth/kakao/link?token=${token}`;
+  };
+
+  const handleLinkGoogle = () => {
+    const token = localStorage.getItem('accessToken');
+    window.location.href = `${api.defaults.baseURL}/auth/google/link?token=${token}`;
+  };
+
+  const handleUnlinkSocial = async (provider) => {
+    if (!window.confirm(`${provider === 'KAKAO' ? '카카오' : '구글'} 연동을 해제하시겠습니까?`)) return;
+    try {
+      await unlinkSocialMutation.mutateAsync(provider);
+      setSocialMsg('연동이 해제됐습니다.'); setSocialMsgType('success');
+    } catch {
+      setSocialMsg('연동 해제에 실패했습니다.'); setSocialMsgType('error');
+    }
+  };
 
   /* ── 포트폴리오 폼 상태 ── */
   const [pfTicker,   setPfTicker]   = useState('');
@@ -494,6 +534,42 @@ export default function ProfilePage() {
                 <span className={styles['info-key']}>보안</span>
                 <span className={`${styles['info-val']} ${styles.secure}`}>🔒 HTTPS 보안 접속</span>
               </div>
+
+              {!isSocial && (
+                <div className={styles['social-section']}>
+                  <div className="section-title" style={{ marginTop: 20 }}>소셜 계정 연동</div>
+
+                  {socialMsg && (
+                    <p className={`${styles['social-msg']} ${styles[socialMsgType]}`}>{socialMsg}</p>
+                  )}
+
+                  <div className={styles['social-row']}>
+                    <div className={styles['social-row-left']}>
+                      <span className={`${styles['social-icon']} ${styles['social-icon-kakao']}`}>K</span>
+                      <span className={styles['social-name']}>카카오</span>
+                      {kakaoLink
+                        ? <span className={styles['social-email']}>{kakaoLink.providerEmail}</span>
+                        : <span className={styles['social-not-linked']}>미연동</span>}
+                    </div>
+                    {kakaoLink
+                      ? <button className={styles['btn-unlink']} onClick={() => handleUnlinkSocial('KAKAO')}>해제</button>
+                      : <button className={`${styles['btn-social-link']} ${styles['btn-social-link-kakao']}`} onClick={handleLinkKakao}>연동하기</button>}
+                  </div>
+
+                  <div className={styles['social-row']}>
+                    <div className={styles['social-row-left']}>
+                      <span className={`${styles['social-icon']} ${styles['social-icon-google']}`}>G</span>
+                      <span className={styles['social-name']}>구글</span>
+                      {googleLink
+                        ? <span className={styles['social-email']}>{googleLink.providerEmail}</span>
+                        : <span className={styles['social-not-linked']}>미연동</span>}
+                    </div>
+                    {googleLink
+                      ? <button className={styles['btn-unlink']} onClick={() => handleUnlinkSocial('GOOGLE')}>해제</button>
+                      : <button className={`${styles['btn-social-link']} ${styles['btn-social-link-google']}`} onClick={handleLinkGoogle}>연동하기</button>}
+                  </div>
+                </div>
+              )}
 
               {!isSocial && (
                 <div className={styles['pw-section']}>

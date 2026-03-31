@@ -3,17 +3,18 @@ import api from '../api/axiosInstance';
 
 // ── Query Keys ─────────────────────────────────────────────
 export const QUERY_KEYS = {
-  stocks:       ['stocks'],
-  stockDetail:  (ticker) => ['stocks', ticker],
-  stockRange:   (ticker, start, end) => ['stocks', ticker, 'range', start, end],
-  watchlist:    ['watchlist'],
+  stocks:          ['stocks'],
+  stockDetail:     (ticker) => ['stocks', ticker],
+  stockRange:      (ticker, start, end) => ['stocks', ticker, 'range', start, end],
+  watchlist:       ['watchlist'],
   watchlistDetail: ['watchlist', 'detail'],
-  news:         (query) => ['news', query],
-  stockNews:    (stockName) => ['news', 'stock', stockName],
-  alerts:       ['alerts'],
-  alertsByTicker: (ticker) => ['alerts', ticker],
-  userInfo:     ['user', 'info'],
-  portfolio:    ['portfolio'],
+  news:            (query) => ['news', query],
+  stockNews:       (stockName) => ['news', 'stock', stockName],
+  alerts:          ['alerts'],
+  alertsByTicker:  (ticker) => ['alerts', ticker],
+  userInfo:        ['user', 'info'],
+  portfolio:       ['portfolio'],
+  socialLinks:     ['user', 'social'],
 };
 
 // ── 주식 전체 목록 ──────────────────────────────────────────
@@ -188,5 +189,32 @@ export function useDeletePortfolio() {
   return useMutation({
     mutationFn: (portfolioId) => api.delete(`/portfolio/${portfolioId}`),
     onSuccess:  () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.portfolio }),
+  });
+}
+
+// ── 소셜 연동 목록 조회 ─────────────────────────────────────
+export function useSocialLinks() {
+  return useQuery({
+    queryKey: QUERY_KEYS.socialLinks,
+    queryFn:  () => api.get('/user/social').then(r => r.data),
+    staleTime: 60 * 1000,
+  });
+}
+
+// ── 소셜 계정 연동 뮤테이션 ────────────────────────────────
+export function useLinkSocial() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload) => api.post('/user/social/link', payload),
+    onSuccess:  () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.socialLinks }),
+  });
+}
+
+// ── 소셜 연동 해제 뮤테이션 ────────────────────────────────
+export function useUnlinkSocial() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (provider) => api.delete(`/user/social/unlink/${provider}`),
+    onSuccess:  () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.socialLinks }),
   });
 }

@@ -15,8 +15,10 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(!!localStorage.getItem('savedEmail'));
   const [showPw, setShowPw]         = useState(false);
 
-  const handleGoogleLogin = () => { window.location.href = 'https://api.jyyouk.shop/api/auth/google/login'; };
-  const handleKakaoLogin  = () => { window.location.href = 'https://api.jyyouk.shop/api/auth/kakao/login'; };
+  const BASE = import.meta.env.VITE_API_BASE_URL;
+
+  const handleGoogleLogin = () => { window.location.href = `${BASE}/api/auth/google/login`; };
+  const handleKakaoLogin  = () => { window.location.href = `${BASE}/api/auth/kakao/login`; };
 
   const handleLogin = async () => {
     setError('');
