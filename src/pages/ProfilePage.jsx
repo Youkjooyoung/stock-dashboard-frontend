@@ -85,9 +85,12 @@ export default function ProfilePage() {
   const email = userInfo?.email || localStorage.getItem('userEmail') || '';
   const isKakaoOnlyEmail = email.startsWith('kakao_') || email.startsWith('google_');
 
-  const isSocial = socialLinks.length > 0;
+  const provider  = localStorage.getItem('provider') || '';
+  const isGoogle  = provider === 'google';
+  const isKakao   = email.startsWith('kakao_') || provider === 'kakao';
+  const isSocial  = isKakao || isGoogle;
 
-  const currentProvider = localStorage.getItem('provider');
+  const currentProvider = provider;
   const loginMethod = currentProvider === 'google' ? 'Google' : currentProvider === 'kakao' ? '카카오' : '이메일';
   const roleLabel   = isSocial ? '소셜 회원' : '일반 회원';
   const roleClass   = isSocial ? 'google' : 'normal';
