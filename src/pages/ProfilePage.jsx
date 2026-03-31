@@ -69,29 +69,51 @@ export default function ProfilePage() {
   const { logout } = useAuthStore();
   const fileRef = useRef(null);
 
-  const email    = localStorage.getItem('userEmail') || '';
-  const provider = localStorage.getItem('provider') || '';
-  const isGoogle = provider === 'google';
-  const isKakao  = email.startsWith('kakao_') || provider === 'kakao';
-  const isSocial = isKakao || isGoogle;
+  /* ── React Query 데이터 ── */
+  const { data: userInfo, refetch: refetchUserInfo }  = useUserInfo();
+  const { data: socialLinks = [] }  = useSocialLinks();
+  const { data: watchlistIds = [] } = useWatchlist();
+  const { data: watchlist = [] }    = useWatchlistDetail();
+  const { data: alerts = [] }       = useAlerts();
+  const deleteAlertMutation         = useDeleteAlert();
+  const { data: portfolio = [] }    = usePortfolio();
+  const { data: stockPrices = [] }  = useStockPrices();
+  const addPortfolioMutation        = useAddPortfolio();
+  const deletePortfolioMutation     = useDeletePortfolio();
+  const unlinkSocialMutation        = useUnlinkSocial();
 
-  /* 기본 상태 */
+  const email = userInfo?.email || localStorage.getItem('userEmail') || '';
+  const isKakaoOnlyEmail = email.startsWith('kakao_') || email.startsWith('google_');
+
+  const isSocial = socialLinks.length > 0;
+
+  const currentProvider = localStorage.getItem('provider');
+  const loginMethod = currentProvider === 'google' ? 'Google' : currentProvider === 'kakao' ? '카카오' : '이메일';
+  const roleLabel   = isSocial ? '소셜 회원' : '일반 회원';
+  const roleClass   = isSocial ? 'google' : 'normal';
+
   const [activeTab, setActiveTab] = useState('계정 정보');
-  const [nickname, setNickname]   = useState(localStorage.getItem('kakaoNickname') || '');
+  const [nickname, setNickname]   = useState('');
   const [avatar, setAvatar]       = useState(localStorage.getItem('userAvatar') || '');
 
-  /* 닉네임 모달 */
+  useEffect(() => {
+    if (userInfo?.nickname) {
+        setNickname(userInfo.nickname);
+    }
+  }, [userInfo]);
+
+  const displayName = nickname || (isSocial ? '소셜 사용자' : email);
+  const avatarClass = currentProvider === 'kakao' ? 'kakao' : currentProvider === 'google' ? 'google' : '';
+
   const [nickModalOpen, setNickModalOpen]       = useState(false);
   const [nickModalInput, setNickModalInput]     = useState('');
   const [nickModalMsg, setNickModalMsg]         = useState('');
   const [nickModalMsgType, setNickModalMsgType] = useState('');
   const [nickDupOk, setNickDupOk]               = useState(false);
 
-  /* 아바타 미리보기 모달 */
   const [avatarPreview, setAvatarPreview]   = useState('');
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
-  /* 비밀번호 변경 */
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw]         = useState('');
   const [confirmPw, setConfirmPw] = useState('');
@@ -100,34 +122,11 @@ export default function ProfilePage() {
   const [loading, setLoading]     = useState(false);
   const [pwVisible, setPwVisible] = useState({ current: false, new: false, confirm: false });
 
-  /* 회원탈퇴 모달 */
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletePassword, setDeletePassword]   = useState('');
   const [deletePwVisible, setDeletePwVisible] = useState(false);
   const [deleteMsg, setDeleteMsg]             = useState('');
 
-  const displayName = isSocial
-    ? nickname || (isGoogle ? 'Google 사용자' : '카카오 사용자')
-    : email;
-  const loginMethod = isGoogle ? 'Google' : isKakao ? '카카오' : '이메일';
-  const roleLabel   = isGoogle ? 'Google 회원' : isKakao ? '카카오 회원' : '일반 회원';
-  const roleClass   = isGoogle ? 'google' : isKakao ? 'kakao' : 'normal';
-  const avatarClass = isKakao ? 'kakao' : isGoogle ? 'google' : '';
-
-  /* ── React Query 데이터 ── */
-  const { data: watchlistIds = [] }  = useWatchlist();
-  const { data: watchlist = [] }     = useWatchlistDetail();
-  const { data: userInfo }           = useUserInfo();
-  const { data: alerts = [] }        = useAlerts();
-  const deleteAlertMutation          = useDeleteAlert();
-  const { data: portfolio = [] }     = usePortfolio();
-  const { data: stockPrices = [] }   = useStockPrices();
-  const addPortfolioMutation         = useAddPortfolio();
-  const deletePortfolioMutation      = useDeletePortfolio();
-
-  /* ── 소셜 연동 ── */
-  const { data: socialLinks = [] }  = useSocialLinks();
-  const unlinkSocialMutation        = useUnlinkSocial();
   const kakaoLink  = socialLinks.find(s => s.provider === 'KAKAO');
   const googleLink = socialLinks.find(s => s.provider === 'GOOGLE');
   const [socialMsg, setSocialMsg]     = useState('');
@@ -165,7 +164,6 @@ export default function ProfilePage() {
     }
   };
 
-  /* ── 포트폴리오 폼 상태 ── */
   const [pfTicker,   setPfTicker]   = useState('');
   const [pfName,     setPfName]     = useState('');
   const [pfQty,      setPfQty]      = useState('');
@@ -175,12 +173,11 @@ export default function ProfilePage() {
   const [pfMsgType,  setPfMsgType]  = useState('');
   const [pfFormOpen, setPfFormOpen] = useState(false);
 
-  /* ── 포트폴리오 종목 추가 ── */
   const handleAddPortfolio = async () => {
     if (!pfTicker || !pfName || !pfQty || !pfPrice || !pfDate) {
       setPfMsg('모든 항목을 입력해주세요.'); setPfMsgType('error'); return;
     }
-    const buyDate = pfDate.replace(/-/g, ''); // yyyy-MM-dd → yyyyMMdd
+    const buyDate = pfDate.replace(/-/g, '');
     try {
       await addPortfolioMutation.mutateAsync({
         ticker: pfTicker.toUpperCase(),
@@ -201,7 +198,6 @@ export default function ProfilePage() {
   const watchCount = watchlistIds.length;
   const joinDate   = userInfo?.createdAt || '';
 
-  /* ── 아바타 ── */
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -226,7 +222,6 @@ export default function ProfilePage() {
     setAvatarPreview('');
   };
 
-  /* ── 닉네임 모달 ── */
   const openNickModal = () => {
     setNickModalInput('');
     setNickDupOk(false);
@@ -269,10 +264,9 @@ export default function ProfilePage() {
     if (!window.confirm('닉네임을 변경하시겠습니까?')) return;
     try {
       await api.put('/user/nickname', { nickname: nickModalInput.trim() });
-      const newNick = nickModalInput.trim();
-      setNickname(newNick);
-      localStorage.setItem('kakaoNickname', newNick);
+      setNickname(nickModalInput.trim());
       localStorage.setItem('nicknameLastChanged', new Date().toISOString());
+      refetchUserInfo();
       setNickModalOpen(false);
     } catch {
       setNickModalMsg('변경에 실패했습니다.');
@@ -280,7 +274,6 @@ export default function ProfilePage() {
     }
   };
 
-  /* ── 비밀번호 변경 ── */
   const handleChangePassword = async () => {
     setPwMsg('');
     if (!currentPw || !newPw || !confirmPw) {
@@ -300,7 +293,6 @@ export default function ProfilePage() {
     finally { setLoading(false); }
   };
 
-  /* ── 회원탈퇴 ── */
   const openDeleteModal = () => {
     setDeletePassword('');
     setDeleteMsg('');
@@ -319,7 +311,6 @@ export default function ProfilePage() {
     }
   };
 
-  /* ── 알림 삭제 ── */
   const handleDeleteAlert = async (alertId) => {
     try {
       await deleteAlertMutation.mutateAsync(alertId);
@@ -471,7 +462,7 @@ export default function ProfilePage() {
               <div className={`${styles['profile-avatar']} ${avatarClass ? styles[avatarClass] : ''}`}>
                 {avatar
                   ? <img src={avatar} alt="avatar" />
-                  : (isGoogle ? 'G' : isKakao ? 'K' : displayName.charAt(0).toUpperCase())}
+                  : (currentProvider === 'google' ? 'G' : currentProvider === 'kakao' ? 'K' : displayName.charAt(0).toUpperCase())}
               </div>
               <div className={styles['profile-avatar-edit-btn']}>✏</div>
             </div>
@@ -479,7 +470,7 @@ export default function ProfilePage() {
 
             <div className={styles['profile-meta']}>
               <div className={styles['profile-nickname-row']}>
-                <span className={styles['profile-nickname-display']}>{nickname || displayName}</span>
+                <span className={styles['profile-nickname-display']}>{displayName}</span>
                 <button className={styles['btn-nickname-change']} onClick={openNickModal}>변경하기</button>
               </div>
               <span className={`${styles['role-badge']} ${styles[roleClass]}`}>{roleLabel}</span>
@@ -524,90 +515,86 @@ export default function ProfilePage() {
               <div className="section-title">계정 정보</div>
               <div className={styles['info-row']}>
                 <span className={styles['info-key']}>이메일</span>
-                <span className={styles['info-val']}>{isKakao ? '카카오 계정' : email}</span>
+                <span className={styles['info-val']}>{isKakaoOnlyEmail ? '소셜 가입 계정' : email}</span>
               </div>
               <div className={styles['info-row']}>
                 <span className={styles['info-key']}>계정 유형</span>
-                <span className={styles['info-val']}>{isSocial ? '소셜 로그인' : '자체 회원'}</span>
+                <span className={styles['info-val']}>{isSocial ? '소셜 연동됨' : '자체 회원'}</span>
               </div>
               <div className={styles['info-row']}>
                 <span className={styles['info-key']}>보안</span>
                 <span className={`${styles['info-val']} ${styles.secure}`}>🔒 HTTPS 보안 접속</span>
               </div>
 
-              {!isSocial && (
-                <div className={styles['social-section']}>
-                  <div className="section-title" style={{ marginTop: 20 }}>소셜 계정 연동</div>
+              <div className={styles['social-section']}>
+                <div className="section-title" style={{ marginTop: 20 }}>소셜 계정 연동</div>
 
-                  {socialMsg && (
-                    <p className={`${styles['social-msg']} ${styles[socialMsgType]}`}>{socialMsg}</p>
-                  )}
+                {socialMsg && (
+                  <p className={`${styles['social-msg']} ${styles[socialMsgType]}`}>{socialMsg}</p>
+                )}
 
-                  <div className={styles['social-row']}>
-                    <div className={styles['social-row-left']}>
-                      <span className={`${styles['social-icon']} ${styles['social-icon-kakao']}`}>K</span>
-                      <span className={styles['social-name']}>카카오</span>
-                      {kakaoLink
-                        ? <span className={styles['social-email']}>{kakaoLink.providerEmail}</span>
-                        : <span className={styles['social-not-linked']}>미연동</span>}
-                    </div>
+                <div className={styles['social-row']}>
+                  <div className={styles['social-row-left']}>
+                    <span className={`${styles['social-icon']} ${styles['social-icon-kakao']}`}>K</span>
+                    <span className={styles['social-name']}>카카오</span>
                     {kakaoLink
-                      ? <button className={styles['btn-unlink']} onClick={() => handleUnlinkSocial('KAKAO')}>해제</button>
-                      : <button className={`${styles['btn-social-link']} ${styles['btn-social-link-kakao']}`} onClick={handleLinkKakao}>연동하기</button>}
+                      ? <span className={styles['social-email']}>{kakaoLink.providerEmail}</span>
+                      : <span className={styles['social-not-linked']}>미연동</span>}
                   </div>
+                  {kakaoLink
+                    ? <button className={styles['btn-unlink']} onClick={() => handleUnlinkSocial('KAKAO')}>해제</button>
+                    : <button className={`${styles['btn-social-link']} ${styles['btn-social-link-kakao']}`} onClick={handleLinkKakao}>연동하기</button>}
+                </div>
 
-                  <div className={styles['social-row']}>
-                    <div className={styles['social-row-left']}>
-                      <span className={`${styles['social-icon']} ${styles['social-icon-google']}`}>G</span>
-                      <span className={styles['social-name']}>구글</span>
-                      {googleLink
-                        ? <span className={styles['social-email']}>{googleLink.providerEmail}</span>
-                        : <span className={styles['social-not-linked']}>미연동</span>}
-                    </div>
+                <div className={styles['social-row']}>
+                  <div className={styles['social-row-left']}>
+                    <span className={`${styles['social-icon']} ${styles['social-icon-google']}`}>G</span>
+                    <span className={styles['social-name']}>구글</span>
                     {googleLink
-                      ? <button className={styles['btn-unlink']} onClick={() => handleUnlinkSocial('GOOGLE')}>해제</button>
-                      : <button className={`${styles['btn-social-link']} ${styles['btn-social-link-google']}`} onClick={handleLinkGoogle}>연동하기</button>}
+                      ? <span className={styles['social-email']}>{googleLink.providerEmail}</span>
+                      : <span className={styles['social-not-linked']}>미연동</span>}
                   </div>
+                  {googleLink
+                    ? <button className={styles['btn-unlink']} onClick={() => handleUnlinkSocial('GOOGLE')}>해제</button>
+                    : <button className={`${styles['btn-social-link']} ${styles['btn-social-link-google']}`} onClick={handleLinkGoogle}>연동하기</button>}
                 </div>
-              )}
+              </div>
 
-              {!isSocial && (
-                <div className={styles['pw-section']}>
-                  <div className="section-title" style={{ marginTop: 20 }}>비밀번호 변경</div>
-                  {[
-                    { label: '현재 비밀번호', value: currentPw, setter: setCurrentPw, key: 'current', placeholder: '현재 비밀번호' },
-                    { label: '새 비밀번호',   value: newPw,     setter: setNewPw,     key: 'new',     placeholder: '영문·한글·숫자·특수문자 중 2가지 이상 혼합 / 6~12자' },
-                    { label: '비밀번호 확인', value: confirmPw, setter: setConfirmPw, key: 'confirm', placeholder: '새 비밀번호 재입력' },
-                  ].map(({ label, value, setter, key, placeholder }) => (
-                    <div className="form-group" key={key}>
-                      <label className="form-label">{label}</label>
-                      <div className="input-wrap">
-                        <input
-                          className="form-input"
-                          type={pwVisible[key] ? 'text' : 'password'}
-                          placeholder={placeholder}
-                          value={value}
-                          onChange={e => setter(e.target.value)}
-                        />
-                        <button
-                          className="pw-toggle"
-                          type="button"
-                          onClick={() => setPwVisible(prev => ({ ...prev, [key]: !prev[key] }))}>
-                          {pwVisible[key] ? '숨기기' : '보기'}
-                        </button>
-                      </div>
+              <div className={styles['pw-section']}>
+                <div className="section-title" style={{ marginTop: 20 }}>비밀번호 변경</div>
+                {[
+                  { label: '현재 비밀번호', value: currentPw, setter: setCurrentPw, key: 'current', placeholder: '현재 비밀번호' },
+                  { label: '새 비밀번호',   value: newPw,     setter: setNewPw,     key: 'new',     placeholder: '영문·한글·숫자·특수문자 중 2가지 이상 혼합 / 6~12자' },
+                  { label: '비밀번호 확인', value: confirmPw, setter: setConfirmPw, key: 'confirm', placeholder: '새 비밀번호 재입력' },
+                ].map(({ label, value, setter, key, placeholder }) => (
+                  <div className="form-group" key={key}>
+                    <label className="form-label">{label}</label>
+                    <div className="input-wrap">
+                      <input
+                        className="form-input"
+                        type={pwVisible[key] ? 'text' : 'password'}
+                        placeholder={placeholder}
+                        value={value}
+                        onChange={e => setter(e.target.value)}
+                      />
+                      <button
+                        className="pw-toggle"
+                        type="button"
+                        onClick={() => setPwVisible(prev => ({ ...prev, [key]: !prev[key] }))}>
+                        {pwVisible[key] ? '숨기기' : '보기'}
+                      </button>
                     </div>
-                  ))}
-                  {pwMsg && <p className={`feedback-msg ${pwMsgType}`}>{pwMsg}</p>}
-                  <button
-                    className="btn btn-primary btn-full"
-                    onClick={handleChangePassword}
-                    disabled={loading}
-                    style={{ marginBottom: 16 }}>
-                    {loading ? '변경 중...' : '비밀번호 변경'}
-                  </button>
-                </div>
-              )}
+                  </div>
+                ))}
+                {pwMsg && <p className={`feedback-msg ${pwMsgType}`}>{pwMsg}</p>}
+                <button
+                  className="btn btn-primary btn-full"
+                  onClick={handleChangePassword}
+                  disabled={loading}
+                  style={{ marginBottom: 16 }}>
+                  {loading ? '변경 중...' : '비밀번호 변경'}
+                </button>
+              </div>
 
               <div className={styles['danger-zone']}>
                 <div className={styles['danger-zone-text']}>
@@ -748,12 +735,10 @@ export default function ProfilePage() {
 
           {/* ── 포트폴리오 탭 ── */}
           {activeTab === '포트폴리오' && (() => {
-            // 현재가 맵 (ticker → clpr)
             const priceMap = Object.fromEntries(
               stockPrices.map(s => [s.srtnCd, s.clpr || 0])
             );
 
-            // 총 투자금액 / 총 평가금액
             const totalBuy  = portfolio.reduce((s, p) => s + p.buyPrice  * p.quantity, 0);
             const totalNow  = portfolio.reduce((s, p) => s + (priceMap[p.ticker] ?? p.buyPrice) * p.quantity, 0);
             const totalPnl  = totalNow - totalBuy;
@@ -763,7 +748,6 @@ export default function ProfilePage() {
 
             return (
               <>
-                {/* 요약 카드 */}
                 {portfolio.length > 0 && (
                   <div className={styles['pf-summary']}>
                     <div className={styles['pf-summary-item']}>
@@ -789,7 +773,6 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                {/* 종목별 수익률 차트 */}
                 {portfolio.length > 0 && (
                   <div className={styles['pf-chart-wrap']}>
                     <div className="section-title" style={{ marginBottom: 12 }}>종목별 손익</div>
@@ -838,7 +821,6 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                {/* 헤더 */}
                 <div className={styles['pf-header']}>
                   <div className="section-title" style={{ margin: 0 }}>보유 종목 ({portfolio.length})</div>
                   <button className={styles['btn-pf-add']} onClick={() => { setPfFormOpen(v => !v); setPfMsg(''); }}>
@@ -846,7 +828,6 @@ export default function ProfilePage() {
                   </button>
                 </div>
 
-                {/* 추가 폼 */}
                 {pfFormOpen && (
                   <div className={styles['pf-form']}>
                     <div className={styles['pf-form-row']}>
@@ -888,7 +869,6 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                {/* 보유 종목 목록 */}
                 {portfolio.length === 0 ? (
                   <div className={styles['profile-empty']}>보유 종목이 없습니다.</div>
                 ) : (

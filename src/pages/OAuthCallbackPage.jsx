@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import api from '../api/axiosInstance';
@@ -6,8 +6,12 @@ import api from '../api/axiosInstance';
 export default function OAuthCallbackPage() {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
+  const isRequestSent = useRef(false);
 
   useEffect(() => {
+    if (isRequestSent.current) return;
+    isRequestSent.current = true;
+
     const hash   = window.location.hash.slice(1);
     const query  = window.location.search.slice(1);
     const params = new URLSearchParams(hash || query);
@@ -17,7 +21,6 @@ export default function OAuthCallbackPage() {
     const code         = params.get('code');
 
     if (accessToken && refreshToken) {
-      // 기존 백엔드 리다이렉트 방식 (hash로 토큰 전달)
       const email    = params.get('email') || '';
       const nickname = params.get('nickname') || '';
       const provider = params.get('provider') || 'kakao';
@@ -26,7 +29,6 @@ export default function OAuthCallbackPage() {
       localStorage.setItem('provider', provider);
       navigate('/');
     } else if (code) {
-      // 프론트엔드 콜백 방식 (Kakao → 프론트로 code 전달)
       const provider = window.location.pathname.includes('kakao') ? 'kakao' : 'google';
       api.get(`/auth/${provider}/exchange?code=${encodeURIComponent(code)}`)
         .then(res => {
@@ -40,7 +42,7 @@ export default function OAuthCallbackPage() {
     } else {
       navigate('/login');
     }
-  }, []);
+  }, [navigate, setAuth]);
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>

@@ -15,10 +15,17 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(!!localStorage.getItem('savedEmail'));
   const [showPw, setShowPw]         = useState(false);
 
-  const BASE = import.meta.env.VITE_API_BASE_URL;
+  const handleGoogleLogin = () => {
+    const clientId = '899202954877-jp3695atffhjqrlegjlhri2qd0m6u2v5.apps.googleusercontent.com';
+    const redirectUri = 'http://localhost:5173/oauth/google';
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=email profile`;
+  };
 
-  const handleGoogleLogin = () => { window.location.href = `${BASE}/api/auth/google/login`; };
-  const handleKakaoLogin  = () => { window.location.href = `${BASE}/api/auth/kakao/login`; };
+  const handleKakaoLogin = () => {
+    const clientId = '0d601cab110ab3f6724f8a267f3768c3';
+    const redirectUri = 'http://localhost:5173/oauth/kakao';
+    window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
+  };
 
   const handleLogin = async () => {
     setError('');
