@@ -197,7 +197,8 @@ export function useSocialLinks() {
   return useQuery({
     queryKey: QUERY_KEYS.socialLinks,
     queryFn:  () => api.get('/user/social').then(r => r.data),
-    staleTime: 60 * 1000,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 }
 
