@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import api from '../api/axiosInstance';
 
 const useAuthStore = create((set) => ({
   token: localStorage.getItem('accessToken') || null,
@@ -8,21 +9,19 @@ const useAuthStore = create((set) => ({
     try {
       const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
-        await fetch('https://api.jyyouk.shop/api/auth/logout', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ refreshToken }),
-          credentials: 'include',
-        });
+        await api.post('/auth/logout', { refreshToken });
       }
-    } catch {}
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('kakaoNickname');
-    localStorage.removeItem('provider');
-    localStorage.removeItem('userId');
-    set({ user: null, token: null });
+    } catch (error) {
+      console.error("로그아웃 API 에러:", error);
+    } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('kakaoNickname');
+      localStorage.removeItem('provider');
+      localStorage.removeItem('userId');
+      set({ user: null, token: null });
+    }
   },
 
   setAuth: (email, accessToken, refreshToken, userId) => {

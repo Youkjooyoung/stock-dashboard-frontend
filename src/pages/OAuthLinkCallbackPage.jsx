@@ -1,11 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
 
 export default function OAuthLinkCallbackPage() {
   const navigate = useNavigate();
+  const isRequestSent = useRef(false);
 
   useEffect(() => {
+    if (isRequestSent.current) return;
+    isRequestSent.current = true;
+
     const params     = new URLSearchParams(window.location.search);
     const code       = params.get('code');
     const state      = params.get('state');
@@ -27,7 +31,7 @@ export default function OAuthLinkCallbackPage() {
     api.get(`/auth/${provider}/link/callback`, { params: { code, token } })
       .then(() => navigate(`/profile?linked=${provider}`))
       .catch(() => navigate('/profile?linkError=true'));
-  }, []);
+  }, [navigate]);
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
