@@ -5,6 +5,7 @@ import AlertSetter from './AlertSetter';
 import AiAnalysis from './AiAnalysis';
 import CandlestickChart from './CandlestickChart';
 import { useStockDetail, useStockNews, useCollectTickerHistory } from '../hooks/useQueries';
+import { SkeletonChart, SkeletonNews } from './StockModalSkeleton';
 import styles from '../styles/components/StockModal.module.css';
 
 const chartOptions = {
@@ -177,10 +178,7 @@ export default function StockModal({ stock, onClose }) {
               </div>
             </div>
             {chartLoading ? (
-              <div className={styles['modal-chart-loading']}>
-                <span className="spinner spinner-dark" />
-                차트 데이터를 불러오는 중...
-              </div>
+              <SkeletonChart />
             ) : detailData.length > 0 ? (
               chartType === 'candle' ? (
                 <CandlestickChart data={detailData} period={period} height={280} />
@@ -215,7 +213,7 @@ export default function StockModal({ stock, onClose }) {
           <div className={styles['modal-news-wrap']}>
             <div className={styles['modal-section-title']}>📰 관련 뉴스</div>
             {newsLoading ? (
-              <div className={styles['modal-news-loading']}>뉴스 불러오는 중...</div>
+              <SkeletonNews />
             ) : news.length > 0 ? (
               news.map((n, i) => (
                 <a key={i}
