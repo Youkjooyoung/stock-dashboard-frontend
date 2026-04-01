@@ -13,35 +13,13 @@ import StockCharts from '../components/StockCharts';
 import StockModal from '../components/StockModal';
 import StockTable from '../components/StockTable';
 import SummaryCards from '../components/SummaryCards';
+import { SkeletonCards, SkeletonTable } from '../components/StockListSkeleton';
 import { useStockPrices, useWatchlist, useToggleWatchlist, QUERY_KEYS } from '../hooks/useQueries';
 import api from '../api/axiosInstance';
 import styles from '../styles/pages/DashboardPage.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
-function SkeletonCards() {
-  return (
-    <div className={styles['summary-cards-skeleton']}>
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className={styles['skeleton-card']}>
-          <div className={`skeleton ${styles['skeleton-line']}`} style={{ width: '45%' }} />
-          <div className={`skeleton ${styles['skeleton-val']}`} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SkeletonTable() {
-  return (
-    <div className={styles['table-skeleton']}>
-      <div className={`skeleton ${styles['table-skeleton-toolbar']}`} />
-      {[...Array(8)].map((_, i) => (
-        <div key={i} className={`skeleton ${styles['table-skeleton-row']}`} />
-      ))}
-    </div>
-  );
-}
 
 export default function DashboardPage() {
   const navigate = useNavigate();
