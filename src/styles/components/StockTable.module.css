@@ -112,7 +112,7 @@
 
 .search-input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(59,91,219,0.10);
+  box-shadow: 0 0 0 3px rgba(3,199,90,0.10);
 }
 
 .search-input::placeholder { color: var(--text-4); }
@@ -282,10 +282,10 @@
   transform: scale(1.2);
 }
 
-.watch-star.active   { color: #f5a623; }
+.watch-star.active   { color: var(--warning); }
 .watch-star.inactive { color: var(--text-4); }
 
-.watch-star.inactive:hover { color: #f5a623; }
+.watch-star.inactive:hover { color: var(--warning); }
 
 .change-cell {
   font-weight: 600;

@@ -3,17 +3,15 @@
    Design Tokens — Instagram 감성 / 차분한 모노크롬 + 소프트 블루
    =================================================================== */
 :root {
-  /* 메인 액션 컬러 (차분한 인디고 블루) */
-  --primary:          #3b5bdb;
-  --primary-dark:     #2f4ac7;
-  --primary-light:    #eef2ff;
+  --primary:          #03C75A;
+  --primary-dark:     #02A049;
+  --primary-light:    #E8F9EF;
   --primary-text:     #ffffff;
 
-  /* 주식 등락 (한국 증시 컨벤션 — 부드럽게 조정) */
-  --up:               #e03131;   /* 상승 - 빨강 */
-  --up-light:         #fff5f5;
-  --down:             #1971c2;   /* 하락 - 파랑 */
-  --down-light:       #e7f5ff;
+  --up:               #F04452;
+  --up-light:         #FFF0F1;
+  --down:             #1E6EEB;
+  --down-light:       #EEF3FF;
   --flat:             #adb5bd;
 
   /* 위험 / 성공 */
@@ -27,21 +25,18 @@
   --kakao-text:       #3C1E1E;
   --google:           #4285F4;
 
-  /* 배경 — 인스타그램 특유의 fafafa */
-  --bg:               #fafafa;
+  --bg:               #F5F6F7;
   --surface:          #ffffff;
-  --surface-2:        #f5f5f5;
-  --surface-hover:    #efefef;
+  --surface-2:        #FAFAFA;
+  --surface-hover:    #F0F0F0;
 
-  /* 테두리 — 아주 연하게 */
-  --border:           #dbdbdb;
+  --border:           #E5E5E5;
   --border-strong:    #b0b0b0;
   --border-focus:     #3b5bdb;
 
-  /* 텍스트 */
-  --text-1:           #262626;
-  --text-2:           #6b7280;
-  --text-3:           #a0a0a0;
+  --text-1:           #191919;
+  --text-2:           #6D6D6D;
+  --text-3:           #A0A0A0;
   --text-4:           #c7c7c7;
 
   /* 반지름 — 더 크고 부드럽게 */
@@ -50,7 +45,7 @@
   --radius-md:        12px;
   --radius-lg:        16px;
   --radius-xl:        24px;
-  --radius-full:      9999px;
+  --radius-full:      20px;
   --radius:           8px; /* 레거시 alias */
 
   /* 그림자 — 아주 가볍게 */
@@ -68,9 +63,20 @@
   /* 최대 너비 */
   --max-width:        1440px;
 
-  /* 헤더 높이 */
-  --header-h:         60px;
+  --header-h:         56px;
   --subnav-h:         44px;
+
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-rise: var(--up);
+  --color-fall: var(--down);
+  --color-bg: var(--bg);
+  --color-card: var(--surface);
+  --color-text-primary: var(--text-1);
+  --color-text-secondary: var(--text-2);
+  --color-text-hint: var(--text-3);
+  --color-border: var(--border);
 }
 
 /* ===================================================================

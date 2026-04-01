@@ -78,7 +78,7 @@
 
 .alert-price-input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(59,91,219,0.10);
+  box-shadow: 0 0 0 3px rgba(3,199,90,0.10);
 }
 
 .alert-price-input::placeholder { color: var(--text-4); }

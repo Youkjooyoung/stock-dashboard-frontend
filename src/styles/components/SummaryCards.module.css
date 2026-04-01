@@ -37,10 +37,10 @@
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
-.summary-card.color-green::before  { background: linear-gradient(90deg, var(--primary), #6c8ef7); }
-.summary-card.color-up::before     { background: linear-gradient(90deg, var(--up), #f87171); }
-.summary-card.color-down::before   { background: linear-gradient(90deg, var(--down), #60a5fa); }
-.summary-card.color-warning::before { background: linear-gradient(90deg, var(--warning), #fbbf24); }
+.summary-card.color-green::before  { background: var(--primary); }
+.summary-card.color-up::before     { background: var(--up); }
+.summary-card.color-down::before   { background: var(--down); }
+.summary-card.color-warning::before { background: var(--warning); }
 
 .summary-card-header {
   display: flex;

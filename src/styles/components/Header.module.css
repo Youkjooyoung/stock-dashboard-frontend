@@ -3,9 +3,7 @@
    =================================================================== */
 
 .header {
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #ffffff;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -35,16 +33,16 @@
 .header-logo-mark {
   width: 34px;
   height: 34px;
-  background: linear-gradient(135deg, var(--primary), #6c8ef7);
+  background: var(--primary-light);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   font-weight: 900;
-  color: white;
+  color: var(--primary);
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(59,91,219,0.25);
+  box-shadow: none;
 }
 
 .header-logo-text {
@@ -306,7 +304,7 @@
 }
 
 [data-theme="dark"] .header {
-  background: rgba(18,18,18,0.92);
+  background: #121212;
 }
 
 [data-theme="dark"] .mobile-menu {
