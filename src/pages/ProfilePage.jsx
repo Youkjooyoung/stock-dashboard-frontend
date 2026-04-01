@@ -13,6 +13,7 @@ import {
   usePortfolio, useAddPortfolio, useDeletePortfolio,
   useStockPrices, useSocialLinks, useUnlinkSocial,
 } from '../hooks/useQueries';
+import { uploadProfileImage } from '../api/profileApi';
 import AiAnalysis from '../components/AiAnalysis';
 import styles from '../styles/pages/ProfilePage.module.css';
 
@@ -115,6 +116,7 @@ export default function ProfilePage() {
   const [nickDupOk, setNickDupOk]               = useState(false);
 
   const [avatarPreview, setAvatarPreview]   = useState('');
+  const [avatarFile, setAvatarFile]           = useState(null);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const [currentPw, setCurrentPw] = useState('');
@@ -210,16 +212,23 @@ export default function ProfilePage() {
       setAvatarPreview(ev.target.result);
       setAvatarModalOpen(true);
     };
+    setAvatarFile(file);
     reader.readAsDataURL(file);
   };
 
-  const handleAvatarConfirm = () => {
-    setAvatar(avatarPreview);
-    localStorage.setItem('userAvatar', avatarPreview);
-    setAvatarModalOpen(false);
-    setAvatarPreview('');
+  const handleAvatarConfirm = async () => {
+    if (!avatarFile) return;
+    try {
+        const imageUrl = await uploadProfileImage(avatarFile);
+        setAvatar(imageUrl);
+        localStorage.setItem('userAvatar', imageUrl);
+        setAvatarModalOpen(false);
+        setAvatarPreview('');
+        setAvatarFile(null);
+    } catch (err) {
+        alert(err.response?.data?.message || '이미지 업로드에 실패했습니다.');
+    }
   };
-
   const handleAvatarCancel = () => {
     setAvatarModalOpen(false);
     setAvatarPreview('');
