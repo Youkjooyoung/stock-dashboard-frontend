@@ -61,7 +61,11 @@
       "Bash(find \"c:/Users/USER/Desktop/포트폴리오/1.개인 포폴\\(주식\\)/stock-dashboard\" -type f \\\\\\( -name \"*.sql\" -o -name \"*.xml\" \\\\\\))",
       "Bash(find \"c:/Users/USER/Desktop/포트폴리오/1.개인 포폴\\(주식\\)/stock-dashboard/src/main/resources\" -type f)",
       "Bash(find \"c:/Users/USER/Desktop/포트폴리오/1.개인 포폴\\(주식\\)/stock-dashboard-react/src\" -type d)",
-      "Bash(ls -la \"c:/Users/USER/Desktop/포트폴리오/1.개인 포폴\\(주식\\)/stock-dashboard-react/src\")"
+      "Bash(ls -la \"c:/Users/USER/Desktop/포트폴리오/1.개인 포폴\\(주식\\)/stock-dashboard-react/src\")",
+      "Bash(sudo cp:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }

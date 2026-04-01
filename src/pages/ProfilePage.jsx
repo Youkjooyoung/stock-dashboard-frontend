@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useToast } from '../hooks/useToast';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -67,6 +68,7 @@ function getCooldownDays() {
 export default function ProfilePage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showToast } = useToast();
   const { logout } = useAuthStore();
   const fileRef = useRef(null);
 
@@ -226,7 +228,7 @@ export default function ProfilePage() {
         setAvatarPreview('');
         setAvatarFile(null);
     } catch (err) {
-        alert(err.response?.data?.message || '이미지 업로드에 실패했습니다.');
+        showToast(err.response?.data?.message || '이미지 업로드에 실패했습니다.', 'error');
     }
   };
   const handleAvatarCancel = () => {
@@ -587,6 +589,7 @@ export default function ProfilePage() {
 </div>
               <div className={styles['pw-section']}>
                 <div className="section-title" style={{ marginTop: 20 }}>비밀번호 변경</div>
+                <form onSubmit={(e) => { e.preventDefault(); handleChangePassword(); }}>
                 {[
                   { label: '현재 비밀번호', value: currentPw, setter: setCurrentPw, key: 'current', placeholder: '현재 비밀번호' },
                   { label: '새 비밀번호',   value: newPw,     setter: setNewPw,     key: 'new',     placeholder: '영문·한글·숫자·특수문자 중 2가지 이상 혼합 / 6~12자' },
@@ -614,11 +617,12 @@ export default function ProfilePage() {
                 {pwMsg && <p className={`feedback-msg ${pwMsgType}`}>{pwMsg}</p>}
                 <button
                   className="btn btn-primary btn-full"
-                  onClick={handleChangePassword}
+                  type="submit"
                   disabled={loading}
                   style={{ marginBottom: 16 }}>
                   {loading ? '변경 중...' : '비밀번호 변경'}
                 </button>
+                </form>
               </div>
 
               <div className={styles['danger-zone']}>

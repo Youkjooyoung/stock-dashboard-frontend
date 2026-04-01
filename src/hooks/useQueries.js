@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axiosInstance';
 
+const isLoggedIn = () => !!localStorage.getItem('accessToken');
 // ── Query Keys ─────────────────────────────────────────────
 export const QUERY_KEYS = {
   stocks:          ['stocks'],
@@ -56,7 +57,8 @@ export function useWatchlist() {
   return useQuery({
     queryKey: QUERY_KEYS.watchlist,
     queryFn:  () => api.get('/user/watchlist').then(r => r.data),
-    staleTime: 60 * 1000,
+	staleTime: 60 * 1000,
+    	enabled: isLoggedIn(),
   });
 }
 
@@ -65,7 +67,8 @@ export function useWatchlistDetail() {
   return useQuery({
     queryKey: QUERY_KEYS.watchlistDetail,
     queryFn:  () => api.get('/user/watchlist/detail').then(r => r.data),
-    staleTime: 30 * 1000,
+	 staleTime: 30 * 1000,
+	 enabled: isLoggedIn(),
   });
 }
 
@@ -113,7 +116,8 @@ export function useAlerts() {
   return useQuery({
     queryKey: QUERY_KEYS.alerts,
     queryFn:  () => api.get('/alert').then(r => r.data),
-    staleTime: 30 * 1000,
+	staleTime: 30 * 1000,
+    	enabled: isLoggedIn(),
   });
 }
 
@@ -149,7 +153,8 @@ export function useUserInfo() {
   return useQuery({
     queryKey: QUERY_KEYS.userInfo,
     queryFn:  () => api.get('/user/info').then(r => r.data),
-    staleTime: 5 * 60 * 1000,
+	staleTime: 30 * 1000,
+    	enabled: isLoggedIn(),
   });
 }
 
@@ -158,7 +163,8 @@ export function usePortfolio() {
   return useQuery({
     queryKey: QUERY_KEYS.portfolio,
     queryFn:  () => api.get('/portfolio').then(r => r.data),
-    staleTime: 30 * 1000,
+	staleTime: 30 * 1000,
+    	enabled: isLoggedIn(),
   });
 }
 
@@ -197,8 +203,9 @@ export function useSocialLinks() {
   return useQuery({
     queryKey: QUERY_KEYS.socialLinks,
     queryFn:  () => api.get('/user/social').then(r => r.data),
-    staleTime: 0,
-    refetchOnWindowFocus: true,
+	refetchOnWindowFocus: true,
+    	enabled: isLoggedIn(),
+
   });
 }
 
