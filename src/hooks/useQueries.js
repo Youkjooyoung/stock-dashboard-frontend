@@ -34,7 +34,7 @@ export function useStockDetail(ticker) {
     queryFn:  () =>
       api.get(`/stock/prices/${ticker}`)
         .then(r => r.data.sort((a, b) => a.basDt.localeCompare(b.basDt))),
-    enabled: !!ticker,
+    enabled: !!ticker && isLoggedIn(),
     staleTime: 60 * 1000,
   });
 }
@@ -47,7 +47,7 @@ export function useStockRange(ticker, startDate, endDate, enabled = true) {
       api.get(`/stock/prices/${ticker}/range`, {
         params: { startDate, endDate },
       }).then(r => ({ ticker, data: r.data })),
-    enabled: enabled && !!ticker && !!startDate && !!endDate,
+    enabled: enabled && !!ticker && !!startDate && !!endDate && isLoggedIn(),
     staleTime: 5 * 60 * 1000,
   });
 }

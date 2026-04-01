@@ -58,6 +58,10 @@ api.interceptors.response.use(
     const status          = error.response?.status;
     const hasToken        = !!localStorage.getItem('accessToken');
 
+    if (status === 403 && !hasToken) {
+      return Promise.reject(error);
+    }
+
     if ((status === 401 || (status === 403 && hasToken)) && !originalRequest._retry) {
       originalRequest._retry = true;
 
