@@ -487,26 +487,29 @@
   min-width: 0;
 }
 
-.social-icon {
-  width: 28px;
-  height: 28px;
+css.social-icon {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.social-icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .social-icon-kakao {
   background: var(--kakao);
-  color: var(--kakao-text);
 }
 
 .social-icon-google {
-  background: #e8f0fe;
-  color: var(--google);
+  background: #fff;
+  border: 1px solid #e0e0e0;
 }
 
 .social-name {
@@ -516,12 +519,31 @@
   flex-shrink: 0;
 }
 
+.social-status-linked {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.social-status-unlinked {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
 .social-email {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-3);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 160px;
 }
 
 .social-not-linked {
@@ -571,10 +593,9 @@
 }
 
 .btn-unlink:hover {
-  border-color: var(--danger);
   color: var(--danger);
+  border-color: var(--danger);
 }
-
 /* ── 즐겨찾기 ────────────────────────────────────── */
 
 .watchlist-item {

@@ -69,7 +69,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const client = new Client({
-      webSocketFactory: () => new SockJS('https://api.jyyouk.shop/ws'),
+      webSocketFactory: () => new SockJS('https://api.jyyouk.shop/ws', null, { transports: ['websocket'] }),
       reconnectDelay: 5000,
       onConnect: () => {
         client.subscribe('/topic/prices', () => {
