@@ -1,47 +1,49 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import AppLayout from '../components/AppLayout';
 import ErrorBoundary from '../components/ErrorBoundary';
-import LoginPage from '../pages/LoginPage';
-import SignupPage from '../pages/SignupPage';
-import DashboardPage from '../pages/DashboardPage';
-import ProfilePage from '../pages/ProfilePage';
-import OAuthCallbackPage from '../pages/OAuthCallbackPage';
-import OAuthLinkCallbackPage from '../pages/OAuthLinkCallbackPage';
-import VerifyEmailPage from '../pages/VerifyEmailPage';
-import ComparePage from '../pages/ComparePage';
+
+const LoginPage            = lazy(() => import('../pages/LoginPage'));
+const SignupPage           = lazy(() => import('../pages/SignupPage'));
+const DashboardPage        = lazy(() => import('../pages/DashboardPage'));
+const ProfilePage          = lazy(() => import('../pages/ProfilePage'));
+const OAuthCallbackPage    = lazy(() => import('../pages/OAuthCallbackPage'));
+const OAuthLinkCallbackPage = lazy(() => import('../pages/OAuthLinkCallbackPage'));
+const VerifyEmailPage      = lazy(() => import('../pages/VerifyEmailPage'));
+const ComparePage          = lazy(() => import('../pages/ComparePage'));
 
 export default function AppRouter() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* 인증 불필요 페이지 */}
-        <Route path="/login"  element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/oauth"        element={<OAuthCallbackPage />} />
-        <Route path="/oauth/kakao"  element={<OAuthCallbackPage />} />
-        <Route path="/oauth/google" element={<OAuthCallbackPage />} />
-        <Route path="/oauth/link"      element={<OAuthLinkCallbackPage />} />
-        <Route path="/verify-email"    element={<VerifyEmailPage />} />
+    return (
+        <BrowserRouter>
+            <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>로딩 중...</div>}>
+                <Routes>
+                    <Route path="/login"         element={<LoginPage />} />
+                    <Route path="/signup"        element={<SignupPage />} />
+                    <Route path="/oauth"         element={<OAuthCallbackPage />} />
+                    <Route path="/oauth/kakao"   element={<OAuthCallbackPage />} />
+                    <Route path="/oauth/google"  element={<OAuthCallbackPage />} />
+                    <Route path="/oauth/link"    element={<OAuthLinkCallbackPage />} />
+                    <Route path="/verify-email"  element={<VerifyEmailPage />} />
 
-        {/* 공유 레이아웃: Header + StockTicker (로그인 필요) */}
-        <Route element={<AppLayout />}>
-          <Route path="/" element={
-            <ErrorBoundary title="대시보드 오류" fallbackUrl="/">
-              <DashboardPage />
-            </ErrorBoundary>
-          } />
-          <Route path="/compare" element={
-            <ErrorBoundary title="종목 비교 오류" fallbackUrl="/compare">
-              <ComparePage />
-            </ErrorBoundary>
-          } />
-          <Route path="/profile" element={
-            <ErrorBoundary title="프로필 오류" fallbackUrl="/profile">
-              <ProfilePage />
-            </ErrorBoundary>
-          } />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+                    <Route element={<AppLayout />}>
+                        <Route path="/" element={
+                            <ErrorBoundary title="대시보드 오류" fallbackUrl="/">
+                                <DashboardPage />
+                            </ErrorBoundary>
+                        } />
+                        <Route path="/compare" element={
+                            <ErrorBoundary title="종목 비교 오류" fallbackUrl="/compare">
+                                <ComparePage />
+                            </ErrorBoundary>
+                        } />
+                        <Route path="/profile" element={
+                            <ErrorBoundary title="프로필 오류" fallbackUrl="/profile">
+                                <ProfilePage />
+                            </ErrorBoundary>
+                        } />
+                    </Route>
+                </Routes>
+            </Suspense>
+        </BrowserRouter>
+    );
 }
