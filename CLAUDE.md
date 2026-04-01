@@ -218,3 +218,21 @@ style: ProfilePage CSS 수정
 
 - [ ] 소셜 계정 연동 로컬 테스트 완료 후 운영 배포
 - [ ] 이메일 미인증 상태 로그인 차단 (백엔드 로그인 검증 추가 필요)
+
+---
+
+## 작업 이력
+
+### 2026-04-01 완료 작업
+- 403 에러 정리
+  - useQueries.js: useStockDetail, useStockRange에 isLoggedIn() 조건 추가
+  - axiosInstance.js: 403 + 토큰 없음 즉시 reject, 불필요한 refresh 차단
+- 스켈레톤 UI 추가
+  - StockListSkeleton.jsx / StockListSkeleton.module.css (SkeletonCards, SkeletonTable)
+  - StockModalSkeleton.jsx / StockModalSkeleton.module.css (SkeletonChart, SkeletonNews)
+
+### 다음 세션 예정 작업
+- 네이버페이 스타일 UI 리디자인 (CSS 변수 → 헤더/네비 → 대시보드 → 관심종목 → 포트폴리오 순)
+  - 메인 컬러: #03C75A / 상승: #F04452 / 하락: #1E6EEB
+  - 배경: #F5F6F7 / 카드: #ffffff / border-radius 12px
+  - 폰트: Noto Sans KR
