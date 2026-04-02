@@ -237,8 +237,19 @@
   color: var(--primary);
 }
 
+.account-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.account-left {}
+
+.account-right {}
+
 .pw-section {
-  margin-top: 20px;
+  margin-top: 0;
 }
 
 .profile-modal-overlay {
@@ -487,9 +498,9 @@
   min-width: 0;
 }
 
-css.social-icon {
-  width: 32px;
-  height: 32px;
+.social-icon {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -499,8 +510,8 @@ css.social-icon {
 }
 
 .social-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
 }
 
 .social-icon-kakao {
@@ -946,6 +957,11 @@ css.social-icon {
   .profile-tab-content { padding: 16px 16px; }
   .profile-info-row { gap: 14px; }
   .pf-summary { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .account-layout { grid-template-columns: 1fr; gap: 0; }
+  .account-right { margin-top: 24px; }
 }
 
 @media (max-width: 480px) {

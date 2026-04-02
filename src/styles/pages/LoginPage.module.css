@@ -96,6 +96,60 @@
   margin-bottom: 4px;
 }
 
+.kakaoBtn {
+  display: flex;
+  align-items: center;
+  background-color: #FEE500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0 12px;
+  height: 40px;
+  width: 100%;
+  position: relative;
+}
+
+.kakaoBtn:hover {
+  background-color: #F6DC00;
+}
+
+.kakaoBtnState {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+}
+
+.kakaoBtnContentWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  justify-content: center;
+}
+
+.kakaoBtnIcon {
+  display: flex;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 0;
+}
+
+.kakaoBtnIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.kakaoBtnContents {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  letter-spacing: 0.25px;
+  text-align: center;
+  width: 100%;
+}
+
 .btn-kakao-login {
   display: inline-flex;
   align-items: center;
@@ -127,28 +181,60 @@
   font-size: 18px;
 }
 
-.btn-google-login {
-  display: inline-flex;
+.googleBtn {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 9px;
-  width: 100%;
-  padding: 13px;
-  background: var(--surface);
-  color: #3c4043;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 500;
-  font-family: var(--font-sans);
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background var(--transition), border-color var(--transition);
-  letter-spacing: -0.01em;
+  font-family: 'Google Sans', Roboto, sans-serif;
+  padding: 0 12px;
+  height: 40px;
+  width: 100%;
+  position: relative;
 }
 
-.btn-google-login:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-strong);
+.googleBtn:hover {
+  background-color: #f8f8f8;
+  border-color: #d2d2d2;
+}
+
+.googleBtnState {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+}
+
+.googleBtnContentWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  justify-content: center;
+}
+
+.googleBtnIcon {
+  display: flex;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 0;
+}
+
+.googleBtnIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.googleBtnContents {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f1f1f;
+  letter-spacing: 0.25px;
+  text-align: center;
+  width: 100%;
 }
 
 .btn-login-submit {

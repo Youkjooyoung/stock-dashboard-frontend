@@ -46,13 +46,14 @@ src/
 │   └── profileApi.js              # S3 프로필 이미지 업로드
 ├── components/
 │   ├── AddressSearch.jsx          # 주소 검색
-│   ├── AiAnalysis.jsx             # AI 종목 분석 패널
+│   ├── AiAnalysis.jsx             # AI 종목 분석 패널 (모달 내)
 │   ├── AlertNotification.jsx      # 목표가 알림 토스트
 │   ├── AlertSetter.jsx            # 목표가 설정 폼
-│   ├── AppLayout.jsx              # 공통 레이아웃 (Header + 본문)
+│   ├── AppLayout.jsx              # 공통 레이아웃 (Header + FloatingAiChat 포함)
 │   ├── CandlestickChart.jsx       # 캔들차트
 │   ├── EmailVerifyStep.jsx        # 회원가입 이메일 인증 단계
 │   ├── ErrorBoundary.jsx          # 전역 에러 경계
+│   ├── FloatingAiChat.jsx         # 플로팅 AI 채팅 위젯 (전체 페이지 공통)
 │   ├── Header.jsx                 # 상단 네비게이션
 │   ├── NewsSection.jsx            # 종목 뉴스
 │   ├── PhoneVerifyStep.jsx        # 회원가입 전화/본인인증 단계
@@ -288,6 +289,14 @@ chore: gitignore 추가
 - [x] 토스트 알림
 - [x] ErrorBoundary
 - [x] 번들 최적화 (코드 스플리팅, lazy import)
+- [x] 로그인 페이지 소셜 버튼 공식 디자인 적용 (카카오 HTML/CSS, 구글 공식 스펙)
+- [x] vite.config.js `@/` 경로 별칭 추가
+- [x] 프로필 페이지 계정 정보 탭 2컬럼 그리드 레이아웃 (좌: 계정/소셜, 우: 비밀번호/탈퇴)
+- [x] ProfilePage.module.css `css.social-icon` 오타 수정 → 소셜 아이콘 정렬/크기 정상화
+- [x] 플로팅 AI 채팅 위젯 (FloatingAiChat) 전체 페이지 공통 적용
+  - FAQ 탭: 23개 질문 4개 카테고리 아코디언 + 키워드 매칭 답변
+  - AI 종목 분석 탭: 종목코드 + 질문 입력 → /ai/analyze/stock 호출
+  - 탭별 대화 분리, overscroll-behavior 격리
 
 **관리자**
 - [x] 로그인 시 ADMIN → /admin 자동 이동 (role 기반 라우터 분기)
@@ -299,5 +308,14 @@ chore: gitignore 추가
 
 ## 진행 중 / 예정
 
-- [ ] develop → main 머지 후 운영 배포 (관리자 탭 3개 추가분)
+### 미커밋 (로컬 develop, 배포 전)
+- [ ] LoginPage.jsx — 카카오(HTML/CSS)/구글 공식 버튼 교체
+- [ ] ProfilePage.jsx — 2컬럼 레이아웃, 소셜 아이콘 오타 수정
+- [ ] FloatingAiChat.jsx + FloatingAiChat.module.css — 신규 컴포넌트
+- [ ] AppLayout.jsx — FloatingAiChat 추가
+- [ ] vite.config.js — @/ 별칭
+
+### 배포 예정
+- [ ] 프론트엔드 develop → main 머지 후 운영 배포
+- [ ] 백엔드 운영 배포 (관리자 탭 3개는 main에 이미 머지됨)
 - [ ] 소셜 연동 운영 배포 검증
