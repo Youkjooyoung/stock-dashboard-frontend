@@ -38,11 +38,11 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await api.post('/auth/login', { email, password });
-      const { accessToken, refreshToken, userId } = res.data;
-      setAuth(email, accessToken, refreshToken, userId);
+      const { accessToken, refreshToken, userId, role } = res.data;
+      setAuth(email, accessToken, refreshToken, userId, role);
       if (rememberMe) localStorage.setItem('savedEmail', email);
       else localStorage.removeItem('savedEmail');
-      navigate('/');
+      navigate(role === 'ADMIN' ? '/admin' : '/');
     } catch (err) {
       const msg = err.response?.data?.message || '로그인에 실패했습니다.';
       setError(msg);

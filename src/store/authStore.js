@@ -4,6 +4,7 @@ import api from '../api/axiosInstance';
 const useAuthStore = create((set) => ({
   token: localStorage.getItem('accessToken') || null,
   user:  localStorage.getItem('userEmail')   || null,
+  role:  localStorage.getItem('userRole')    || 'USER',
 
   logout: async () => {
     try {
@@ -20,16 +21,18 @@ const useAuthStore = create((set) => ({
       localStorage.removeItem('kakaoNickname');
       localStorage.removeItem('provider');
       localStorage.removeItem('userId');
-      set({ user: null, token: null });
+      localStorage.removeItem('userRole');
+      set({ user: null, token: null, role: 'USER' });
     }
   },
 
-  setAuth: (email, accessToken, refreshToken, userId) => {
+  setAuth: (email, accessToken, refreshToken, userId, role = 'USER') => {
     localStorage.setItem('accessToken',  accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('userEmail',    email);
+    localStorage.setItem('userRole',     role);
     if (userId) localStorage.setItem('userId', String(userId));
-    set({ user: email, token: accessToken });
+    set({ user: email, token: accessToken, role });
   },
 }));
 
