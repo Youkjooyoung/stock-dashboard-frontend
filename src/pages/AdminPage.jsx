@@ -8,11 +8,17 @@ export default function AdminPage() {
     const navigate   = useNavigate();
     const { role, logout } = useAuthStore();
 
-    const [tab, setTab]         = useState('stats');
-    const [stats, setStats]     = useState(null);
-    const [topList, setTopList] = useState([]);
-    const [users, setUsers]     = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [tab, setTab]               = useState('stats');
+    const [stats, setStats]           = useState(null);
+    const [topList, setTopList]       = useState([]);
+    const [users, setUsers]           = useState([]);
+    const [stocks, setStocks]         = useState([]);
+    const [alerts, setAlerts]         = useState([]);
+    const [chats, setChats]           = useState([]);
+    const [loading, setLoading]       = useState(false);
+    const [stocksLoading, setStocksLoading] = useState(false);
+    const [alertsLoading, setAlertsLoading] = useState(false);
+    const [chatsLoading, setChatsLoading]   = useState(false);
 
     useEffect(() => {
         if (role !== 'ADMIN') { navigate('/'); return; }
@@ -21,8 +27,31 @@ export default function AdminPage() {
     }, []);
 
     useEffect(() => {
-        if (tab === 'users' && users.length === 0) fetchUsers();
+        if (tab === 'users'   && users.length  === 0) fetchUsers();
+        if (tab === 'stocks'  && stocks.length === 0) fetchStocks();
+        if (tab === 'alerts'  && alerts.length === 0) fetchAlerts();
+        if (tab === 'chats'   && chats.length  === 0) fetchChats();
     }, [tab]);
+
+    const fetchAlerts = async () => {
+        setAlertsLoading(true);
+        try {
+            const { data } = await api.get('/admin/alerts');
+            setAlerts(data);
+        } finally {
+            setAlertsLoading(false);
+        }
+    };
+
+    const fetchChats = async () => {
+        setChatsLoading(true);
+        try {
+            const { data } = await api.get('/admin/chats');
+            setChats(data);
+        } finally {
+            setChatsLoading(false);
+        }
+    };
 
     const fetchStats = async () => {
         const { data } = await api.get('/admin/stats');
@@ -32,6 +61,16 @@ export default function AdminPage() {
     const fetchTopWatchlist = async () => {
         const { data } = await api.get('/admin/watchlist/top');
         setTopList(data);
+    };
+
+    const fetchStocks = async () => {
+        setStocksLoading(true);
+        try {
+            const { data } = await api.get('/admin/stocks');
+            setStocks(data);
+        } finally {
+            setStocksLoading(false);
+        }
     };
 
     const fetchUsers = async () => {
@@ -79,8 +118,11 @@ export default function AdminPage() {
 
             <div className={styles.container}>
                 <nav className={styles.tabs}>
-                    <button className={`${styles.tab} ${tab === 'stats' ? styles.tabActive : ''}`} onClick={() => setTab('stats')}>통계</button>
-                    <button className={`${styles.tab} ${tab === 'users' ? styles.tabActive : ''}`} onClick={() => setTab('users')}>회원 관리</button>
+                    <button className={`${styles.tab} ${tab === 'stats'  ? styles.tabActive : ''}`} onClick={() => setTab('stats')}>통계</button>
+                    <button className={`${styles.tab} ${tab === 'users'  ? styles.tabActive : ''}`} onClick={() => setTab('users')}>회원 관리</button>
+                    <button className={`${styles.tab} ${tab === 'stocks' ? styles.tabActive : ''}`} onClick={() => setTab('stocks')}>주식 관리</button>
+                    <button className={`${styles.tab} ${tab === 'alerts' ? styles.tabActive : ''}`} onClick={() => setTab('alerts')}>알림 관리</button>
+                    <button className={`${styles.tab} ${tab === 'chats'  ? styles.tabActive : ''}`} onClick={() => setTab('chats')}>AI 채팅 이력</button>
                 </nav>
 
                 {tab === 'stats' && (
@@ -192,6 +234,130 @@ export default function AdminPage() {
                                                         {u.role === 'ADMIN' ? 'USER로' : 'ADMIN으로'}
                                                     </button>
                                                 </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                )}
+                {tab === 'stocks' && (
+                    <div className={styles.usersSection}>
+                        <div className={styles.sectionHeader}>
+                            <h3 className={styles.sectionTitle}>종목 목록 ({stocks.length}개)</h3>
+                            <button className={styles.refreshBtn} onClick={fetchStocks}>새로고침</button>
+                        </div>
+                        {stocksLoading ? (
+                            <p className={styles.empty}>불러오는 중...</p>
+                        ) : (
+                            <div className={styles.tableWrap}>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>티커</th>
+                                            <th>종목명</th>
+                                            <th>거래소</th>
+                                            <th>등록일</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {stocks.length === 0 ? (
+                                            <tr><td colSpan={4} className={styles.empty}>데이터가 없습니다.</td></tr>
+                                        ) : stocks.map(s => (
+                                            <tr key={s.ticker}>
+                                                <td>{s.ticker}</td>
+                                                <td>{s.name}</td>
+                                                <td>{s.market}</td>
+                                                <td>{s.createdAt ? new Date(s.createdAt).toLocaleDateString('ko-KR') : '-'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {tab === 'alerts' && (
+                    <div className={styles.usersSection}>
+                        <div className={styles.sectionHeader}>
+                            <h3 className={styles.sectionTitle}>목표가 알림 ({alerts.length}건)</h3>
+                            <button className={styles.refreshBtn} onClick={fetchAlerts}>새로고침</button>
+                        </div>
+                        {alertsLoading ? (
+                            <p className={styles.empty}>불러오는 중...</p>
+                        ) : (
+                            <div className={styles.tableWrap}>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>알림ID</th>
+                                            <th>사용자이메일</th>
+                                            <th>티커</th>
+                                            <th>종목명</th>
+                                            <th>목표가</th>
+                                            <th>조건</th>
+                                            <th>활성여부</th>
+                                            <th>등록일</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {alerts.length === 0 ? (
+                                            <tr><td colSpan={8} className={styles.empty}>데이터가 없습니다.</td></tr>
+                                        ) : alerts.map(a => (
+                                            <tr key={a.alertId}>
+                                                <td>{a.alertId}</td>
+                                                <td>{a.email}</td>
+                                                <td>{a.ticker}</td>
+                                                <td>{a.stockName}</td>
+                                                <td>{a.targetPrice?.toLocaleString()}</td>
+                                                <td>{a.alertType}</td>
+                                                <td>
+                                                    <span className={a.isTriggered === 'N' ? styles.badgeOk : styles.badgeWarn}>
+                                                        {a.isTriggered === 'N' ? '활성' : '발동됨'}
+                                                    </span>
+                                                </td>
+                                                <td>{a.createdAt ? new Date(a.createdAt).toLocaleDateString('ko-KR') : '-'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {tab === 'chats' && (
+                    <div className={styles.usersSection}>
+                        <div className={styles.sectionHeader}>
+                            <h3 className={styles.sectionTitle}>AI 채팅 이력 ({chats.length}건)</h3>
+                            <button className={styles.refreshBtn} onClick={fetchChats}>새로고침</button>
+                        </div>
+                        {chatsLoading ? (
+                            <p className={styles.empty}>불러오는 중...</p>
+                        ) : (
+                            <div className={styles.tableWrap}>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>사용자이메일</th>
+                                            <th>티커</th>
+                                            <th>메시지 (50자)</th>
+                                            <th>일시</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {chats.length === 0 ? (
+                                            <tr><td colSpan={5} className={styles.empty}>데이터가 없습니다.</td></tr>
+                                        ) : chats.map(c => (
+                                            <tr key={c.msgId}>
+                                                <td>{c.msgId}</td>
+                                                <td>{c.userEmail}</td>
+                                                <td>{c.ticker}</td>
+                                                <td>{c.content}</td>
+                                                <td>{c.createdAt ? new Date(c.createdAt).toLocaleString('ko-KR') : '-'}</td>
                                             </tr>
                                         ))}
                                     </tbody>

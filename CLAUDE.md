@@ -17,6 +17,8 @@
 - PortOne V1 (본인인증)
 - Resend API (이메일 인증)
 - AES-256 (주민등록번호 암호화)
+- AWS S3 (프로필 이미지)
+- Anthropic API (AI 분석)
 
 **Frontend**
 - React 18, Vite
@@ -36,30 +38,75 @@
 
 ## Project Structure
 
-**Backend** (`stock-dashboard`)
-```
-src/main/java/com/stock/dashboard/
-├── controller/     # AuthController, UserController, StockController ...
-├── service/        # UserService, StockService ...
-├── dao/            # MyBatis Mapper 인터페이스
-├── dto/            # DTO 클래스
-└── config/         # SecurityConfig, WebSocketConfig ...
-
-src/main/resources/
-├── mapper/         # MyBatis XML
-└── application.properties
-```
-
-**Frontend** (`stock-dashboard-react`)
+**Frontend**
 ```
 src/
-├── api/            # axiosInstance.js
-├── components/     # 재사용 컴포넌트
-├── hooks/          # useQueries.js (React Query 훅)
-├── pages/          # 페이지 컴포넌트
-├── router/         # index.jsx
-├── store/          # authStore.js (Zustand)
-└── styles/         # CSS Modules (pages/, components/)
+├── api/
+│   ├── axiosInstance.js           # Axios 인터셉터 (JWT 자동 첨부, 401 refresh)
+│   └── profileApi.js              # S3 프로필 이미지 업로드
+├── components/
+│   ├── AddressSearch.jsx          # 주소 검색
+│   ├── AiAnalysis.jsx             # AI 종목 분석 패널
+│   ├── AlertNotification.jsx      # 목표가 알림 토스트
+│   ├── AlertSetter.jsx            # 목표가 설정 폼
+│   ├── AppLayout.jsx              # 공통 레이아웃 (Header + 본문)
+│   ├── CandlestickChart.jsx       # 캔들차트
+│   ├── EmailVerifyStep.jsx        # 회원가입 이메일 인증 단계
+│   ├── ErrorBoundary.jsx          # 전역 에러 경계
+│   ├── Header.jsx                 # 상단 네비게이션
+│   ├── NewsSection.jsx            # 종목 뉴스
+│   ├── PhoneVerifyStep.jsx        # 회원가입 전화/본인인증 단계
+│   ├── ProfileImageUpload.jsx     # S3 이미지 업로드 UI
+│   ├── SecureKeypad.jsx           # 주민번호 뒷자리 보안 키패드
+│   ├── SignupFormStep.jsx         # 회원가입 정보입력 단계
+│   ├── StockCharts.jsx            # 주가 라인차트
+│   ├── StockChat.jsx              # WebSocket 실시간 채팅
+│   ├── StockListSkeleton.jsx      # 종목 리스트 스켈레톤 UI
+│   ├── StockModal.jsx             # 종목 상세 모달
+│   ├── StockModalSkeleton.jsx     # 종목 모달 스켈레톤 UI
+│   ├── StockTable.jsx             # 종목 테이블
+│   ├── StockTicker.jsx            # 실시간 시세 티커
+│   ├── SummaryCards.jsx           # 요약 카드 (포트폴리오 등)
+│   └── Toast.jsx                  # 토스트 알림
+├── hooks/
+│   └── useQueries.js              # React Query 훅 집중 관리
+├── pages/
+│   ├── AdminPage.jsx              # 관리자 페이지 (탭 5개)
+│   ├── ComparePage.jsx            # 종목 비교
+│   ├── DashboardPage.jsx          # 메인 대시보드
+│   ├── ForgotPasswordPage.jsx     # 비밀번호 찾기
+│   ├── LoginPage.jsx              # 로그인
+│   ├── OAuthCallbackPage.jsx      # 소셜 로그인 콜백
+│   ├── OAuthLinkCallbackPage.jsx  # 소셜 연동 콜백
+│   ├── ProfilePage.jsx            # 마이페이지
+│   ├── ResetPasswordPage.jsx      # 비밀번호 재설정
+│   ├── SignupPage.jsx             # 회원가입 (3단계)
+│   └── VerifyEmailPage.jsx        # 이메일 인증
+├── router/
+│   └── index.jsx                  # 라우터 (코드 스플리팅 + role 분기)
+├── store/
+│   └── authStore.js               # Zustand (user, role, token, logout)
+└── styles/
+    ├── global.css                 # CSS 변수, 전역 리셋
+    ├── components/                # 컴포넌트별 .module.css
+    └── pages/                     # 페이지별 .module.css
+```
+
+**Backend**
+```
+src/main/java/com/stock/dashboard/
+├── config/          # CacheConfig, GlobalExceptionHandler
+├── controller/      # Admin, AiAnalysis, Auth, Chat, News, Portfolio,
+│                    # PriceAlert, Stock, User
+├── dao/             # MyBatis Mapper 인터페이스
+├── dto/             # DTO 클래스 (@Data 롬복)
+├── scheduler/       # StockScheduler (시세 자동 수집)
+├── service/         # 비즈니스 로직
+├── util/            # AesEncryptor
+├── JwtUtil.java
+├── JwtAuthFilter.java
+├── SecurityConfig.java
+└── WebSocketConfig.java
 ```
 
 ---
@@ -73,7 +120,7 @@ src/
 
 **로컬 개발**
 - Frontend: `http://localhost:5173`
-- Backend: `https://localhost:8443`
+- Backend: `http://localhost:8080` (로컬), `https://localhost:8443` (SSL)
 - DB: `localhost:3306/stock_dashboard`
 
 **환경변수 파일**
@@ -83,21 +130,6 @@ src/
 ---
 
 ## Commands
-
-**Backend**
-```bash
-# 로컬 실행
-./mvnw spring-boot:run
-
-# 빌드
-./mvnw clean package -DskipTests
-
-# 운영 배포 (MobaXterm)
-cd ~/stock-dashboard-backend
-git pull origin main
-./mvnw clean package -DskipTests
-sudo systemctl restart stock-dashboard
-```
 
 **Frontend**
 ```bash
@@ -115,9 +147,23 @@ npm run build
 sudo systemctl restart nginx
 ```
 
+**Backend**
+```bash
+# 로컬 실행
+./mvnw spring-boot:run
+
+# 빌드
+./mvnw clean package -DskipTests
+
+# 운영 배포 (MobaXterm)
+cd ~/stock-dashboard-backend
+git pull origin main
+./mvnw clean package -DskipTests
+sudo systemctl restart stock-dashboard
+```
+
 **DB**
 ```bash
-# 로컬 MySQL 접속
 mysql -u root -p stock_dashboard
 ```
 
@@ -130,54 +176,67 @@ mysql -u root -p stock_dashboard
 - 메소드명 알파벳 순서 정렬
 - CSS, JS, JSX 파일 모듈화 유지
 
+**Frontend (React)**
+- CSS Modules 사용 (`styles.className`), 인라인 스타일 금지
+- 전역 스타일은 `global.css`, 컴포넌트별 스타일은 `모듈명.module.css`
+- React Query 훅은 `useQueries.js`에 집중 관리
+- Zustand store는 `store/` 디렉토리
+- `key` prop은 인덱스 대신 고유 ID 사용
+
 **Backend (Java)**
 - CRUD 순서로 메소드 정렬 (Create → Read → Update → Delete)
 - private 헬퍼 메소드는 하단에 배치
 - DTO는 @Data 롬복 사용
-
-**Frontend (React)**
-- CSS Modules 사용 (`styles.className`)
-- 전역 스타일은 `index.css`, 컴포넌트별 스타일은 `모듈명.module.css`
-- React Query 훅은 `useQueries.js`에 집중 관리
-- Zustand store는 `store/` 디렉토리
-
----
-
-## DB Schema (주요 테이블)
-
-```sql
-USERS           -- 회원 (EMAIL, PASSWORD, NAME, NICKNAME ...)
-USER_SOCIAL     -- 소셜 연동 (user_id, provider, provider_email)
-STOCK_ITEM      -- 종목 기본정보
-STOCK_PRICE     -- 일별 시세
-USER_WATCHLIST  -- 즐겨찾기
-PORTFOLIO       -- 포트폴리오
-PRICE_ALERT     -- 목표가 알림
-REFRESH_TOKEN   -- JWT 리프레시 토큰
-CHAT_MESSAGE    -- AI 채팅 이력
-```
 
 ---
 
 ## API Endpoints (주요)
 
 ```
+# 인증
 POST /api/auth/login
 POST /api/auth/signup
+POST /api/auth/logout
 POST /api/auth/refresh
+POST /api/auth/portone/verify
+POST /api/auth/forgot-password
+POST /api/auth/reset-password
+
+# OAuth2 소셜 로그인
 GET  /api/auth/kakao/login
 GET  /api/auth/google/login
-GET  /api/auth/kakao/link       # 소셜 연동용
-GET  /api/auth/google/link      # 소셜 연동용
+GET  /api/auth/kakao/link          # 소셜 연동용
+GET  /api/auth/google/link         # 소셜 연동용
 
-GET  /api/user/social           # 연동 목록 조회
-POST /api/user/social/link      # 연동
-DEL  /api/user/social/unlink/{provider}  # 연동 해제
+# 사용자
+GET  /api/user/profile
+PUT  /api/user/profile
+POST /api/user/profile-image
+GET  /api/user/social
+POST /api/user/social/link
+DEL  /api/user/social/unlink/{provider}
 
+# 주식 / 즐겨찾기 / 포트폴리오 / 알림
 GET  /api/stock/prices
 GET  /api/user/watchlist
 GET  /api/user/portfolio
 GET  /api/alert
+
+# AI / 뉴스
+POST /api/ai/analyze
+GET  /api/news/{ticker}
+WS   /ws/stock
+
+# 관리자
+GET  /api/admin/stats
+GET  /api/admin/users
+GET  /api/admin/watchlist/top
+GET  /api/admin/stocks
+GET  /api/admin/alerts
+GET  /api/admin/chats
+POST /api/admin/users/{userId}/unlock
+POST /api/admin/users/{userId}/resend-verify
+POST /api/admin/users/{userId}/role
 ```
 
 ---
@@ -197,42 +256,48 @@ feat: 소셜 계정 연동 기능 추가
 fix: 카카오 콜백 URL 오류 수정
 refactor: UserService 메소드 정렬
 style: ProfilePage CSS 수정
+design: 네이버페이 스타일 UI 리디자인
+chore: gitignore 추가
 ```
 
 ---
 
-## 현재 구현 완료
+## 구현 완료
 
-- [x] 회원가입 (본인인증 → 정보입력 → 이메일인증)
-- [x] 로그인/로그아웃 (JWT)
+**인증/회원**
+- [x] 회원가입 (PortOne 본인인증 → 주민번호 교차검증 → 정보입력 → 이메일인증)
+- [x] 보안 키패드 (주민번호 뒷자리 가상 키패드, 랜덤 배치, 마스킹)
+- [x] 로그인/로그아웃 (JWT Access/Refresh Token)
+- [x] 이메일 미인증 로그인 차단 + 재발송 버튼 (60초 쿨타임)
+- [x] 비밀번호 찾기/재설정 (이메일 링크 방식, 1시간 유효)
 - [x] 카카오/구글 소셜 로그인
-- [x] 소셜 계정 연동/해제 (USER_SOCIAL)
-- [x] 주식 시세 조회/즐겨찾기
+- [x] 소셜 계정 연동/해제 (SVG 로고, 연동 상태 배지)
+- [x] 프로필 이미지 업로드 (AWS S3)
+
+**주식 기능**
+- [x] 주식 시세 조회 / 즐겨찾기
 - [x] 포트폴리오 관리
 - [x] 목표가 알림
 - [x] WebSocket 실시간 시세
-- [x] AI 분석 (Anthropic API)
-- [x] 이메일 인증 (Resend)
+- [x] AI 종목 분석 (Anthropic API)
+- [x] 뉴스 조회
+
+**UI/UX**
+- [x] 네이버페이 스타일 UI 리디자인 (CSS 변수 기반)
+- [x] 스켈레톤 UI (종목 리스트, 상세 모달)
+- [x] 토스트 알림
+- [x] ErrorBoundary
+- [x] 번들 최적화 (코드 스플리팅, lazy import)
+
+**관리자**
+- [x] 로그인 시 ADMIN → /admin 자동 이동 (role 기반 라우터 분기)
+- [x] 통계 탭 (전체회원/오늘가입/이메일인증/계정잠금, 즐겨찾기 TOP5)
+- [x] 회원 관리 탭 (잠금해제, 메일재발송, 권한변경)
+- [x] 주식 관리 탭 (STOCK_ITEM 종목 목록)
+- [x] 알림 관리 탭 (PRICE_ALERT 전체 목록)
+- [x] AI 채팅 이력 탭 (CHAT_MESSAGE 최신 500건)
 
 ## 진행 중 / 예정
 
-- [ ] 소셜 계정 연동 로컬 테스트 완료 후 운영 배포
-- [ ] 이메일 미인증 상태 로그인 차단 (백엔드 로그인 검증 추가 필요)
-
----
-
-## 작업 이력
-
-### 2026-04-01 완료 작업
-- 403 에러 정리
-  - useQueries.js: useStockDetail, useStockRange에 isLoggedIn() 조건 추가
-  - axiosInstance.js: 403 + 토큰 없음 즉시 reject, 불필요한 refresh 차단
-- 스켈레톤 UI 추가
-  - StockListSkeleton.jsx / StockListSkeleton.module.css (SkeletonCards, SkeletonTable)
-  - StockModalSkeleton.jsx / StockModalSkeleton.module.css (SkeletonChart, SkeletonNews)
-
-### 다음 세션 예정 작업
-- 네이버페이 스타일 UI 리디자인 (CSS 변수 → 헤더/네비 → 대시보드 → 관심종목 → 포트폴리오 순)
-  - 메인 컬러: #03C75A / 상승: #F04452 / 하락: #1E6EEB
-  - 배경: #F5F6F7 / 카드: #ffffff / border-radius 12px
-  - 폰트: Noto Sans KR
+- [ ] develop → main 머지 후 운영 배포 (관리자 탭 3개 추가분)
+- [ ] 소셜 연동 운영 배포 검증
