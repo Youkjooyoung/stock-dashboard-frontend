@@ -125,6 +125,7 @@ export default function LoginPage() {
               />
               아이디 기억하기
             </label>
+            <a href="/forgot-password" className={styles['forgot-link']}>비밀번호 찾기</a>
           </div>
 
           {error && <p className="error-msg">{error}</p>}

@@ -10,6 +10,8 @@ const ProfilePage          = lazy(() => import('../pages/ProfilePage'));
 const OAuthCallbackPage    = lazy(() => import('../pages/OAuthCallbackPage'));
 const OAuthLinkCallbackPage = lazy(() => import('../pages/OAuthLinkCallbackPage'));
 const VerifyEmailPage      = lazy(() => import('../pages/VerifyEmailPage'));
+const ForgotPasswordPage   = lazy(() => import('../pages/ForgotPasswordPage'));
+const ResetPasswordPage    = lazy(() => import('../pages/ResetPasswordPage'));
 const ComparePage          = lazy(() => import('../pages/ComparePage'));
 
 export default function AppRouter() {
@@ -23,7 +25,9 @@ export default function AppRouter() {
                     <Route path="/oauth/kakao"   element={<OAuthCallbackPage />} />
                     <Route path="/oauth/google"  element={<OAuthCallbackPage />} />
                     <Route path="/oauth/link"    element={<OAuthLinkCallbackPage />} />
-                    <Route path="/verify-email"  element={<VerifyEmailPage />} />
+                    <Route path="/verify-email"      element={<VerifyEmailPage />} />
+                    <Route path="/forgot-password"  element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password"   element={<ResetPasswordPage />} />
 
                     <Route element={<AppLayout />}>
                         <Route path="/" element={

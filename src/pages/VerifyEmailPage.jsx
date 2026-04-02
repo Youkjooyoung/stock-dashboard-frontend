@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import styles from '../styles/pages/VerifyEmailPage.module.css';
@@ -8,6 +8,7 @@ export default function VerifyEmailPage() {
   const [status, setStatus]           = useState('loading');
   const [resendEmail, setResendEmail] = useState('');
   const [resendStatus, setResendStatus] = useState(null);
+  const called = useRef(false);
 
   const handleResend = async () => {
     if (!resendEmail) return;
@@ -21,6 +22,8 @@ export default function VerifyEmailPage() {
   };
 
   useEffect(() => {
+    if (called.current) return;
+    called.current = true;
     const token = new URLSearchParams(window.location.search).get('token');
     if (!token) {
       setStatus('error');

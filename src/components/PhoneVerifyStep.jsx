@@ -30,7 +30,7 @@ export default function PhoneVerifyStep({ onCertified }) {
                     { impUid: rsp.imp_uid },
                     { withCredentials: true }
                 );
-                onCertified({ name: data.name, phone: data.phone });
+                onCertified({ name: data.name, phone: data.phone, impUid: rsp.imp_uid });
             } catch {
                 alert('본인인증 정보 확인에 실패했습니다.');
             }

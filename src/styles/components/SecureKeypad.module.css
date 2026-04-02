@@ -1,0 +1,85 @@
+.wrap {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 200;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 14px;
+    width: 220px;
+}
+
+.display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 10px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
+
+.dotFilled {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.dotEmpty {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.key {
+    padding: 12px 0;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-1);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.1s, transform 0.08s;
+    font-family: inherit;
+    text-align: center;
+}
+
+.key:hover {
+    background: var(--surface-hover);
+}
+
+.key:active {
+    transform: scale(0.93);
+}
+
+.back {
+    color: var(--danger);
+    font-size: 18px;
+}
+
+.confirm {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.confirm:hover {
+    background: var(--primary-dark);
+}
