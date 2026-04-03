@@ -140,12 +140,13 @@ npm run dev
 # 빌드
 npm run build
 
-# 운영 배포 (MobaXterm)
+# 운영 배포 (MobaXterm) — nginx root: /var/www/stock-dashboard/
 cd ~/stock-dashboard-frontend
 git pull origin main
 npm install
 npm run build
-sudo systemctl restart nginx
+sudo cp -r ~/stock-dashboard-frontend/dist/* /var/www/stock-dashboard/
+sudo systemctl reload nginx
 ```
 
 **Backend**
@@ -308,14 +309,9 @@ chore: gitignore 추가
 
 ## 진행 중 / 예정
 
-### 미커밋 (로컬 develop, 배포 전)
-- [ ] LoginPage.jsx — 카카오(HTML/CSS)/구글 공식 버튼 교체
-- [ ] ProfilePage.jsx — 2컬럼 레이아웃, 소셜 아이콘 오타 수정
-- [ ] FloatingAiChat.jsx + FloatingAiChat.module.css — 신규 컴포넌트
-- [ ] AppLayout.jsx — FloatingAiChat 추가
-- [ ] vite.config.js — @/ 별칭
-
-### 배포 예정
-- [ ] 프론트엔드 develop → main 머지 후 운영 배포
-- [ ] 백엔드 운영 배포 (관리자 탭 3개는 main에 이미 머지됨)
-- [ ] 소셜 연동 운영 배포 검증
+### 다음 작업 예정 (고도화)
+- [ ] 소셜 로그인(OAuth) 시 role 미전달 버그 수정
+  - Backend: `buildOAuthRedirect`에 role 파라미터 추가
+  - Frontend: `OAuthCallbackPage` — role 읽어서 setAuth 전달 + /admin 분기
+- [ ] 관리자 회원 탭 검색/필터 기능 추가
+- [ ] 포트폴리오 수익률 차트 강화
