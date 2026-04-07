@@ -24,19 +24,20 @@ export default function OAuthCallbackPage() {
       const email    = params.get('email') || '';
       const nickname = params.get('nickname') || '';
       const provider = params.get('provider') || 'kakao';
-      setAuth(email, accessToken, refreshToken);
+      const role     = params.get('role') || 'USER';
+      setAuth(email, accessToken, refreshToken, null, role);
       localStorage.setItem('kakaoNickname', nickname);
       localStorage.setItem('provider', provider);
-      navigate('/');
+      navigate(role === 'ADMIN' ? '/admin' : '/');
     } else if (code) {
       const provider = window.location.pathname.includes('kakao') ? 'kakao' : 'google';
       api.get(`/auth/${provider}/exchange?code=${encodeURIComponent(code)}`)
         .then(res => {
-          const { accessToken, refreshToken, email, nickname } = res.data;
-          setAuth(email, accessToken, refreshToken);
+          const { accessToken, refreshToken, email, nickname, role } = res.data;
+          setAuth(email, accessToken, refreshToken, null, role || 'USER');
           localStorage.setItem('kakaoNickname', nickname || '');
           localStorage.setItem('provider', provider);
-          navigate('/');
+          navigate(role === 'ADMIN' ? '/admin' : '/');
         })
         .catch(() => navigate('/login'));
     } else {
