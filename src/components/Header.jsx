@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import useAlertStore from '../store/alertStore';
 import useDarkMode from '../hooks/useDarkMode';
+import { useAlerts, useDeleteAlert } from '../hooks/useQueries';
 import styles from '../styles/components/Header.module.css';
 
 const NAV_ITEMS = [
@@ -18,6 +19,8 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
   const [dark, setDark] = useDarkMode();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { badgeCount, reset } = useAlertStore();
+  const { data: alerts = [] } = useAlerts();
+  const deleteAlertMutation = useDeleteAlert();
 
   const email    = localStorage.getItem('userEmail') || '';
   const nickname = localStorage.getItem('kakaoNickname') || '';
@@ -25,6 +28,49 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
   const isGoogle = provider === 'google';
   const isKakao  = email.startsWith('kakao_') || provider === 'kakao';
   const displayName = nickname || (isGoogle ? 'Google 사용자' : isKakao ? '카카오 사용자' : email);
+
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const alertRef = useRef(null);
+  const [readAlerts, setReadAlerts] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('readAlerts') || '[]'); }
+    catch { return []; }
+  });
+
+  // 이미 도달(Triggered) 처리된 알림만 최신순 정렬
+  const triggeredAlerts = alerts.filter(a => a.isTriggered === 'Y' || a.IS_TRIGGERED === 'Y')
+                                .sort((a, b) => new Date(b.triggeredAt || b.TRIGGERED_AT || b.createdAt || b.CREATED_AT) - new Date(a.triggeredAt || a.TRIGGERED_AT || a.createdAt || a.CREATED_AT));
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (alertRef.current && !alertRef.current.contains(e.target)) {
+        setIsAlertOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleBellClick = () => {
+    setIsAlertOpen(p => !p);
+    if (badgeCount > 0) reset();
+  };
+
+  const markAsRead = (e, alertId) => {
+    e.stopPropagation();
+    if (readAlerts.includes(alertId)) return;
+    const newRead = [...readAlerts, alertId];
+    setReadAlerts(newRead);
+    localStorage.setItem('readAlerts', JSON.stringify(newRead));
+  };
+
+  const deleteAlert = async (e, alertId) => {
+    e.stopPropagation();
+    try {
+      await deleteAlertMutation.mutateAsync(alertId);
+    } catch (error) {
+      alert('알림 삭제에 실패했습니다.');
+    }
+  };
 
   const handleLogout = async () => {
     if (!window.confirm('로그아웃 하시겠습니까?')) return;
@@ -81,10 +127,10 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
             )}
 
             {/* 알림 배지 버튼 */}
-            <div className={styles['header-bell-wrap']}>
+            <div className={styles['header-bell-wrap']} style={{ position: 'relative' }} ref={alertRef}>
               <button
                 className={styles['header-bell-btn']}
-                onClick={reset}
+                onClick={handleBellClick}
                 title="알림 확인 (클릭시 초기화)">
                 🔔
                 {badgeCount > 0 && (
@@ -93,6 +139,44 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
                   </span>
                 )}
               </button>
+
+              {/* 알림 드롭다운 */}
+              {isAlertOpen && (
+                <div className={styles['alert-dropdown']}>
+                  <div className={styles['alert-dropdown-header']}>
+                    알림 목록
+                  </div>
+                  <div className={styles['alert-dropdown-body']}>
+                    {triggeredAlerts.length === 0 ? (
+                      <div className={styles['alert-empty']}>수신된 알림이 없습니다.</div>
+                    ) : (
+                      triggeredAlerts.map(a => {
+                        const alertId = a.alertId || a.ALERT_ID;
+                        const isRead = readAlerts.includes(alertId);
+                        return (
+                          <div key={alertId} className={`${styles['alert-item']} ${isRead ? styles.read : ''}`}>
+                            <div className={styles['alert-item-content']}>
+                              <div className={styles['alert-item-title']}>{a.stockName || a.STOCK_NAME}</div>
+                              <div className={styles['alert-item-desc']}>
+                                목표가 {(a.targetPrice || a.TARGET_PRICE)?.toLocaleString()}원 {(a.alertType || a.ALERT_TYPE) === 'ABOVE' ? '이상' : '이하'} 도달!
+                              </div>
+                              <div className={styles['alert-item-time']}>
+                                {new Date(a.triggeredAt || a.TRIGGERED_AT || a.createdAt || a.CREATED_AT).toLocaleString('ko-KR')}
+                              </div>
+                            </div>
+                            <div className={styles['alert-item-actions']}>
+                              {!isRead && (
+                                <button className={styles['alert-action-btn']} onClick={(e) => markAsRead(e, alertId)}>✓</button>
+                              )}
+                              <button className={`${styles['alert-action-btn']} ${styles.delete}`} onClick={(e) => deleteAlert(e, alertId)}>✕</button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 다크모드 토글 */}

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import styles from '../styles/components/StockTable.module.css';
 
 const SS_KEY = 'stockTableState';
@@ -29,7 +29,7 @@ function matchesInitial(name, query) {
 }
 
 const COLUMNS = [
-  { key: 'srtnCd',  label: '종목코드', sortable: false },
+  { key: 'srtnCd',  label: '종목코드', sortable: true  },
   { key: 'itmsNm',  label: '종목명',   sortable: true  },
   { key: 'mrktCtg', label: '시장',     sortable: true  },
   { key: 'mkp',     label: '시가',     sortable: true  },
@@ -207,7 +207,7 @@ export default function StockTable({
   }, [sortKey, sortDir, pageSize, filterMarket, filterRateMin, filterRateMax, filterVolMin]);
 
   const handleSort = (key) => {
-    if (!key || key === 'watch' || key === 'srtnCd') return;
+    if (!key || key === 'watch') return;
     if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     else { setSortKey(key); setSortDir('desc'); }
     setPage(1);
@@ -227,39 +227,45 @@ export default function StockTable({
 
   const hasActiveFilter = filterMarket !== 'all' || filterRateMin !== '' || filterRateMax !== '' || filterVolMin !== '';
 
-  const filtered = stocks
-    .filter(d => {
-      const matchSearch =
-        (d.itmsNm || '').includes(search) ||
-        (d.srtnCd || '').includes(search) ||
-        matchesInitial(d.itmsNm || '', search);
-      return tab === 'watch' ? matchSearch && watchlist.includes(d.itemId) : matchSearch;
-    })
-    .map(d => {
-      const open  = d.mkp  || 0;
-      const close = d.clpr || 0;
-      const rate  = open > 0 ? ((close - open) / open * 100) : 0;
-      return { ...d, rate };
-    })
-    .filter(d => {
-      const market = d.mrktCtg || 'KOSPI';
-      if (filterMarket !== 'all' && market !== filterMarket) return false;
-      if (filterRateMin !== '' && d.rate < Number(filterRateMin)) return false;
-      if (filterRateMax !== '' && d.rate > Number(filterRateMax)) return false;
-      if (filterVolMin  !== '' && (d.trqu || 0) < Number(filterVolMin)) return false;
-      return true;
-    })
-    .sort((a, b) => {
-      let av = a[sortKey], bv = b[sortKey];
-      if (typeof av === 'string') av = av.toLowerCase();
-      if (typeof bv === 'string') bv = bv.toLowerCase();
-      if (av < bv) return sortDir === 'asc' ? -1 : 1;
-      if (av > bv) return sortDir === 'asc' ?  1 : -1;
-      return 0;
-    });
+  // 성능 최적화: 검색, 필터링, 정렬 로직 메모이제이션 (입력 지연 방지)
+  const filtered = useMemo(() => {
+    return stocks
+      .filter(d => {
+        const matchSearch =
+          (d.itmsNm || '').includes(search) ||
+          (d.srtnCd || '').includes(search) ||
+          matchesInitial(d.itmsNm || '', search);
+        return tab === 'watch' ? matchSearch && watchlist.includes(d.itemId) : matchSearch;
+      })
+      .map(d => {
+        const open  = d.mkp  || 0;
+        const close = d.clpr || 0;
+        const rate  = open > 0 ? ((close - open) / open * 100) : 0;
+        return { ...d, rate };
+      })
+      .filter(d => {
+        const market = d.mrktCtg || 'KOSPI';
+        if (filterMarket !== 'all' && market !== filterMarket) return false;
+        if (filterRateMin !== '' && d.rate < Number(filterRateMin)) return false;
+        if (filterRateMax !== '' && d.rate > Number(filterRateMax)) return false;
+        if (filterVolMin  !== '' && (d.trqu || 0) < Number(filterVolMin)) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        let av = a[sortKey], bv = b[sortKey];
+        if (typeof av === 'string') av = av.toLowerCase();
+        if (typeof bv === 'string') bv = bv.toLowerCase();
+        if (av < bv) return sortDir === 'asc' ? -1 : 1;
+        if (av > bv) return sortDir === 'asc' ?  1 : -1;
+        return 0;
+      });
+  }, [stocks, watchlist, tab, search, filterMarket, filterRateMin, filterRateMax, filterVolMin, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / pageSize);
-  const paginated  = filtered.slice((page - 1) * pageSize, page * pageSize);
+  
+  const paginated = useMemo(() => {
+    return filtered.slice((page - 1) * pageSize, page * pageSize);
+  }, [filtered, page, pageSize]);
 
   const getPageNumbers = () => {
     const delta = 2;
