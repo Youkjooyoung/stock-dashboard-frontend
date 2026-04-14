@@ -1,7 +1,9 @@
 import { createContext, useCallback, useState, useEffect, useRef } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
 import styles from './Toast.module.css';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const ToastContext = createContext({ showToast: () => {} });
 
 const ICONS = { 
@@ -101,7 +103,7 @@ const toastVariants = {
 function ToastItem({ id, type, message, onRemove }) {
   const [progress, setProgress] = useState(100);
   const [isPaused, setIsPaused] = useState(false);
-  const startTimeRef = useRef(Date.now());
+  const startTimeRef = useRef(0);
   const remainingTimeRef = useRef(DURATIONS[type]);
   const timerRef = useRef(null);
 

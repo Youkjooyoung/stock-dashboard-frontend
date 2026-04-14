@@ -65,7 +65,7 @@ export default function LoginPage() {
           return prev - 1;
         });
       }, 1000);
-    } catch (err) {
+    } catch {
       setResendStatus('error');
     }
   };

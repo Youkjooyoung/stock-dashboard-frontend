@@ -67,7 +67,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
     e.stopPropagation();
     try {
       await deleteAlertMutation.mutateAsync(alertId);
-    } catch (error) {
+    } catch {
       alert('알림 삭제에 실패했습니다.');
     }
   };

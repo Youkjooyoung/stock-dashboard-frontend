@@ -90,7 +90,7 @@
 
 .control-input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 2px rgba(3,199,90,0.10);
+  box-shadow: 0 0 0 2px rgba(0, 199, 60, 0.12);
 }
 
 input[type="date"].control-input {
@@ -135,7 +135,7 @@ input[type="date"].control-input {
 }
 
 .btn-search {
-  padding: 8px 18px;
+  padding: 9px 20px;
   background: var(--primary);
   color: white;
   border: none;
@@ -144,17 +144,25 @@ input[type="date"].control-input {
   font-weight: 700;
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: background var(--transition), opacity var(--transition);
+  transition: all var(--transition);
   white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 199, 60, 0.25);
 }
 
 .btn-search:hover:not(:disabled) {
   background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 199, 60, 0.35);
+}
+
+.btn-search:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn-search:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .compare-chart-box {
@@ -189,6 +197,12 @@ input[type="date"].control-input {
   padding: 16px 18px;
   box-shadow: var(--shadow-sm);
   border-left: 4px solid;
+  transition: all var(--transition-smooth);
+}
+
+.compare-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
 
 .stat-ticker {

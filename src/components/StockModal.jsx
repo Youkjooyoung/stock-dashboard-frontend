@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
 import { Line } from 'react-chartjs-2';
 import StockChat from './StockChat';
@@ -115,7 +116,6 @@ export default function StockModal({ stock, onClose }) {
   const [chartType, setChartType] = useState('candle');
   const [period, setPeriod] = useState('일');
   const [collectOpen, setCollectOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
   const tabGroupRef = useRef(null);
 
   const { data: detailData = [], isLoading: chartLoading } = useStockDetail(stock?.srtnCd);
@@ -298,7 +298,7 @@ export default function StockModal({ stock, onClose }) {
                   
                   {/* 기간 선택 */}
                   <div className={styles['modal-chart-tab-group']} ref={tabGroupRef}>
-                    {PERIODS.map((p, i) => (
+                    {PERIODS.map((p) => (
                       <motion.button
                         key={p}
                         className={`${styles['modal-chart-tab']} ${period === p ? styles.active : ''}`}

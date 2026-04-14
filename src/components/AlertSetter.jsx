@@ -51,7 +51,9 @@ export default function AlertSetter({ stock }) {
   const handleDelete = async (alertId) => {
     try {
       await deleteAlert.mutateAsync(alertId);
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
 
   return (

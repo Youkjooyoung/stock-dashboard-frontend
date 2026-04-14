@@ -8,6 +8,11 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  transition: box-shadow var(--transition-smooth);
+}
+
+.table-box:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .table-toolbar {
@@ -112,7 +117,7 @@
 
 .search-input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(3,199,90,0.10);
+  box-shadow: 0 0 0 3px rgba(0, 199, 60, 0.12);
 }
 
 .search-input::placeholder { color: var(--text-4); }
@@ -232,10 +237,15 @@
 
 .stock-table tbody tr {
   cursor: pointer;
+  transition: background var(--transition);
 }
 
 .stock-table tbody tr:hover td {
-  background: var(--surface-hover);
+  background: var(--primary-light);
+}
+
+.stock-table tbody tr:hover .stock-name {
+  color: var(--primary-dark);
 }
 
 .stock-code {

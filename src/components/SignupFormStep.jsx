@@ -13,7 +13,7 @@ function getPasswordStrength(pw) {
     if (!pw) return 0;
     const hasLetter  = /[가-힣a-zA-Z]/.test(pw);
     const hasNumber  = /[0-9]/.test(pw);
-    const hasSpecial = /[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>/?~`]/.test(pw);
+    const hasSpecial = /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/.test(pw);
     const types = [hasLetter, hasNumber, hasSpecial].filter(Boolean).length;
     if (pw.length < 6) return 1;
     if (types >= 3 && pw.length >= 10) return 4;
@@ -28,7 +28,7 @@ function validateEmail(v) {
 
 function validateNickname(name) {
     if (!name.trim()) return '닉네임을 입력해주세요.';
-    if (/[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>/?~`]/.test(name)) return '특수문자는 사용할 수 없습니다.';
+    if (/[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/.test(name)) return '특수문자는 사용할 수 없습니다.';
     if (!/^[가-힣a-zA-Z0-9]+$/.test(name)) return '한글, 영문, 숫자만 사용 가능합니다.';
     if (/^[가-힣]+$/.test(name)) {
         if (name.length < 2 || name.length > 8) return '한글만 사용 시 2~8자여야 합니다.';
@@ -43,7 +43,7 @@ function validatePassword(pw) {
     if (pw.length < 6 || pw.length > 12) return '비밀번호는 6~12자여야 합니다.';
     const hasLetter  = /[가-힣a-zA-Z]/.test(pw);
     const hasNumber  = /[0-9]/.test(pw);
-    const hasSpecial = /[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>/?~`]/.test(pw);
+    const hasSpecial = /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/.test(pw);
     const types = [hasLetter, hasNumber, hasSpecial].filter(Boolean).length;
     if (types < 2) return '영문·한글·숫자·특수문자 중 2가지 이상을 혼합해야 합니다.';
     return null;

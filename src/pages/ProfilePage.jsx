@@ -34,7 +34,7 @@ function formatDate(str) {
 
 function validateNickname(name) {
   if (!name.trim()) return '닉네임을 입력해주세요.';
-  if (/[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>/?~`]/.test(name))
+  if (/[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/.test(name))
     return '특수문자는 사용할 수 없습니다.';
   if (!/^[가-힣a-zA-Z0-9]+$/.test(name))
     return '한글, 영문, 숫자만 사용 가능합니다.';
@@ -50,7 +50,7 @@ function validatePassword(pw) {
   if (pw.length < 6 || pw.length > 12) return '비밀번호는 6~12자여야 합니다.';
   const hasLetter  = /[가-힣a-zA-Z]/.test(pw);
   const hasNumber  = /[0-9]/.test(pw);
-  const hasSpecial = /[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>/?~`]/.test(pw);
+  const hasSpecial = /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/.test(pw);
   const types = [hasLetter, hasNumber, hasSpecial].filter(Boolean).length;
   if (types < 2) return '영문·한글·숫자·특수문자 중 2가지 이상을 혼합해야 합니다.';
   return null;
@@ -328,7 +328,9 @@ export default function ProfilePage() {
   const handleDeleteAlert = async (alertId) => {
     try {
       await deleteAlertMutation.mutateAsync(alertId);
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
 
   const rateList = watchlist.map(s => {

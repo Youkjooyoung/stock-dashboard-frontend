@@ -1,11 +1,11 @@
 
 /* ===================================================================
-   Design Tokens — Instagram 감성 / 차분한 모노크롬 + 소프트 블루
+   Design Tokens — 토스 / 네이버페이 스타일 (Primary Green)
    =================================================================== */
 :root {
-  --primary:          #03C75A;
-  --primary-dark:     #02A049;
-  --primary-light:    #E8F9EF;
+  --primary:          #00C73C;
+  --primary-dark:     #00A532;
+  --primary-light:    #E6F9EC;
   --primary-text:     #ffffff;
 
   --up:               #F04452;
@@ -25,18 +25,18 @@
   --kakao-text:       #3C1E1E;
   --google:           #4285F4;
 
-  --bg:               #F5F6F7;
+  --bg:               #F8F9FA;
   --surface:          #ffffff;
-  --surface-2:        #FAFAFA;
-  --surface-hover:    #F0F0F0;
+  --surface-2:        #FAFBFC;
+  --surface-hover:    #F1F3F5;
 
-  --border:           #E5E5E5;
-  --border-strong:    #b0b0b0;
-  --border-focus:     #3b5bdb;
+  --border:           #E9ECEF;
+  --border-strong:    #CED4DA;
+  --border-focus:     #00C73C;
 
-  --text-1:           #191919;
-  --text-2:           #6D6D6D;
-  --text-3:           #A0A0A0;
+  --text-1:           #1a1a1a;
+  --text-2:           #4a4a4a;
+  --text-3:           #8b8b8b;
   --text-4:           #c7c7c7;
 
   /* 반지름 — 더 크고 부드럽게 */
@@ -233,7 +233,7 @@ img { max-width: 100%; }
 }
 .input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(59,91,219,0.10);
+  box-shadow: 0 0 0 3px rgba(0, 199, 60, 0.12);
 }
 .input::placeholder { color: var(--text-4); }
 
@@ -321,7 +321,7 @@ img { max-width: 100%; }
 }
 .form-input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(59,91,219,0.10);
+  box-shadow: 0 0 0 3px rgba(0, 199, 60, 0.12);
 }
 .form-input::placeholder { color: var(--text-4); }
 
@@ -353,7 +353,7 @@ img { max-width: 100%; }
   vertical-align: middle; margin-right: 5px;
 }
 .spinner-green {
-  border-color: rgba(59,91,219,0.15);
+  border-color: rgba(0, 199, 60, 0.15);
   border-top-color: var(--primary);
 }
 .spinner-dark {
@@ -490,8 +490,8 @@ img { max-width: 100%; }
   75% { transform: translateX(5px); }
 }
 @keyframes glow      {
-  0%, 100% { box-shadow: 0 0 5px rgba(59, 91, 219, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(59, 91, 219, 0.6); }
+  0%, 100% { box-shadow: 0 0 5px rgba(0, 199, 60, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(0, 199, 60, 0.6); }
 }
 @keyframes ripple    {
   to { transform: scale(2); opacity: 0; }
@@ -536,7 +536,7 @@ img { max-width: 100%; }
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 20px rgba(59, 91, 219, 0.4);
+  box-shadow: 0 0 20px rgba(0, 199, 60, 0.4);
 }
 
 /* ===================================================================
