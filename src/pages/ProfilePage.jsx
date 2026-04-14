@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from '../hooks/useToast';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Bar } from 'react-chartjs-2';
+import { Bar, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS, CategoryScale, LinearScale,
-  BarElement, Tooltip, Legend
+  BarElement, ArcElement, Tooltip, Legend
 } from 'chart.js';
 import api from '../api/axiosInstance';
 import useAuthStore from '../store/authStore';
@@ -18,7 +18,7 @@ import { uploadProfileImage } from '../api/profileApi';
 import AiAnalysis from '../components/AiAnalysis';
 import styles from '../styles/pages/ProfilePage.module.css';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 const TABS = ['계정 정보', '즐겨찾기', '수익률 차트', '알림 관리', '포트폴리오', 'AI 분석'];
 const NICK_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000; // 30일
@@ -856,6 +856,70 @@ export default function ProfilePage() {
                         }
                       }}
                     />
+                  </div>
+                )}
+
+                {portfolio.length > 0 && (
+                  <div className={styles['pf-charts-row']}>
+                    <div className={styles['pf-chart-wrap']}>
+                      <div className="section-title" style={{ marginBottom: 12 }}>종목별 수익률</div>
+                      <Bar
+                        data={{
+                          labels: portfolio.map(p => p.stockName),
+                          datasets: [{
+                            label: '수익률 (%)',
+                            data: portfolio.map(p => {
+                              const cur = priceMap[p.ticker] ?? p.buyPrice;
+                              return p.buyPrice > 0 ? ((cur - p.buyPrice) / p.buyPrice * 100) : 0;
+                            }),
+                            backgroundColor: portfolio.map(p => {
+                              const cur = priceMap[p.ticker] ?? p.buyPrice;
+                              const r = p.buyPrice > 0 ? ((cur - p.buyPrice) / p.buyPrice * 100) : 0;
+                              return r > 0 ? 'rgba(200,74,49,0.7)' : r < 0 ? 'rgba(23,99,178,0.7)' : 'rgba(153,153,153,0.5)';
+                            }),
+                            borderColor: portfolio.map(p => {
+                              const cur = priceMap[p.ticker] ?? p.buyPrice;
+                              const r = p.buyPrice > 0 ? ((cur - p.buyPrice) / p.buyPrice * 100) : 0;
+                              return r > 0 ? '#c84a31' : r < 0 ? '#1763b2' : '#999';
+                            }),
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                          }]
+                        }}
+                        options={{
+                          responsive: true,
+                          plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: ctx => `${ctx.raw >= 0 ? '+' : ''}${ctx.raw.toFixed(2)}%` } }
+                          },
+                          scales: {
+                            y: { ticks: { callback: v => `${Number(v) >= 0 ? '+' : ''}${Number(v).toFixed(1)}%` }, grid: { color: 'rgba(128,128,128,0.08)' } },
+                            x: { grid: { display: false } }
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className={styles['pf-chart-wrap']}>
+                      <div className="section-title" style={{ marginBottom: 12 }}>포트폴리오 구성</div>
+                      <Doughnut
+                        data={{
+                          labels: portfolio.map(p => p.stockName),
+                          datasets: [{
+                            data: portfolio.map(p => p.buyPrice * p.quantity),
+                            backgroundColor: ['#4f8ef7','#f76e6e','#4ec980','#f7c94f','#9b59b6','#1abc9c','#e67e22','#3498db','#e74c3c','#2ecc71'].slice(0, portfolio.length),
+                            borderWidth: 1,
+                            borderColor: 'var(--surface-2)',
+                          }]
+                        }}
+                        options={{
+                          responsive: true,
+                          plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } },
+                            tooltip: { callbacks: { label: ctx => `${ctx.label}: ${Number(ctx.raw).toLocaleString()}원 (${totalBuy > 0 ? (ctx.raw / totalBuy * 100).toFixed(1) : 0}%)` } }
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
                 )}
 
