@@ -25,6 +25,7 @@ export default function OAuthCallbackPage() {
       const nickname = params.get('nickname') || '';
       const provider = params.get('provider') || 'kakao';
       const role     = params.get('role') || 'USER';
+      window.history.replaceState(null, '', window.location.pathname);
       setAuth(email, accessToken, refreshToken, null, role);
       localStorage.setItem('kakaoNickname', nickname);
       localStorage.setItem('provider', provider);
