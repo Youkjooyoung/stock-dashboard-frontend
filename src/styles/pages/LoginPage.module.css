@@ -30,7 +30,7 @@
   font-size: 20px;
   font-weight: 900;
   color: white;
-  box-shadow: 0 2px 10px rgba(3,199,90,0.25);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.25);
 }
 
 .login-page-brand {
@@ -259,7 +259,7 @@
 
 .btn-login-submit:hover:not(:disabled) {
   background: var(--primary-dark);
-  box-shadow: 0 4px 14px rgba(3,199,90,0.3);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
 }
 
 .btn-login-submit:disabled {

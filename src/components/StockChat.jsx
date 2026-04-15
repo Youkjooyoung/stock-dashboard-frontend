@@ -9,7 +9,7 @@ export default function StockChat({ ticker, stockName }) {
   const [input, setInput]         = useState('');
   const [connected, setConnected] = useState(false);
   const clientRef = useRef(null);
-  const bottomRef = useRef(null);
+  const listRef = useRef(null);
 
   const email    = localStorage.getItem('userEmail') || '';
   const nickname = localStorage.getItem('kakaoNickname') || email.split('@')[0] || '익명';
@@ -41,7 +41,8 @@ export default function StockChat({ ticker, stockName }) {
   }, [ticker]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const el = listRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
   const sendMessage = () => {
@@ -75,7 +76,7 @@ export default function StockChat({ ticker, stockName }) {
         <span className={styles['chat-status-text']}>{connected ? '연결됨' : '연결 중..'}</span>
       </div>
 
-      <div className={styles['chat-message-list']}>
+      <div className={styles['chat-message-list']} ref={listRef}>
         {messages.length === 0 && (
           <div className={styles['chat-empty']}>첫 번째 의견을 남겨보세요!</div>
         )}
@@ -105,7 +106,6 @@ export default function StockChat({ ticker, stockName }) {
             </div>
           );
         })}
-        <div ref={bottomRef} />
       </div>
 
       <div className={styles['chat-input-row']}>

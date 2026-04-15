@@ -34,7 +34,7 @@ function formatDate(str) {
 
 function validateNickname(name) {
   if (!name.trim()) return '닉네임을 입력해주세요.';
-  if (/[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>/?~`]/.test(name))
+  if (/[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/.test(name))
     return '특수문자는 사용할 수 없습니다.';
   if (!/^[가-힣a-zA-Z0-9]+$/.test(name))
     return '한글, 영문, 숫자만 사용 가능합니다.';
@@ -50,7 +50,7 @@ function validatePassword(pw) {
   if (pw.length < 6 || pw.length > 12) return '비밀번호는 6~12자여야 합니다.';
   const hasLetter  = /[가-힣a-zA-Z]/.test(pw);
   const hasNumber  = /[0-9]/.test(pw);
-  const hasSpecial = /[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>/?~`]/.test(pw);
+  const hasSpecial = /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/.test(pw);
   const types = [hasLetter, hasNumber, hasSpecial].filter(Boolean).length;
   if (types < 2) return '영문·한글·숫자·특수문자 중 2가지 이상을 혼합해야 합니다.';
   return null;
@@ -328,7 +328,9 @@ export default function ProfilePage() {
   const handleDeleteAlert = async (alertId) => {
     try {
       await deleteAlertMutation.mutateAsync(alertId);
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
 
   const rateList = watchlist.map(s => {
@@ -691,10 +693,10 @@ export default function ProfilePage() {
                         label: '등락률 (%)',
                         data: rateList.map(s => s.rate),
                         backgroundColor: rateList.map(s =>
-                          s.rate > 0 ? 'rgba(200,74,49,0.7)' : s.rate < 0 ? 'rgba(23,99,178,0.7)' : 'rgba(153,153,153,0.5)'
+                          s.rate > 0 ? 'rgba(226,76,75,0.75)' : s.rate < 0 ? 'rgba(59,122,217,0.75)' : 'rgba(142,142,147,0.5)'
                         ),
                         borderColor: rateList.map(s =>
-                          s.rate > 0 ? '#c84a31' : s.rate < 0 ? '#1763b2' : '#999'
+                          s.rate > 0 ? '#E24C4B' : s.rate < 0 ? '#3B7AD9' : '#8E8E93'
                         ),
                         borderWidth: 1.5,
                         borderRadius: 4,
@@ -826,12 +828,12 @@ export default function ProfilePage() {
                           backgroundColor: portfolio.map(p => {
                             const cur = priceMap[p.ticker] ?? p.buyPrice;
                             const pnl = (cur - p.buyPrice) * p.quantity;
-                            return pnl > 0 ? 'rgba(200,74,49,0.7)' : pnl < 0 ? 'rgba(23,99,178,0.7)' : 'rgba(153,153,153,0.5)';
+                            return pnl > 0 ? 'rgba(226,76,75,0.75)' : pnl < 0 ? 'rgba(59,122,217,0.75)' : 'rgba(142,142,147,0.5)';
                           }),
                           borderColor: portfolio.map(p => {
                             const cur = priceMap[p.ticker] ?? p.buyPrice;
                             const pnl = (cur - p.buyPrice) * p.quantity;
-                            return pnl > 0 ? '#c84a31' : pnl < 0 ? '#1763b2' : '#999';
+                            return pnl > 0 ? '#E24C4B' : pnl < 0 ? '#3B7AD9' : '#8E8E93';
                           }),
                           borderWidth: 1.5,
                           borderRadius: 4,
@@ -875,12 +877,12 @@ export default function ProfilePage() {
                             backgroundColor: portfolio.map(p => {
                               const cur = priceMap[p.ticker] ?? p.buyPrice;
                               const r = p.buyPrice > 0 ? ((cur - p.buyPrice) / p.buyPrice * 100) : 0;
-                              return r > 0 ? 'rgba(200,74,49,0.7)' : r < 0 ? 'rgba(23,99,178,0.7)' : 'rgba(153,153,153,0.5)';
+                              return r > 0 ? 'rgba(226,76,75,0.75)' : r < 0 ? 'rgba(59,122,217,0.75)' : 'rgba(142,142,147,0.5)';
                             }),
                             borderColor: portfolio.map(p => {
                               const cur = priceMap[p.ticker] ?? p.buyPrice;
                               const r = p.buyPrice > 0 ? ((cur - p.buyPrice) / p.buyPrice * 100) : 0;
-                              return r > 0 ? '#c84a31' : r < 0 ? '#1763b2' : '#999';
+                              return r > 0 ? '#E24C4B' : r < 0 ? '#3B7AD9' : '#8E8E93';
                             }),
                             borderWidth: 1.5,
                             borderRadius: 4,

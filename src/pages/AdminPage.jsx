@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axiosInstance';
 import useAuthStore from '../store/authStore';
 import styles from '../styles/pages/AdminPage.module.css';
@@ -16,7 +15,6 @@ const NAV_ITEMS = [
 export default function AdminPage() {
     const navigate = useNavigate();
     const { role, logout } = useAuthStore();
-    const queryClient = useQueryClient();
 
     const [activeTab, setActiveTab] = useState('stats');
     const [stats, setStats] = useState(null);

@@ -8,7 +8,7 @@ function loadState() {
 }
 
 function saveState(state) {
-  try { sessionStorage.setItem(SS_KEY, JSON.stringify(state)); } catch {}
+  try { sessionStorage.setItem(SS_KEY, JSON.stringify(state)); } catch { /* ignore */ }
 }
 
 // ── 한국어 초성 검색 ────────────────────────────────────────

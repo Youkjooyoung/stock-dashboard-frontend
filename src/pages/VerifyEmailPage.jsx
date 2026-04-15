@@ -26,6 +26,7 @@ export default function VerifyEmailPage() {
     called.current = true;
     const token = new URLSearchParams(window.location.search).get('token');
     if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus('error');
       return;
     }
