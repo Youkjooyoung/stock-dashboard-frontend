@@ -1,18 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from '../styles/components/SecureKeypad.module.css';
 
-export default function SecureKeypad({ value, onChange, onClose }) {
-    const [keys, setKeys] = useState([]);
-    const ref = useRef(null);
+const createShuffledKeys = () => {
+    const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+    for (let i = nums.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [nums[i], nums[j]] = [nums[j], nums[i]];
+    }
+    return nums;
+};
 
-    useEffect(() => {
-        const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-        for (let i = nums.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [nums[i], nums[j]] = [nums[j], nums[i]];
-        }
-        setKeys(nums);
-    }, []);
+export default function SecureKeypad({ value, onChange, onClose }) {
+    const [keys] = useState(createShuffledKeys);
+    const ref = useRef(null);
 
     useEffect(() => {
         const handleOutside = (e) => {

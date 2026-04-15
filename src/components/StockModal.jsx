@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
 import { Line } from 'react-chartjs-2';
 import StockChat from './StockChat';
@@ -115,11 +116,28 @@ export default function StockModal({ stock, onClose }) {
   const [chartType, setChartType] = useState('candle');
   const [period, setPeriod] = useState('일');
   const [collectOpen, setCollectOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
   const tabGroupRef = useRef(null);
+  const modalBodyRef = useRef(null);
 
   const { data: detailData = [], isLoading: chartLoading } = useStockDetail(stock?.srtnCd);
   const { data: news = [], isLoading: newsLoading } = useStockNews(stock?.itmsNm);
+
+  useLayoutEffect(() => {
+    const el = modalBodyRef.current;
+    if (!el) return;
+    const reset = () => { el.scrollTop = 0; };
+    reset();
+    const raf1 = requestAnimationFrame(reset);
+    const t1 = setTimeout(reset, 50);
+    const t2 = setTimeout(reset, 150);
+    const t3 = setTimeout(reset, 350);
+    return () => {
+      cancelAnimationFrame(raf1);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [stock?.srtnCd]);
   const collectMutation = useCollectTickerHistory(stock?.srtnCd);
 
   function handleCollect(months) {
@@ -208,7 +226,7 @@ export default function StockModal({ stock, onClose }) {
           </div>
 
           {/* 본문 */}
-          <div className={styles['modal-body']}>
+          <div className={styles['modal-body']} ref={modalBodyRef}>
 
             {/* 핵심 지표 */}
             <motion.div 
@@ -298,7 +316,7 @@ export default function StockModal({ stock, onClose }) {
                   
                   {/* 기간 선택 */}
                   <div className={styles['modal-chart-tab-group']} ref={tabGroupRef}>
-                    {PERIODS.map((p, i) => (
+                    {PERIODS.map((p) => (
                       <motion.button
                         key={p}
                         className={`${styles['modal-chart-tab']} ${period === p ? styles.active : ''}`}

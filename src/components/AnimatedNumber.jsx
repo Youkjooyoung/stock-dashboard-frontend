@@ -62,6 +62,7 @@ export default function AnimatedNumber({
 /**
  * 미리 정의된 포맷터
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatters = {
   // 천 단위 구분 쉼표
   comma: (val) => Math.round(val).toLocaleString(),

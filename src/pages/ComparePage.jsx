@@ -11,7 +11,7 @@ import styles from '../styles/pages/ComparePage.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
-const COLORS = ['#1ec800', '#c84a31', '#1763b2', '#f5a623', '#8b5cf6'];
+const COLORS = ['#6366F1', '#E24C4B', '#3B7AD9', '#F59E0B', '#F472B6'];
 
 const toApiDate = (iso) => iso.replace(/-/g, '');
 
@@ -126,10 +126,12 @@ export default function ComparePage() {
           <div className={styles['control-group']}>
             <label className={styles['control-label']}>시작일</label>
             <input
-              className={styles['control-input']}
+              className={`${styles['control-input']} ${styles['date-input']}`}
               type="date"
               value={startDate}
               onChange={e => setStartDate(e.target.value)}
+              onClick={e => e.currentTarget.showPicker?.()}
+              onFocus={e => e.currentTarget.showPicker?.()}
               max={endDate}
             />
           </div>
@@ -137,10 +139,12 @@ export default function ComparePage() {
           <div className={styles['control-group']}>
             <label className={styles['control-label']}>종료일</label>
             <input
-              className={styles['control-input']}
+              className={`${styles['control-input']} ${styles['date-input']}`}
               type="date"
               value={endDate}
               onChange={e => setEndDate(e.target.value)}
+              onClick={e => e.currentTarget.showPicker?.()}
+              onFocus={e => e.currentTarget.showPicker?.()}
               min={startDate}
             />
           </div>
