@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const client = new Client({
-      webSocketFactory: () => new SockJS('https://api.jyyouk.shop/ws', null, { transports: ['websocket'] }),
+      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_API_BASE_URL}/ws`, null, { transports: ['websocket'] }),
       reconnectDelay: 5000,
       onConnect: () => {
         client.subscribe('/topic/prices', () => {

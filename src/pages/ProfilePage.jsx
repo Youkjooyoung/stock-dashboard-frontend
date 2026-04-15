@@ -47,12 +47,11 @@ function validateNickname(name) {
 }
 
 function validatePassword(pw) {
-  if (pw.length < 6 || pw.length > 12) return '비밀번호는 6~12자여야 합니다.';
-  const hasLetter  = /[가-힣a-zA-Z]/.test(pw);
-  const hasNumber  = /[0-9]/.test(pw);
-  const hasSpecial = /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/.test(pw);
-  const types = [hasLetter, hasNumber, hasSpecial].filter(Boolean).length;
-  if (types < 2) return '영문·한글·숫자·특수문자 중 2가지 이상을 혼합해야 합니다.';
+  if (!pw || pw.length < 8) return '비밀번호는 8자 이상이어야 합니다.';
+  if (!/[a-z]/.test(pw)) return '소문자(a-z)를 포함해야 합니다.';
+  if (!/[A-Z]/.test(pw)) return '대문자(A-Z)를 포함해야 합니다.';
+  if (!/[0-9]/.test(pw)) return '숫자를 포함해야 합니다.';
+  if (!/[!@#$%^&*]/.test(pw)) return '특수문자(!@#$%^&*)를 포함해야 합니다.';
   return null;
 }
 
