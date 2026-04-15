@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import useAuthStore from '../store/authStore';
+import { useToast } from '../hooks/useToast';
 import styles from '../styles/pages/AdminPage.module.css';
 
 const NAV_ITEMS = [
@@ -15,6 +16,7 @@ const NAV_ITEMS = [
 export default function AdminPage() {
     const navigate = useNavigate();
     const { role, logout } = useAuthStore();
+    const { showToast } = useToast();
 
     const [activeTab, setActiveTab] = useState('stats');
     const [stats, setStats] = useState(null);
@@ -142,7 +144,7 @@ export default function AdminPage() {
 
     const handleResend = async (userId) => {
         await api.post(`/admin/users/${userId}/resend-verify`);
-        alert('인증 메일을 재발송했습니다.');
+        showToast('인증 메일을 재발송했습니다.', 'success');
     };
 
     const handleRoleToggle = async (userId, currentRole) => {

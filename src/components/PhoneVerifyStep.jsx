@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import axios from 'axios';
+import { useToast } from '../hooks/useToast';
 import styles from '../styles/components/PhoneVerifyStep.module.css';
 
 export default function PhoneVerifyStep({ onCertified }) {
+    const { showToast } = useToast();
 
     useEffect(() => {
         const script = document.createElement('script');
@@ -14,7 +16,7 @@ export default function PhoneVerifyStep({ onCertified }) {
 
     const handleVerify = () => {
         const { IMP } = window;
-        if (!IMP) return alert('본인인증 모듈 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+        if (!IMP) { showToast('본인인증 모듈 로딩 중입니다. 잠시 후 다시 시도해주세요.', 'warning'); return; }
 
         IMP.init(import.meta.env.VITE_PORTONE_IMP_KEY);
         IMP.certification({
@@ -22,7 +24,7 @@ export default function PhoneVerifyStep({ onCertified }) {
             channel_key: 'channel-key-9d22f33f-5c96-4c09-ace1-957763da1b9e',
             popup: true
         }, async (rsp) => {
-            if (!rsp.success) return alert('본인인증이 실패했습니다.');
+            if (!rsp.success) { showToast('본인인증이 실패했습니다.', 'error'); return; }
 
             try {
                 const { data } = await axios.post(
@@ -32,7 +34,7 @@ export default function PhoneVerifyStep({ onCertified }) {
                 );
                 onCertified({ name: data.name, phone: data.phone, impUid: rsp.imp_uid });
             } catch {
-                alert('본인인증 정보 확인에 실패했습니다.');
+                showToast('본인인증 정보 확인에 실패했습니다.', 'error');
             }
         });
     };

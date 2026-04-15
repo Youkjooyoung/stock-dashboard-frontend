@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../hooks/useToast';
 import { Line } from 'react-chartjs-2';
 import { useMutation } from '@tanstack/react-query';
 import {
@@ -17,6 +18,7 @@ const toApiDate = (iso) => iso.replace(/-/g, '');
 
 export default function ComparePage() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [tickerInput, setTickerInput] = useState('');
   const [tickers, setTickers]         = useState([]);
@@ -28,7 +30,7 @@ export default function ComparePage() {
   const addTicker = () => {
     const t = tickerInput.trim().toUpperCase();
     if (!t || tickers.includes(t)) return;
-    if (tickers.length >= 5) { alert('최대 5개까지 비교 가능해요!'); return; }
+    if (tickers.length >= 5) { showToast('최대 5개까지 비교 가능해요!', 'warning'); return; }
     setTickers(prev => [...prev, t]);
     setTickerInput('');
   };
@@ -89,11 +91,11 @@ export default function ComparePage() {
       setChartData(chartData);
       setStatsData(stats);
     },
-    onError: () => alert('데이터 조회에 실패했습니다. 종목코드를 확인해주세요.'),
+    onError: () => showToast('데이터 조회에 실패했습니다. 종목코드를 확인해주세요.', 'error'),
   });
 
   const handleSearch = () => {
-    if (tickers.length === 0) { alert('종목코드를 입력해주세요!'); return; }
+    if (tickers.length === 0) { showToast('종목코드를 입력해주세요!', 'warning'); return; }
     searchMutation.mutate({ tickers, startDate, endDate });
   };
 

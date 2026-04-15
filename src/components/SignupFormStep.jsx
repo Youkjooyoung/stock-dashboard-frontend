@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import AddressSearch from './AddressSearch';
 import SecureKeypad from './SecureKeypad';
+import { useToast } from '../hooks/useToast';
 import styles from '../styles/components/SignupFormStep.module.css';
 
 const API = `${import.meta.env.VITE_API_BASE_URL}/api/auth`;
@@ -57,6 +58,7 @@ function validateResidentNo(v) {
 }
 
 export default function SignupFormStep({ certInfo, onComplete }) {
+    const { showToast } = useToast();
     const [emailChecked, setEmailChecked] = useState(false);
     const [emailExists, setEmailExists]   = useState(false);
     const [errors, setErrors]             = useState({});
@@ -196,7 +198,7 @@ export default function SignupFormStep({ certInfo, onComplete }) {
             }, { withCredentials: true });
             onComplete(form.email);
         } catch (err) {
-            alert(err.response?.data?.message || '회원가입 중 오류가 발생했습니다.');
+            showToast(err.response?.data?.message || '회원가입 중 오류가 발생했습니다.', 'error');
         } finally {
             setLoading(false);
         }

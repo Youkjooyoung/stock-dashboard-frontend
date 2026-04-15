@@ -4,6 +4,7 @@ import useAuthStore from '../store/authStore';
 import useAlertStore from '../store/alertStore';
 import useDarkMode from '../hooks/useDarkMode';
 import { useAlerts, useDeleteAlert } from '../hooks/useQueries';
+import { useToast } from '../hooks/useToast';
 import styles from '../styles/components/Header.module.css';
 
 const NAV_ITEMS = [
@@ -16,6 +17,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
   const navigate  = useNavigate();
   const location  = useLocation();
   const { logout } = useAuthStore();
+  const { showToast } = useToast();
   const [dark, setDark] = useDarkMode();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { badgeCount, reset } = useAlertStore();
@@ -75,7 +77,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
     try {
       await deleteAlertMutation.mutateAsync(alertId);
     } catch {
-      alert('알림 삭제에 실패했습니다.');
+      showToast('알림 삭제에 실패했습니다.', 'error');
     }
   };
 
@@ -87,7 +89,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
         triggeredAlerts.map(a => deleteAlertMutation.mutateAsync(a.alertId || a.ALERT_ID))
       );
     } catch {
-      alert('일부 알림 삭제에 실패했습니다.');
+      showToast('일부 알림 삭제에 실패했습니다.', 'error');
     }
   };
 

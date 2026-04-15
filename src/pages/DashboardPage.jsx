@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from '../hooks/useToast';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {
@@ -24,6 +25,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointEleme
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { autoRefresh } = useOutletContext();
+  const { showToast } = useToast();
   const queryClient = useQueryClient();
 
   const [tab, setTab]               = useState('all');
@@ -84,7 +86,7 @@ export default function DashboardPage() {
     try {
       await toggleWatchMutation.mutateAsync({ itemId, isWatched });
     } catch {
-      alert('로그인이 필요합니다.');
+      showToast('로그인이 필요합니다.', 'warning');
       navigate('/login');
     }
   };
