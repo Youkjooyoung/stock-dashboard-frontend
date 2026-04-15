@@ -16,6 +16,7 @@ import {
 } from '../hooks/useQueries';
 import { uploadProfileImage } from '../api/profileApi';
 import AiAnalysis from '../components/AiAnalysis';
+import { formatShortDate } from '../utils/dateUtils';
 import styles from '../styles/pages/ProfilePage.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
@@ -23,14 +24,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Le
 const TABS = ['계정 정보', '즐겨찾기', '수익률 차트', '알림 관리', '포트폴리오', 'AI 분석'];
 const NICK_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000; // 30일
 
-/* ── 유틸 함수 ────────────────────────────────── */
-function formatDate(str) {
-  if (!str) return '-';
-  if (str.includes('T')) return str.slice(0, 10);
-  if (/^\d{4}-\d{2}-\d{2}/.test(str)) return str.slice(0, 10);
-  if (/^\d{8}$/.test(str)) return `${str.slice(0,4)}-${str.slice(4,6)}-${str.slice(6,8)}`;
-  return str;
-}
 
 function validateNickname(name) {
   if (!name.trim()) return '닉네임을 입력해주세요.';
@@ -504,7 +497,7 @@ export default function ProfilePage() {
             <div className={styles['profile-stat-label']}>로그인 방식</div>
           </div>
           <div className={styles['profile-stat-card']}>
-            <div className={`${styles['profile-stat-value']} ${styles['profile-stat-value--date']}`}>{formatDate(joinDate)}</div>
+            <div className={`${styles['profile-stat-value']} ${styles['profile-stat-value--date']}`}>{formatShortDate(joinDate)}</div>
             <div className={styles['profile-stat-label']}>가입일</div>
           </div>
         </div>
@@ -988,7 +981,7 @@ export default function ProfilePage() {
                           <div className={styles['pf-item-left']}>
                             <p className={styles['pf-item-name']}>{p.stockName}</p>
                             <p className={styles['pf-item-meta']}>
-                              {p.ticker} &middot; {p.quantity}주 &middot; 매수 {p.buyPrice.toLocaleString()}원 &middot; {formatDate(p.buyDate)}
+                              {p.ticker} &middot; {p.quantity}주 &middot; 매수 {p.buyPrice.toLocaleString()}원 &middot; {formatShortDate(p.buyDate)}
                             </p>
                           </div>
                           <div className={styles['pf-item-right']}>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../hooks/useToast';
+import { toYYYYMMDD } from '../utils/dateUtils';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {
@@ -92,11 +93,6 @@ export default function DashboardPage() {
   };
 
   const openModal = (stock) => setModal(stock);
-
-  // ?�체 과거 ?�이???�집
-  function toYYYYMMDD(date) {
-    return date.toISOString().slice(0, 10).replace(/-/g, '');
-  }
 
   async function startBulkCollect(years, skipExisting = false) {
     const end   = new Date();

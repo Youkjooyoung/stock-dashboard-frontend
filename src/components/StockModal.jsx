@@ -9,6 +9,7 @@ import CandlestickChart from './CandlestickChart';
 import AnimatedNumber, { formatters } from './AnimatedNumber';
 import { useStockDetail, useStockNews, useCollectTickerHistory } from '../hooks/useQueries';
 import { SkeletonChart, SkeletonNews } from './StockModalSkeleton';
+import { toYYYYMMDD, formatNewsDate } from '../utils/dateUtils';
 import styles from '../styles/components/StockModal.module.css';
 
 const chartOptions = {
@@ -60,10 +61,6 @@ const COLLECT_RANGES = [
   { label: '5년',  months: 60 },
   { label: '최대', months: 240 },
 ];
-
-function toYYYYMMDD(date) {
-  return date.toISOString().slice(0, 10).replace(/-/g, '');
-}
 
 // 모달 애니메이션 variants
 const modalVariants = {
@@ -170,14 +167,6 @@ export default function StockModal({ stock, onClose }) {
     { label: '거래량', value: vol, cls: '', isVolume: true },
     { label: '등락률', value: rate, diff, cls, isRate: true },
   ];
-
-  const formatDate = (dateStr) => {
-    try {
-      return new Date(dateStr).toLocaleDateString('ko-KR', {
-        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-      });
-    } catch { return dateStr; }
-  };
 
   return (
     <AnimatePresence>
@@ -412,7 +401,7 @@ export default function StockModal({ stock, onClose }) {
                     whileHover={{ x: 4, backgroundColor: 'var(--surface-hover)' }}>
                     <div className={styles['modal-news-title']}>{n.title}</div>
                     <div className={styles['modal-news-desc']}>{n.description}</div>
-                    <div className={styles['modal-news-date']}>{formatDate(n.pubDate)}</div>
+                    <div className={styles['modal-news-date']}>{formatNewsDate(n.pubDate)}</div>
                   </motion.a>
                 ))
               ) : (

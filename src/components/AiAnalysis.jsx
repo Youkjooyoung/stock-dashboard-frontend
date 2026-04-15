@@ -79,7 +79,7 @@ export default function AiAnalysis({ type, stock, portfolio, priceMap }) {
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState('');
 
-  const endpoint = type === 'stock' ? '/ai/analyze/stock' : '/ai/analyze/portfolio';
+  const endpoint = '/ai/analyze';
 
   const buildPrompt = () => {
     if (type === 'stock') return buildStockPrompt(stock);

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
+import { isoToApiDate } from '../utils/dateUtils';
 import { Line } from 'react-chartjs-2';
 import { useMutation } from '@tanstack/react-query';
 import {
@@ -14,7 +15,6 @@ ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, T
 
 const COLORS = ['#6366F1', '#E24C4B', '#3B7AD9', '#F59E0B', '#F472B6'];
 
-const toApiDate = (iso) => iso.replace(/-/g, '');
 
 export default function ComparePage() {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function ComparePage() {
       const results = await Promise.all(
         tickers.map(t =>
           api.get(`/stock/prices/${t}/range`, {
-            params: { startDate: toApiDate(startDate), endDate: toApiDate(endDate) }
+            params: { startDate: isoToApiDate(startDate), endDate: isoToApiDate(endDate) }
           }).then(res => ({ ticker: t, data: res.data }))
         )
       );

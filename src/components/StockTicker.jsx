@@ -1,9 +1,11 @@
+import { useStockPrices } from '../hooks/useQueries';
 import styles from '../styles/components/StockTicker.module.css';
 
-export default function StockTicker({ stocks }) {
-  if (!stocks || stocks.length === 0) return null;
+export default function StockTicker() {
+  const { data: stocks = [] } = useStockPrices();
 
-  // 거래량 상위 25개 선별
+  if (stocks.length === 0) return null;
+
   const tickerStocks = [...stocks]
     .sort((a, b) => b.trqu - a.trqu)
     .slice(0, 25)
@@ -14,7 +16,6 @@ export default function StockTicker({ stocks }) {
       return { ...s, rate };
     });
 
-  // 끊김없는 루프를 위해 2배 복제
   const items = [...tickerStocks, ...tickerStocks];
 
   return (

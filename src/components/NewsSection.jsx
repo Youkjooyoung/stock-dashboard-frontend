@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNews } from '../hooks/useQueries';
+import { formatNewsDate } from '../utils/dateUtils';
 import styles from '../styles/components/NewsSection.module.css';
 
 function NewsSkeleton() {
@@ -25,14 +26,6 @@ export default function NewsSection({ stockName }) {
   const handleSearch = (e) => {
     e.preventDefault();
     setQuery(inputVal.trim() || '코스피');
-  };
-
-  const formatDate = (dateStr) => {
-    try {
-      return new Date(dateStr).toLocaleDateString('ko-KR', {
-        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-      });
-    } catch { return dateStr; }
   };
 
   return (
@@ -62,7 +55,7 @@ export default function NewsSection({ stockName }) {
               className={styles['news-item']}>
               <div className={styles['news-item-header']}>
                 <span className={styles['news-item-title']}>{n.title}</span>
-                <span className={styles['news-item-date']}>{formatDate(n.pubDate)}</span>
+                <span className={styles['news-item-date']}>{formatNewsDate(n.pubDate)}</span>
               </div>
               <p className={styles['news-item-desc']}>{n.description}</p>
             </a>
