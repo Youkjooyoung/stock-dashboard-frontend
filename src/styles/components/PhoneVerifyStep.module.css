@@ -76,7 +76,7 @@
 
 .button:hover {
     background: var(--primary-dark);
-    box-shadow: 0 4px 14px rgba(3, 199, 90, 0.28);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.28);
 }
 
 .link {

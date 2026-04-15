@@ -63,12 +63,31 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
     localStorage.setItem('readAlerts', JSON.stringify(newRead));
   };
 
+  const markAllAsRead = () => {
+    const allIds = triggeredAlerts.map(a => a.alertId || a.ALERT_ID);
+    const merged = Array.from(new Set([...readAlerts, ...allIds]));
+    setReadAlerts(merged);
+    localStorage.setItem('readAlerts', JSON.stringify(merged));
+  };
+
   const deleteAlert = async (e, alertId) => {
     e.stopPropagation();
     try {
       await deleteAlertMutation.mutateAsync(alertId);
     } catch {
       alert('알림 삭제에 실패했습니다.');
+    }
+  };
+
+  const deleteAllAlerts = async () => {
+    if (triggeredAlerts.length === 0) return;
+    if (!window.confirm('수신된 모든 알림을 삭제할까요?')) return;
+    try {
+      await Promise.all(
+        triggeredAlerts.map(a => deleteAlertMutation.mutateAsync(a.alertId || a.ALERT_ID))
+      );
+    } catch {
+      alert('일부 알림 삭제에 실패했습니다.');
     }
   };
 
@@ -144,7 +163,23 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
               {isAlertOpen && (
                 <div className={styles['alert-dropdown']}>
                   <div className={styles['alert-dropdown-header']}>
-                    알림 목록
+                    <span>알림 목록</span>
+                    {triggeredAlerts.length > 0 && (
+                      <div className={styles['alert-dropdown-header-actions']}>
+                        <button
+                          className={styles['alert-header-btn']}
+                          onClick={markAllAsRead}
+                          title="모두 읽음 처리">
+                          모두 읽음
+                        </button>
+                        <button
+                          className={`${styles['alert-header-btn']} ${styles['alert-header-btn-danger']}`}
+                          onClick={deleteAllAlerts}
+                          title="모두 삭제">
+                          모두 삭제
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div className={styles['alert-dropdown-body']}>
                     {triggeredAlerts.length === 0 ? (

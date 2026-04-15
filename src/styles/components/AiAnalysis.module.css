@@ -50,13 +50,13 @@
   font-family: var(--font-sans);
   transition: all var(--transition);
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(0, 199, 60, 0.25);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
 }
 
 .ai-btn:hover:not(:disabled) {
   background: var(--primary-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 199, 60, 0.35);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
 }
 
 .ai-btn:active:not(:disabled) {

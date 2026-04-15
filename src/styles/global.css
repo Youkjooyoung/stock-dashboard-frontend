@@ -1,43 +1,48 @@
 
 /* ===================================================================
-   Design Tokens — 토스 / 네이버페이 스타일 (Primary Green)
+   Design Tokens — Instagram Calm (Soft Indigo · Warm Neutrals)
+   의도적으로 네이버(#03C75A 계열) 그린을 피하고 차분한 인디고 톤 사용
    =================================================================== */
 :root {
-  --primary:          #00C73C;
-  --primary-dark:     #00A532;
-  --primary-light:    #E6F9EC;
+  --primary:          #6366F1;
+  --primary-dark:     #4F46E5;
+  --primary-light:    #EEF0FF;
+  --primary-soft:     #F5F6FF;
   --primary-text:     #ffffff;
 
-  --up:               #F04452;
-  --up-light:         #FFF0F1;
-  --down:             #1E6EEB;
-  --down-light:       #EEF3FF;
-  --flat:             #adb5bd;
+  --accent:           #F472B6;
+  --accent-soft:      #FDF2F8;
+
+  --up:               #E24C4B;
+  --up-light:         #FDEEEE;
+  --down:             #3B7AD9;
+  --down-light:       #ECF2FB;
+  --flat:             #a0a4ad;
 
   /* 위험 / 성공 */
-  --danger:           #e03131;
-  --danger-light:     #fff5f5;
-  --success:          #2f9e44;
-  --warning:          #e67700;
+  --danger:           #E11D48;
+  --danger-light:     #FFF1F2;
+  --success:          #10B981;
+  --warning:          #F59E0B;
 
   /* 소셜 로그인 */
   --kakao:            #FEE500;
   --kakao-text:       #3C1E1E;
   --google:           #4285F4;
 
-  --bg:               #F8F9FA;
+  --bg:               #FAFAFA;
   --surface:          #ffffff;
-  --surface-2:        #FAFBFC;
-  --surface-hover:    #F1F3F5;
+  --surface-2:        #F7F7F9;
+  --surface-hover:    #F2F2F5;
 
-  --border:           #E9ECEF;
-  --border-strong:    #CED4DA;
-  --border-focus:     #00C73C;
+  --border:           #ECECEE;
+  --border-strong:    #D6D6DB;
+  --border-focus:     #6366F1;
 
-  --text-1:           #1a1a1a;
-  --text-2:           #4a4a4a;
-  --text-3:           #8b8b8b;
-  --text-4:           #c7c7c7;
+  --text-1:           #262626;
+  --text-2:           #545454;
+  --text-3:           #8E8E93;
+  --text-4:           #C7C7CC;
 
   /* 반지름 — 더 크고 부드럽게 */
   --radius-xs:        4px;
@@ -233,7 +238,7 @@ img { max-width: 100%; }
 }
 .input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(0, 199, 60, 0.12);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 .input::placeholder { color: var(--text-4); }
 
@@ -321,7 +326,7 @@ img { max-width: 100%; }
 }
 .form-input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(0, 199, 60, 0.12);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 .form-input::placeholder { color: var(--text-4); }
 
@@ -353,7 +358,7 @@ img { max-width: 100%; }
   vertical-align: middle; margin-right: 5px;
 }
 .spinner-green {
-  border-color: rgba(0, 199, 60, 0.15);
+  border-color: rgba(99, 102, 241, 0.15);
   border-top-color: var(--primary);
 }
 .spinner-dark {
@@ -490,8 +495,8 @@ img { max-width: 100%; }
   75% { transform: translateX(5px); }
 }
 @keyframes glow      {
-  0%, 100% { box-shadow: 0 0 5px rgba(0, 199, 60, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(0, 199, 60, 0.6); }
+  0%, 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
 }
 @keyframes ripple    {
   to { transform: scale(2); opacity: 0; }
@@ -536,7 +541,7 @@ img { max-width: 100%; }
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 20px rgba(0, 199, 60, 0.4);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
 }
 
 /* ===================================================================
@@ -565,28 +570,32 @@ img { max-width: 100%; }
    다크 모드 — 인스타그램 다크 감성
    =================================================================== */
 [data-theme="dark"] {
-  --primary:          #4c6ef5;
-  --primary-dark:     #3b5bdb;
-  --primary-light:    #1a2040;
+  --primary:          #818CF8;
+  --primary-dark:     #6366F1;
+  --primary-light:    #1E1F3D;
+  --primary-soft:     #161726;
 
-  --up:               #f03e3e;
-  --up-light:         #2d1515;
-  --down:             #339af0;
-  --down-light:       #0d2040;
+  --accent:           #F472B6;
+  --accent-soft:      #2A1421;
 
-  --bg:               #000000;
-  --surface:          #121212;
-  --surface-2:        #1c1c1c;
-  --surface-hover:    #262626;
+  --up:               #F04452;
+  --up-light:         #2D1517;
+  --down:             #4C89E4;
+  --down-light:       #0F1B33;
 
-  --border:           #262626;
-  --border-strong:    #363636;
-  --border-focus:     #4c6ef5;
+  --bg:               #0A0A0B;
+  --surface:          #121214;
+  --surface-2:        #1A1A1D;
+  --surface-hover:    #222228;
 
-  --text-1:           #fafafa;
-  --text-2:           #a8a8a8;
-  --text-3:           #737373;
-  --text-4:           #3d3d3d;
+  --border:           #262629;
+  --border-strong:    #36363B;
+  --border-focus:     #818CF8;
+
+  --text-1:           #F5F5F7;
+  --text-2:           #A8A8AE;
+  --text-3:           #75757C;
+  --text-4:           #3D3D42;
 
   --shadow-sm:        0 1px 3px rgba(0,0,0,0.4);
   --shadow-md:        0 4px 16px rgba(0,0,0,0.5);

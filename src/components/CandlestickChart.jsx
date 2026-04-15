@@ -59,17 +59,17 @@ export default function CandlestickChart({ data = [], period = '일', height = 3
     if (period === '주') {
       const agg = aggregateWeekly(sorted);
       chartData = agg.map(d => ({ time: d.time, open: d.open, high: d.high, low: d.low, close: d.close }));
-      volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(200,74,49,0.4)' : 'rgba(23,99,178,0.4)' }));
+      volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(226,76,75,0.4)' : 'rgba(59,122,217,0.4)' }));
     } else if (period === '월') {
       const agg = aggregateMonthly(sorted);
       chartData = agg.map(d => ({ time: d.time, open: d.open, high: d.high, low: d.low, close: d.close }));
-      volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(200,74,49,0.4)' : 'rgba(23,99,178,0.4)' }));
+      volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(226,76,75,0.4)' : 'rgba(59,122,217,0.4)' }));
     } else {
       chartData = sorted.map(d => ({ time: toTime(d.basDt), open: d.mkp||0, high: d.hipr||0, low: d.lopr||0, close: d.clpr||0 }));
       volData   = sorted.map(d => ({
         time:  toTime(d.basDt),
         value: d.trqu || 0,
-        color: (d.clpr || 0) >= (d.mkp || 0) ? 'rgba(200,74,49,0.4)' : 'rgba(23,99,178,0.4)',
+        color: (d.clpr || 0) >= (d.mkp || 0) ? 'rgba(226,76,75,0.4)' : 'rgba(59,122,217,0.4)',
       }));
     }
 
@@ -77,6 +77,8 @@ export default function CandlestickChart({ data = [], period = '일', height = 3
     const textColor  = isDark ? '#8b95a1' : '#6b7280';
     const gridColor  = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
     const borderColor = isDark ? '#2a2e39' : '#e5e7eb';
+    const crosshairColor = isDark ? 'rgba(255,255,255,0.55)' : 'rgba(60,60,70,0.55)';
+    const crosshairLabelBg = isDark ? '#2a2e39' : '#2a2e39';
 
     const chart = createChart(containerRef.current, {
       width:  containerRef.current.clientWidth,
@@ -92,11 +94,24 @@ export default function CandlestickChart({ data = [], period = '일', height = 3
       },
       crosshair: {
         mode: 1,
-        vertLine: { color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', width: 1, style: 3 },
-        horzLine: { color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', width: 1, style: 3 },
+        vertLine: {
+          color: crosshairColor,
+          width: 1,
+          style: 3,
+          labelBackgroundColor: crosshairLabelBg,
+          labelVisible: true,
+        },
+        horzLine: {
+          color: crosshairColor,
+          width: 1,
+          style: 3,
+          labelBackgroundColor: crosshairLabelBg,
+          labelVisible: true,
+        },
       },
       rightPriceScale: {
         borderColor,
+        visible: true,
         scaleMargins: { top: 0.08, bottom: 0.28 },
       },
       timeScale: {
@@ -109,16 +124,22 @@ export default function CandlestickChart({ data = [], period = '일', height = 3
       handleScroll: { mouseWheel: true, pressedMouseMove: true },
     });
 
-    // 캔들 시리즈
+    const upColor   = isDark ? '#f03e3e' : '#e24c4b';
+    const downColor = isDark ? '#339af0' : '#3b7ad9';
+
     const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor:          '#c84a31',
-      downColor:        '#1763b2',
-      borderUpColor:    '#c84a31',
-      borderDownColor:  '#1763b2',
-      wickUpColor:      '#c84a31',
-      wickDownColor:    '#1763b2',
-      priceLineVisible: false,        // 현재가 점선 제거
-      lastValueVisible: false,        // 오른쪽 가격 라벨 제거
+      upColor,
+      downColor,
+      borderUpColor:   upColor,
+      borderDownColor: downColor,
+      wickUpColor:     upColor,
+      wickDownColor:   downColor,
+      priceLineVisible: true,
+      priceLineWidth: 1,
+      priceLineColor: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)',
+      priceLineStyle: 2,
+      lastValueVisible: true,
+      priceFormat: { type: 'price', precision: 0, minMove: 1 },
     });
     candleSeries.setData(chartData);
 

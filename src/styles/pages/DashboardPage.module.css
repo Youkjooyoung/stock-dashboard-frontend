@@ -34,7 +34,7 @@
   color: var(--primary);
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 199, 60, 0.15);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
 }
 
 .btn-bulk:active {

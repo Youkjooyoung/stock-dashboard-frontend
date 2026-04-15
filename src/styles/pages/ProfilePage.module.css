@@ -122,7 +122,7 @@
 .btn-nickname-change:hover {
   background: var(--primary);
   color: white;
-  box-shadow: 0 2px 8px rgba(0, 199, 60, 0.25);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
 .profile-stat-value--date {
@@ -868,13 +868,13 @@
   font-family: var(--font-sans);
   cursor: pointer;
   transition: all var(--transition);
-  box-shadow: 0 2px 6px rgba(0, 199, 60, 0.25);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
 }
 
 .btn-pf-add:hover {
   background: var(--primary-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 199, 60, 0.35);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
 }
 
 .btn-pf-add:active {
