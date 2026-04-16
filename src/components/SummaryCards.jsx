@@ -45,53 +45,57 @@ export default function SummaryCards({ stocks }) {
       {/* 총 종목 수 */}
       <div className={`${styles['summary-card']} ${styles['color-green']}`}>
         <div className={styles['summary-card-header']}>
-          <span className={styles['summary-label']}>총 종목 수</span>
-          <span className={styles['summary-icon']}>📋</span>
+          <span className={styles['summary-label']}>TOTAL STOCKS</span>
+          <span className={styles['summary-icon']} aria-hidden="true" />
         </div>
-        <div className={`${styles['summary-value']} ${styles['color-green']}`}>{stocks.length}개</div>
-        <div className={styles['summary-sub']}>기준일: {latestDate}</div>
+        <div className={styles['summary-value']}>
+          {stocks.length.toLocaleString()}
+        </div>
+        <div className={styles['summary-sub']}>기준일 {latestDate}</div>
       </div>
 
       {/* 등락 현황 */}
       <div className={`${styles['summary-card']} ${styles['color-up']}`}>
         <div className={styles['summary-card-header']}>
-          <span className={styles['summary-label']}>등락 현황</span>
-          <span className={styles['summary-icon']}>📊</span>
+          <span className={styles['summary-label']}>ADV / FLAT / DEC</span>
+          <span className={styles['summary-icon']} aria-hidden="true" />
         </div>
         <div className={styles['summary-stat-row']}>
-          <span className={styles['summary-stat-up']}>▲{upCount}</span>
+          <span className={styles['summary-stat-up']}>{upCount}</span>
           <span className={styles['summary-stat-sep']}>/</span>
-          <span className={styles['summary-stat-flat']}>-{flatCount}</span>
+          <span className={styles['summary-stat-flat']}>{flatCount}</span>
           <span className={styles['summary-stat-sep']}>/</span>
-          <span className={styles['summary-stat-down']}>▼{downCount}</span>
+          <span className={styles['summary-stat-down']}>{downCount}</span>
         </div>
-        <div className={styles['summary-sub']}>
-          평균 등락률 {avgRate >= 0 ? '+' : ''}{avgRate.toFixed(2)}%
+        <div className={`${styles['summary-sub']} ${avgRate > 0 ? styles['color-up'] : avgRate < 0 ? styles['color-down'] : ''}`}>
+          평균 {avgRate >= 0 ? '+' : ''}{avgRate.toFixed(2)}%
         </div>
       </div>
 
       {/* 최고 거래량 */}
       <div className={`${styles['summary-card']} ${styles['color-warning']}`}>
         <div className={styles['summary-card-header']}>
-          <span className={styles['summary-label']}>최고 거래량</span>
-          <span className={styles['summary-icon']}>🔥</span>
+          <span className={styles['summary-label']}>TOP VOLUME</span>
+          <span className={styles['summary-icon']} aria-hidden="true" />
         </div>
-        <div className={styles['summary-value']} style={{ fontSize: 15, color: 'var(--warning)' }}>
+        <div className={`${styles['summary-value-name']} ${styles['color-warning']}`}>
           {topVol?.itmsNm || '-'}
         </div>
-        <div className={styles['summary-sub']}>{(topVol?.trqu || 0).toLocaleString()} 주</div>
+        <div className={styles['summary-sub']}>{(topVol?.trqu || 0).toLocaleString()}주</div>
       </div>
 
       {/* 최고 상승 */}
       <div className={`${styles['summary-card']} ${styles['color-up']}`}>
         <div className={styles['summary-card-header']}>
-          <span className={styles['summary-label']}>최고 상승 종목</span>
-          <span className={styles['summary-icon']}>🚀</span>
+          <span className={styles['summary-label']}>TOP GAINER</span>
+          <span className={styles['summary-icon']} aria-hidden="true" />
         </div>
-        <div className={styles['summary-value']} style={{ fontSize: 15, color: 'var(--up)' }}>
+        <div className={`${styles['summary-value-name']} ${styles['color-up']}`}>
           {topGainer?.itmsNm || '-'}
         </div>
-        <div className={`${styles['summary-sub']} up`}>+{topGainerRate}%</div>
+        <div className={`${styles['summary-sub']} ${styles['color-up']}`}>
+          +{topGainerRate}%
+        </div>
       </div>
 
     </div>

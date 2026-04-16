@@ -125,7 +125,12 @@ function AutocompleteSearch({ stocks, value, onChange }) {
 
   return (
     <div ref={wrapRef} className={styles['search-wrap']}>
-      <span className={styles['search-icon']}>🔍</span>
+      <span className={styles['search-icon']} aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="7" cy="7" r="5"/>
+          <path d="m14 14-3.5-3.5"/>
+        </svg>
+      </span>
       <input
         className={styles['search-input']}
         placeholder="종목명 또는 코드 검색"
@@ -147,8 +152,15 @@ function AutocompleteSearch({ stocks, value, onChange }) {
                   key={i}
                   className={`${styles['autocomplete-item']} ${styles['history-item']}`}
                   onMouseDown={() => handleHistorySelect(term)}>
-                  <span className={styles['autocomplete-history-icon']}>🕐</span>
-                  <span className={styles['autocomplete-name']}>{term}</span>
+                  <span className={styles['autocomplete-name']}>
+                    <span className={styles['autocomplete-history-icon']} aria-hidden="true">
+                      <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="8" cy="8" r="6"/>
+                        <path d="M8 4.5V8l2.5 1.5"/>
+                      </svg>
+                    </span>
+                    {term}
+                  </span>
                 </div>
               ))}
             </>
@@ -311,7 +323,12 @@ export default function StockTable({
             className={styles['csv-export-btn']}
             onClick={() => exportCSV(filtered)}
             title="현재 목록 CSV 다운로드">
-            ⬇ CSV
+            <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M8 2v9"/>
+              <path d="M4.5 7.5 8 11l3.5-3.5"/>
+              <path d="M2.5 13.5h11"/>
+            </svg>
+            CSV
           </button>
           <div className={styles['page-size-wrap']}>
             <span className={styles['page-size-label']}>페이지당</span>

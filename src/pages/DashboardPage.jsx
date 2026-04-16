@@ -17,6 +17,7 @@ import StockTable from '../components/StockTable';
 import SummaryCards from '../components/SummaryCards';
 import { SkeletonCards, SkeletonTable } from '../components/StockListSkeleton';
 import { useStockPrices, useWatchlist, useToggleWatchlist, QUERY_KEYS } from '../hooks/useQueries';
+import useAuthStore from '../store/authStore';
 import api from '../api/axiosInstance';
 import styles from '../styles/pages/DashboardPage.module.css';
 
@@ -28,6 +29,8 @@ export default function DashboardPage() {
   const { autoRefresh } = useOutletContext();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
+  const role = useAuthStore(s => s.role);
+  const isAdmin = role === 'ADMIN';
 
   const [tab, setTab]               = useState('all');
   const [search, setSearch]         = useState('');
@@ -115,8 +118,9 @@ export default function DashboardPage() {
     }, 2000);
   }
 
-  // 마운?????�집???��? 진행 중이�??�동?�로 ?�링 ?�작
+  // 마운트 시 수집이 이미 진행 중이면 자동으로 폴링 시작 (ADMIN 전용 엔드포인트)
   useEffect(() => {
+    if (!isAdmin) return;
     api.get('/stock/collect/history/status').then(res => {
       if (res.data.status === 'running') {
         setBulkStatus(res.data);
@@ -132,53 +136,63 @@ export default function DashboardPage() {
       }
     }).catch(() => {});
     return () => clearInterval(bulkPollRef.current);
-  }, []);
+  }, [isAdmin]);
 
   return (
     <div>
       <AlertNotification userId={userId} />
 
-      {/* ?�체 과거 ?�이???�집 UI */}
-      <div className={styles['bulk-bar']}>
-        {bulkStatus && bulkStatus.status === 'running' ? (
-          <div className={styles['bulk-progress']}>
-            <span className="spinner" style={{ width: 14, height: 14 }} />
-            <span>
-              전체 과거 데이터 수집 중&nbsp;
-              {bulkStatus.total > 0
-                ? `${bulkStatus.current} / ${bulkStatus.total} 종목`
-                : '준비 중'}
-            </span>
-          </div>
-        ) : bulkStatus && bulkStatus.status === 'done' ? (
-          <div className={styles['bulk-done']}>
-            ✅ 전체 수집 완료 ({bulkStatus.total}종목)
-            <button className={styles['bulk-close']} onClick={() => setBulkStatus(null)}>✕</button>
-          </div>
-        ) : (
-          <div className={styles['bulk-wrap']}>
-            <button className={styles['btn-bulk']} onClick={() => setBulkOpen(v => !v)}>
-              📥 전체 과거 데이터 수집
-            </button>
-            {bulkOpen && (
-              <div className={styles['bulk-dropdown']}>
-                <div className={styles['bulk-dropdown-title']}>전체 수집</div>
-                {[1, 3, 5, 10].map(y => (
-                  <button key={y} className={styles['bulk-option']} onClick={() => startBulkCollect(y, false)}>
-                    {y}년 ({y * 252}거래일)
-                  </button>
-                ))}
-                <div className={styles['bulk-dropdown-title']} style={{ marginTop: 8 }}>미수집 종목만</div>
-                {[1, 3, 5, 10].map(y => (
-                  <button key={'skip' + y} className={`${styles['bulk-option']} ${styles['bulk-option-skip']}`} onClick={() => startBulkCollect(y, true)}>
-                    {y}년 (기수집 스킵)
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      {/* 전체 과거 데이터 수집 UI (ADMIN 전용) */}
+      {isAdmin && (
+        <div className={styles['bulk-bar']}>
+          {bulkStatus && bulkStatus.status === 'running' ? (
+            <div className={styles['bulk-progress']}>
+              <span className="spinner" style={{ width: 12, height: 12 }} />
+              <span>
+                COLLECTING&nbsp;
+                {bulkStatus.total > 0
+                  ? `${bulkStatus.current} / ${bulkStatus.total}`
+                  : '...'}
+              </span>
+            </div>
+          ) : bulkStatus && bulkStatus.status === 'done' ? (
+            <div className={styles['bulk-done']}>
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M3.5 8.5 6.5 11.5 12.5 5.5"/>
+              </svg>
+              DONE · {bulkStatus.total}
+              <button className={styles['bulk-close']} onClick={() => setBulkStatus(null)} aria-label="닫기">✕</button>
+            </div>
+          ) : (
+            <div className={styles['bulk-wrap']}>
+              <button className={styles['btn-bulk']} onClick={() => setBulkOpen(v => !v)}>
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M8 2v9"/>
+                  <path d="M4.5 7.5 8 11l3.5-3.5"/>
+                  <path d="M2.5 13.5h11"/>
+                </svg>
+                HISTORY COLLECT
+              </button>
+              {bulkOpen && (
+                <div className={styles['bulk-dropdown']}>
+                  <div className={styles['bulk-dropdown-title']}>FULL COLLECT</div>
+                  {[1, 3, 5, 10].map(y => (
+                    <button key={y} className={styles['bulk-option']} onClick={() => startBulkCollect(y, false)}>
+                      {y}Y · {(y * 252).toLocaleString()}d
+                    </button>
+                  ))}
+                  <div className={styles['bulk-dropdown-title']}>UNCOLLECTED ONLY</div>
+                  {[1, 3, 5, 10].map(y => (
+                    <button key={'skip' + y} className={`${styles['bulk-option']} ${styles['bulk-option-skip']}`} onClick={() => startBulkCollect(y, true)}>
+                      {y}Y · skip existing
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <main className={styles['dashboard-main']}>
         {stocksLoading ? (

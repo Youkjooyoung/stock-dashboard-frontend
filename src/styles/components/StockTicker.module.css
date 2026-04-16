@@ -1,5 +1,9 @@
 /* ===================================================================
-   StockTicker — 실시간 주가 흐르는 띠
+   StockTicker v2 — Light-first Bloomberg
+   - 32px 고정 높이 (부모와 동일)
+   - 가격은 JetBrains Mono + tabular-nums
+   - 라벨은 작은 모노 pill, 1px 우측 디바이더
+   - 좌우 페이드는 surface 토큰으로 자동 테마 반응
    =================================================================== */
 
 .stock-ticker {
@@ -12,14 +16,17 @@
   user-select: none;
 }
 
+/* === 라벨 === */
 .ticker-label {
   flex-shrink: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  gap: 6px;
   padding: 0 14px;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
-  color: var(--text-3);
+  color: var(--text-1);
   background: var(--surface);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -29,10 +36,17 @@
   border-right: 1px solid var(--border);
 }
 
-.ticker-label::after {
-  display: none;
+.ticker-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--up);
+  box-shadow: 0 0 0 3px var(--up-bg);
+  animation: pulse 1.8s ease-in-out infinite;
 }
 
+/* === 트랙 === */
 .ticker-track-wrap {
   flex: 1;
   overflow: hidden;
@@ -47,7 +61,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 28px;
+  width: 32px;
   z-index: 1;
   pointer-events: none;
 }
@@ -77,15 +91,17 @@
   100% { transform: translateX(-50%); }
 }
 
+/* === 아이템 === */
 .ticker-item {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 0 18px;
+  gap: 8px;
+  padding: 0 16px;
+  height: 32px;
   font-size: 12px;
   border-right: 1px solid var(--border);
-  height: 34px;
   cursor: default;
+  transition: background var(--transition);
 }
 
 .ticker-item:hover {
@@ -93,27 +109,38 @@
 }
 
 .ticker-name {
+  font-family: var(--font-sans);
   font-weight: 600;
   color: var(--text-1);
-  max-width: 70px;
+  max-width: 80px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
 .ticker-price {
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
   font-size: 12px;
+  letter-spacing: 0;
 }
 
 .ticker-rate {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 600;
+  min-width: 64px;
+  text-align: right;
+  letter-spacing: 0;
 }
 
-:global([data-theme="dark"]) .ticker-track-wrap::before {
-  background: linear-gradient(to right, var(--surface), transparent);
-}
-:global([data-theme="dark"]) .ticker-track-wrap::after {
-  background: linear-gradient(to left, var(--surface), transparent);
+/* === 반응형 === */
+@media (max-width: 560px) {
+  .ticker-label { padding: 0 10px; font-size: 9px; }
+  .ticker-item  { padding: 0 12px; gap: 6px; }
+  .ticker-name  { max-width: 64px; }
+  .ticker-rate  { min-width: 56px; }
 }

@@ -1,123 +1,161 @@
 /* ===================================================================
-   SummaryCards — 상단 요약 카드 (인스타그램 감성)
+   SummaryCards v2 — Light-first Bloomberg
+   - 4칸 그리드, 1px 디바이더만 사용 (그림자 제거)
+   - 메인 숫자는 JetBrains Mono 대형 + tabular-nums
+   - 라벨 = UPPERCASE 10px 모노 + 컬러 dot chip
+   - 반응형: 1024px 2칸, 480px 2칸 유지 (밀도 유지)
    =================================================================== */
 
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .summary-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 20px 20px 18px;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition), transform var(--transition);
+  border-radius: var(--radius-md);
+  padding: 16px 16px 14px;
+  transition: border-color var(--transition);
   cursor: default;
   position: relative;
   overflow: hidden;
 }
 
 .summary-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  border-color: var(--border-strong);
 }
 
-/* 상단 accent 라인 */
-.summary-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-.summary-card.color-green::before  { background: var(--primary); }
-.summary-card.color-up::before     { background: var(--up); }
-.summary-card.color-down::before   { background: var(--down); }
-.summary-card.color-warning::before { background: var(--warning); }
-
+/* === 헤더: 라벨 + dot chip === */
 .summary-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+  height: 14px;
 }
 
 .summary-label {
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 10px;
   color: var(--text-3);
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .summary-icon {
-  font-size: 18px;
-  line-height: 1;
-  opacity: 0.7;
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-4);
 }
 
+.summary-card.color-green .summary-icon   { background: var(--accent); }
+.summary-card.color-up .summary-icon      { background: var(--up); }
+.summary-card.color-down .summary-icon    { background: var(--down); }
+.summary-card.color-warning .summary-icon { background: var(--warning); }
+
+/* === 메인 값 === */
 .summary-value {
-  font-size: 22px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 28px;
   font-weight: 700;
   color: var(--text-1);
-  line-height: 1.2;
+  line-height: 1.1;
   margin-bottom: 6px;
   word-break: break-all;
-  letter-spacing: -0.03em;
-}
-
-.summary-value.color-green  { color: var(--primary); }
-.summary-value.color-up     { color: var(--up); }
-.summary-value.color-down   { color: var(--down); }
-.summary-value.color-warning { color: var(--warning); }
-
-.summary-sub {
-  font-size: 11px;
-  color: var(--text-3);
-  line-height: 1.5;
-}
-
-.summary-stat-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 6px;
   letter-spacing: -0.02em;
 }
 
+.summary-value.color-green   { color: var(--accent); }
+.summary-value.color-up      { color: var(--up); }
+.summary-value.color-down    { color: var(--down); }
+.summary-value.color-warning { color: var(--warning); }
+
+/* 종목명을 value로 쓰는 카드 (sans, 작게) */
+.summary-value-name {
+  font-family: var(--font-sans);
+  font-variant-numeric: normal;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 6px;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-value-name.color-up      { color: var(--up); }
+.summary-value-name.color-warning { color: var(--warning); }
+
+/* === 서브 텍스트 === */
+.summary-sub {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--text-3);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summary-sub.color-up   { color: var(--up); font-weight: 700; }
+.summary-sub.color-down { color: var(--down); font-weight: 700; }
+
+/* === 등락 현황 — 스탯 로우 === */
+.summary-stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
 .summary-stat-up   { color: var(--up); }
-.summary-stat-flat { color: var(--flat); font-size: 14px; font-weight: 400; }
+.summary-stat-flat { color: var(--text-3); font-size: 18px; font-weight: 500; }
 .summary-stat-down { color: var(--down); }
 
 .summary-stat-sep {
-  color: var(--text-4);
+  color: var(--border-strong);
   font-weight: 400;
-  font-size: 12px;
+  font-size: 16px;
 }
 
+/* === 스켈레톤 === */
 .summary-cards-skeleton {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
+/* === 반응형 === */
 @media (max-width: 1024px) {
-  .summary-cards { grid-template-columns: repeat(2, 1fr); }
+  .summary-cards,
   .summary-cards-skeleton { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 480px) {
-  .summary-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .summary-card { padding: 16px 16px 14px; }
-  .summary-value { font-size: 19px; }
+  .summary-cards { gap: 8px; }
+  .summary-card { padding: 12px 12px 10px; }
+  .summary-value { font-size: 22px; }
+  .summary-stat-row { font-size: 18px; }
+  .summary-value-name { font-size: 14px; }
 }
