@@ -724,7 +724,8 @@ merge: Java 17 → 21 LTS 업그레이드 반영
 
 ## 진행 중 / 예정
 
-- [ ] (추후 기능 추가 예정)
+- [ ] 프론트엔드 Vitest + React Testing Library 단위 테스트 도입
+- [ ] GitHub Actions Secrets 등록 후 CI/CD 실전 검증
 
 ---
 
@@ -735,3 +736,4 @@ merge: Java 17 → 21 LTS 업그레이드 반영
 | 2026-04-16 | PortOne 본인인증 기반 비밀번호 변경/회원탈퇴, 2주 소프트 삭제 보류, 탈퇴 계정 복구(임시 비밀번호 발급 + 강제 변경), 보안 검증 토큰(5분 만료, sessionStorage), 다이렉트 URL 접근 차단 | 백엔드, 프론트엔드 |
 | 2026-04-16 | 비밀번호 변경 페이지 분리 (/change-password), FloatingAiChat FAQ 초기 닫힘 상태, AI 분석 입력란 통합 | 프론트엔드 |
 | 2026-04-16 | OAuth 로그인 role/userId 전달 일관화 (`issueTokens`로 일원화, 중복 `put` 제거, 소셜 로그인 URL fragment에 userId 추가), 관리자 회원 탭 검색·권한·상태 필터·컬럼 정렬·페이지네이션 추가, 포트폴리오 탭 차트 강화(손익 내림차순 정렬·최고수익/최대손실 하이라이트·투자금 vs 평가금 비교 차트·보유 종목 정렬 옵션) | 백엔드, 프론트엔드 |
+| 2026-04-16 | **A-4 자동화 역량 (프론트)**: GitHub Actions CI 워크플로 `.github/workflows/ci.yml` (Node 20 + npm 캐시 + ESLint + `npm run build` + dist 아티팩트 업로드), 자동 배포 `.github/workflows/deploy-frontend.yml` (runner 빌드 → appleboy/scp-action → `/var/www/stock-dashboard/` 원자 교체 → `nginx -t` & reload, 직전 버전 `.bak` 롤백 가능) | 프론트엔드 |

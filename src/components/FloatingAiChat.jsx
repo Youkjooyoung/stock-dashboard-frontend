@@ -193,7 +193,7 @@ export default function FloatingAiChat() {
     setInput('');
     setLoading(true);
     try {
-      const prompt = `종목코드 또는 종목명: ${ticker}\n\n질문: ${userText}`;
+      const prompt = userText;
       const res = await api.post('/ai/analyze', { prompt }, { timeout: 60000 });
       setMessages(prev => [...prev, { role: 'ai', text: res.data.analysis || '분석 결과를 가져오지 못했습니다.' }]);
     } catch {
