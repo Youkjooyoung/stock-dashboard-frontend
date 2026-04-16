@@ -14,40 +14,25 @@ import styles from '../styles/components/StockModal.module.css';
 
 const chartOptions = {
   responsive: true,
-  interaction: {
-    mode: 'index',
-    intersect: false,
-  },
+  interaction: { mode: 'index', intersect: false },
   plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.85)',
-      padding: 12,
-      titleFont: { size: 13, weight: '600' },
-      bodyFont: { size: 12 },
+      backgroundColor: 'rgba(11, 13, 16, 0.9)',
+      padding: 10,
+      titleFont: { size: 12, weight: '600' },
+      bodyFont: { size: 11 },
       borderColor: 'rgba(255, 255, 255, 0.1)',
       borderWidth: 1,
-      callbacks: {
-        label: ctx => `종가: ${ctx.raw?.toLocaleString()}원`
-      }
-    },
-    crosshair: {
-      line: {
-        color: 'rgba(59, 91, 219, 0.3)',
-        width: 1,
-        dashPattern: [5, 5]
-      }
+      callbacks: { label: ctx => `종가: ${ctx.raw?.toLocaleString()}원` }
     }
   },
   scales: {
     y: {
-      ticks: { 
-        callback: v => v.toLocaleString(),
-        font: { size: 11 }
-      },
+      ticks: { callback: v => v.toLocaleString(), font: { size: 11 } },
       grid: { color: 'rgba(0,0,0,0.05)' }
     },
-    x: { 
+    x: {
       grid: { display: false },
       ticks: { font: { size: 11 } }
     }
@@ -62,52 +47,49 @@ const COLLECT_RANGES = [
   { label: '최대', months: 240 },
 ];
 
-// 모달 애니메이션 variants
 const modalVariants = {
-  hidden: { 
-    opacity: 0, 
-    scale: 0.95,
-    y: 20 
+  hidden:  { opacity: 0, scale: 0.97, y: 8 },
+  visible: {
+    opacity: 1, scale: 1, y: 0,
+    transition: { duration: 0.2, ease: [0.2, 0, 0.1, 1] }
   },
-  visible: { 
-    opacity: 1, 
-    scale: 1,
-    y: 0,
-    transition: {
-      type: 'spring',
-      duration: 0.4,
-      bounce: 0.3
-    }
-  },
-  exit: { 
-    opacity: 0, 
-    scale: 0.95,
-    y: 20,
-    transition: { duration: 0.2 }
-  }
+  exit:    { opacity: 0, scale: 0.97, y: 8, transition: { duration: 0.15 } }
 };
 
-// 백드롭 애니메이션
 const backdropVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
-  exit: { opacity: 0 }
+  hidden:  { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.15 } },
+  exit:    { opacity: 0, transition: { duration: 0.15 } }
 };
 
-// 탭 컨텐츠 애니메이션
-const tabContentVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: { 
-    opacity: 1, 
-    x: 0,
-    transition: { duration: 0.3 }
-  },
-  exit: { 
-    opacity: 0, 
-    x: 20,
-    transition: { duration: 0.2 }
-  }
-};
+const IconClose = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 6L6 18M6 6l12 12" />
+  </svg>
+);
+
+const IconChart = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 3v18h18" />
+    <path d="M7 15l4-4 3 3 5-6" />
+  </svg>
+);
+
+const IconNews = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 4h13a3 3 0 013 3v11a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
+    <path d="M4 4v14a2 2 0 002 2" />
+    <path d="M8 8h8M8 12h8M8 16h5" />
+  </svg>
+);
+
+const IconDownload = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 3v12" />
+    <path d="M7 10l5 5 5-5" />
+    <path d="M5 21h14" />
+  </svg>
+);
 
 export default function StockModal({ stock, onClose }) {
   const [chartType, setChartType] = useState('candle');
@@ -157,7 +139,7 @@ export default function StockModal({ stock, onClose }) {
   const diff = close - open;
   const rate = open > 0 ? ((diff / open) * 100) : 0;
   const cls = rate > 0 ? 'up' : rate < 0 ? 'down' : 'zero';
-  const sign = rate > 0 ? '▲' : rate < 0 ? '▼' : '-';
+  const sign = rate > 0 ? '▲' : rate < 0 ? '▼' : '−';
 
   const stats = [
     { label: '시가', value: open, cls: '' },
@@ -170,27 +152,21 @@ export default function StockModal({ stock, onClose }) {
 
   return (
     <AnimatePresence>
-      <motion.div 
-        className={styles['modal-overlay']} 
+      <motion.div
+        className={styles['modal-overlay']}
         onClick={onClose}
         variants={backdropVariants}
         initial="hidden"
         animate="visible"
         exit="exit">
-        
-        <motion.div 
-          className={styles['modal-box']} 
+
+        <motion.div
+          className={styles['modal-box']}
           onClick={e => e.stopPropagation()}
           variants={modalVariants}
           initial="hidden"
           animate="visible"
-          exit="exit"
-          drag="y"
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={0.2}
-          onDragEnd={(e, info) => {
-            if (info.offset.y > 100) onClose();
-          }}>
+          exit="exit">
 
           {/* 헤더 */}
           <div className={styles['modal-header']}>
@@ -201,229 +177,187 @@ export default function StockModal({ stock, onClose }) {
                 <span className={styles['modal-stock-sep']}>·</span>
                 <span className="market-badge">{stock.mrktCtg || 'KOSPI'}</span>
                 <span className={styles['modal-stock-sep']}>·</span>
-                <span>{stock.basDt}</span>
+                <span className={styles['modal-stock-date']}>{stock.basDt}</span>
               </div>
             </div>
-            <motion.button 
-              className={styles['modal-close']} 
+            <button
+              className={styles['modal-close']}
               onClick={onClose}
-              whileHover={{ scale: 1.05, rotate: 90 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.2 }}>
-              ✕
-            </motion.button>
+              aria-label="닫기">
+              <IconClose />
+            </button>
           </div>
 
           {/* 본문 */}
           <div className={styles['modal-body']} ref={modalBodyRef}>
 
             {/* 핵심 지표 */}
-            <motion.div 
-              className={styles['modal-stats']}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, staggerChildren: 0.05 }}>
+            <div className={styles['modal-stats']}>
               {stats.map((s, i) => (
-                <motion.div 
-                  key={i} 
-                  className={styles['modal-stat-item']}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  transition={{ duration: 0.2 }}>
+                <div key={i} className={styles['modal-stat-item']}>
                   <div className={styles['modal-stat-label']}>{s.label}</div>
                   <div className={`${styles['modal-stat-value']} ${s.cls || ''}`}>
                     {s.isRate ? (
                       <>
-                        <span>{sign}</span> <AnimatedNumber value={Math.abs(s.diff)} formatter={formatters.comma} duration={0.5} />원
-                        {' ('}
+                        <span>{sign}</span>
+                        <AnimatedNumber value={Math.abs(s.diff)} formatter={formatters.comma} duration={0.5} />
+                        <span>원</span>
+                        <span>(</span>
                         <AnimatedNumber value={Math.abs(s.value)} decimals={2} duration={0.5} />
-                        {'%)'}
+                        <span>%)</span>
                       </>
                     ) : s.isVolume ? (
                       <AnimatedNumber value={s.value} formatter={formatters.comma} duration={0.6} />
                     ) : (
                       <>
-                        <AnimatedNumber value={s.value} formatter={formatters.comma} duration={0.6} />원
+                        <AnimatedNumber value={s.value} formatter={formatters.comma} duration={0.6} />
+                        <span>원</span>
                       </>
                     )}
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
 
             {/* 알림 설정 */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}>
+            <div className={styles['modal-section-wrap']}>
               <AlertSetter stock={stock} />
-            </motion.div>
+            </div>
 
             {/* 종가 추이 차트 */}
-            <motion.div 
-              className={styles['modal-chart-wrap']}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}>
+            <div className={styles['modal-chart-wrap']}>
               <div className={styles['modal-chart-header']}>
                 <div className={styles['modal-section-title']}>
-                  📈 종가 추이
+                  <IconChart />
+                  종가 추이
                   <span className={styles['modal-data-count']}>({detailData.length}일)</span>
                 </div>
                 <div className={styles['modal-chart-controls']}>
                   {/* 과거 데이터 수집 */}
                   <div className={styles['collect-wrap']}>
-                    <motion.button
+                    <button
                       className={styles['btn-collect']}
                       onClick={() => setCollectOpen(v => !v)}
-                      disabled={collectMutation.isPending}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}>
-                      {collectMutation.isPending ? '수집 중...' : '📥 과거 데이터'}
-                    </motion.button>
+                      disabled={collectMutation.isPending}>
+                      <IconDownload />
+                      {collectMutation.isPending ? '수집 중' : '과거 데이터'}
+                    </button>
                     <AnimatePresence>
                       {collectOpen && (
-                        <motion.div 
+                        <motion.div
                           className={styles['collect-dropdown']}
-                          initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                          transition={{ duration: 0.15 }}>
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ duration: 0.12 }}>
                           {COLLECT_RANGES.map(r => (
-                            <motion.button 
-                              key={r.label} 
+                            <button
+                              key={r.label}
                               className={styles['collect-option']}
-                              onClick={() => handleCollect(r.months)}
-                              whileHover={{ x: 4 }}
-                              transition={{ duration: 0.15 }}>
+                              onClick={() => handleCollect(r.months)}>
                               {r.label}
-                            </motion.button>
+                            </button>
                           ))}
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
-                  
+
                   {/* 기간 선택 */}
                   <div className={styles['modal-chart-tab-group']} ref={tabGroupRef}>
                     {PERIODS.map((p) => (
-                      <motion.button
+                      <button
                         key={p}
                         className={`${styles['modal-chart-tab']} ${period === p ? styles.active : ''}`}
-                        onClick={() => setPeriod(p)}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}>
+                        onClick={() => setPeriod(p)}>
                         {p}
-                      </motion.button>
+                      </button>
                     ))}
                   </div>
-                  
+
                   {/* 차트 타입 */}
                   <div className={styles['modal-chart-tab-group']}>
-                    <motion.button
+                    <button
                       className={`${styles['modal-chart-tab']} ${chartType === 'candle' ? styles.active : ''}`}
-                      onClick={() => setChartType('candle')}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}>
+                      onClick={() => setChartType('candle')}>
                       캔들
-                    </motion.button>
-                    <motion.button
+                    </button>
+                    <button
                       className={`${styles['modal-chart-tab']} ${chartType === 'line' ? styles.active : ''}`}
-                      onClick={() => setChartType('line')}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}>
+                      onClick={() => setChartType('line')}>
                       라인
-                    </motion.button>
+                    </button>
                   </div>
                 </div>
               </div>
-              
-              <AnimatePresence mode="wait">
-                {chartLoading ? (
-                  <SkeletonChart />
-                ) : detailData.length > 0 ? (
-                  <motion.div
-                    key={chartType}
-                    variants={tabContentVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit">
-                    {chartType === 'candle' ? (
-                      <CandlestickChart data={detailData} period={period} height={280} />
-                    ) : (
-                      <Line
-                        data={{
-                          labels: detailData.map(d => {
-                            const dt = d.basDt;
-                            return `${dt.slice(4,6)}/${dt.slice(6,8)}`;
-                          }),
-                          datasets: [{
-                            label: '종가',
-                            data: detailData.map(d => d.clpr),
-                            borderColor: 'var(--primary)',
-                            backgroundColor: 'rgba(59,91,219,0.07)',
-                            tension: 0.35,
-                            fill: true,
-                            pointRadius: 3,
-                            pointHoverRadius: 5,
-                            pointBackgroundColor: 'var(--primary)',
-                          }]
-                        }}
-                        options={chartOptions}
-                      />
-                    )}
-                  </motion.div>
+
+              {chartLoading ? (
+                <SkeletonChart />
+              ) : detailData.length > 0 ? (
+                chartType === 'candle' ? (
+                  <CandlestickChart data={detailData} period={period} height={280} />
                 ) : (
-                  <div className={styles['modal-chart-loading']}>데이터가 없습니다.</div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+                  <Line
+                    data={{
+                      labels: detailData.map(d => {
+                        const dt = d.basDt;
+                        return `${dt.slice(4,6)}/${dt.slice(6,8)}`;
+                      }),
+                      datasets: [{
+                        label: '종가',
+                        data: detailData.map(d => d.clpr),
+                        borderColor: 'var(--text-1)',
+                        backgroundColor: 'rgba(11,13,16,0.05)',
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 2,
+                        pointHoverRadius: 4,
+                        pointBackgroundColor: 'var(--text-1)',
+                      }]
+                    }}
+                    options={chartOptions}
+                  />
+                )
+              ) : (
+                <div className={styles['modal-chart-loading']}>데이터가 없습니다.</div>
+              )}
+            </div>
 
             {/* 관련 뉴스 */}
-            <motion.div 
-              className={styles['modal-news-wrap']}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}>
-              <div className={styles['modal-section-title']}>📰 관련 뉴스</div>
+            <div className={styles['modal-news-wrap']}>
+              <div className={styles['modal-section-title']}>
+                <IconNews />
+                관련 뉴스
+              </div>
               {newsLoading ? (
                 <SkeletonNews />
               ) : news.length > 0 ? (
                 news.map((n, i) => (
-                  <motion.a 
+                  <a
                     key={i}
                     href={n.originallink || n.link}
                     target="_blank"
                     rel="noreferrer"
-                    className={styles['modal-news-item']}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 + i * 0.05 }}
-                    whileHover={{ x: 4, backgroundColor: 'var(--surface-hover)' }}>
+                    className={styles['modal-news-item']}>
                     <div className={styles['modal-news-title']}>{n.title}</div>
                     <div className={styles['modal-news-desc']}>{n.description}</div>
                     <div className={styles['modal-news-date']}>{formatNewsDate(n.pubDate)}</div>
-                  </motion.a>
+                  </a>
                 ))
               ) : (
                 <div className={styles['modal-news-empty']}>관련 뉴스가 없습니다.</div>
               )}
-            </motion.div>
+            </div>
 
             {/* AI 종목 분석 */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}>
+            <div className={styles['modal-section-wrap']}>
               <AiAnalysis type="stock" stock={stock} />
-            </motion.div>
+            </div>
 
             {/* 실시간 토론 채팅 */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}>
+            <div className={styles['modal-section-wrap']}>
               <StockChat ticker={stock.srtnCd} stockName={stock.itmsNm} />
-            </motion.div>
+            </div>
 
           </div>
         </motion.div>
