@@ -97,9 +97,12 @@ export default function StockModal({ stock, onClose }) {
   const { data: news = [], isLoading: newsLoading } = useStockNews(stock?.itmsNm);
 
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    document.body.style.overflow = '';
+    document.body.classList.add('modal-open');
+    return () => {
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+    };
   }, []);
 
   useLayoutEffect(() => {
