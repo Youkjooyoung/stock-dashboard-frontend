@@ -1,0 +1,111 @@
+/* === IdentityVerifyModal — 본인인증 모달 === */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  box-shadow: var(--shadow-lg);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 8px;
+  letter-spacing: -0.03em;
+}
+
+.desc {
+  font-size: 13px;
+  color: var(--text-3);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.icon {
+  font-size: 40px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.btn-verify {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-smooth), transform 0.1s;
+  margin-bottom: 12px;
+}
+
+.btn-verify:hover {
+  background: var(--primary-dark);
+}
+
+.btn-verify:active {
+  transform: scale(0.98);
+}
+
+.btn-verify:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-smooth);
+}
+
+.btn-cancel:hover {
+  background: var(--surface-2);
+}
+
+.error-msg {
+  font-size: 13px;
+  color: var(--red);
+  background: rgba(226, 76, 75, 0.06);
+  border: 1px solid rgba(226, 76, 75, 0.15);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+}
+
+.loading-text {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-3);
+  padding: 8px 0;
+}
+
+@media (max-width: 480px) {
+  .modal {
+    margin: 0 16px;
+    padding: 24px 20px;
+  }
+}

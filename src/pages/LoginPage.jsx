@@ -38,10 +38,15 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await api.post('/auth/login', { email, password });
-      const { accessToken, refreshToken, userId, role } = res.data;
+      const { accessToken, refreshToken, userId, role, forcePwChange } = res.data;
       setAuth(email, accessToken, refreshToken, userId, role);
       if (rememberMe) localStorage.setItem('savedEmail', email);
       else localStorage.removeItem('savedEmail');
+      if (forcePwChange) {
+        sessionStorage.setItem('forcePwChange', 'Y');
+        navigate('/change-password');
+        return;
+      }
       navigate(role === 'ADMIN' ? '/admin' : '/');
     } catch (err) {
       const msg = err.response?.data?.message || '로그인에 실패했습니다.';

@@ -29,14 +29,63 @@ export default function AdminPage() {
     const [chatsLoading, setChatsLoading] = useState(false);
 
     const [userSearch, setUserSearch] = useState('');
-    // 주식 목록 검색 및 정렬 상태 관리
+    const [userRoleFilter, setUserRoleFilter] = useState('ALL');
+    const [userStatusFilter, setUserStatusFilter] = useState('ALL');
+    const [userSortKey, setUserSortKey] = useState('userId');
+    const [userSortDir, setUserSortDir] = useState('asc');
+    const [userPage, setUserPage] = useState(1);
+
     const [stockSearch, setStockSearch] = useState('');
     const [stockSortKey, setStockSortKey] = useState('ticker');
     const [stockSortDir, setStockSortDir] = useState('asc');
     const [stockPage, setStockPage] = useState(1);
     const ITEMS_PER_PAGE = 50;
 
-    // 주식 목록 필터링 및 정렬 상태 메모이제이션 (성능 최적화)
+    const filteredAndSortedUsers = useMemo(() => {
+        if (!users) return [];
+        const q = userSearch.toLowerCase().trim();
+        const filtered = users.filter(u => {
+            const matchesSearch = !q
+                || (u.email || '').toLowerCase().includes(q)
+                || (u.name || '').toLowerCase().includes(q)
+                || (u.nickname || '').toLowerCase().includes(q);
+            if (!matchesSearch) return false;
+
+            if (userRoleFilter !== 'ALL' && (u.role || 'USER') !== userRoleFilter) return false;
+
+            if (userStatusFilter === 'LOCKED'   && u.accountLocked !== 'Y')  return false;
+            if (userStatusFilter === 'NORMAL'   && (u.accountLocked === 'Y' || u.emailVerified !== 'Y')) return false;
+            if (userStatusFilter === 'UNVERIFIED' && u.emailVerified === 'Y') return false;
+
+            return true;
+        });
+
+        if (!userSortKey) return filtered;
+
+        return [...filtered].sort((a, b) => {
+            const getField = (obj, key) => {
+                if (key === 'userId')    return obj.userId ?? 0;
+                if (key === 'email')     return (obj.email    || '').toLowerCase();
+                if (key === 'name')      return (obj.name     || '').toLowerCase();
+                if (key === 'createdAt') return obj.createdAt || '';
+                if (key === 'role')      return obj.role      || 'USER';
+                return '';
+            };
+            const valA = getField(a, userSortKey);
+            const valB = getField(b, userSortKey);
+            if (valA < valB) return userSortDir === 'asc' ? -1 : 1;
+            if (valA > valB) return userSortDir === 'asc' ?  1 : -1;
+            return 0;
+        });
+    }, [users, userSearch, userRoleFilter, userStatusFilter, userSortKey, userSortDir]);
+
+    const paginatedUsers = useMemo(() => {
+        const start = (userPage - 1) * ITEMS_PER_PAGE;
+        return filteredAndSortedUsers.slice(start, start + ITEMS_PER_PAGE);
+    }, [filteredAndSortedUsers, userPage]);
+
+    const totalUserPages = Math.ceil(filteredAndSortedUsers.length / ITEMS_PER_PAGE) || 1;
+
     const filteredAndSortedStocks = useMemo(() => {
         if (!stocks) return [];
         const q = stockSearch.toLowerCase();
@@ -83,6 +132,10 @@ export default function AdminPage() {
         if (activeTab === 'alerts' && alerts.length === 0) fetchAlerts();
         if (activeTab === 'chats' && chats.length === 0) fetchChats();
     }, [activeTab]);
+
+    useEffect(() => {
+        setUserPage(1);
+    }, [userSearch, userRoleFilter, userStatusFilter, userSortKey, userSortDir]);
 
     const fetchAlerts = async () => {
         setAlertsLoading(true);
@@ -160,7 +213,20 @@ export default function AdminPage() {
     const handleStockSort = (key) => {
         if (stockSortKey === key) setStockSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
         else { setStockSortKey(key); setStockSortDir('asc'); }
-        setStockPage(1); // 정렬 변경 시 1페이지로 초기화
+        setStockPage(1);
+    };
+
+    const handleUserSort = (key) => {
+        if (userSortKey === key) setUserSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+        else { setUserSortKey(key); setUserSortDir('asc'); }
+    };
+
+    const resetUserFilters = () => {
+        setUserSearch('');
+        setUserRoleFilter('ALL');
+        setUserStatusFilter('ALL');
+        setUserSortKey('userId');
+        setUserSortDir('asc');
     };
 
     const renderContent = () => {
@@ -222,47 +288,69 @@ export default function AdminPage() {
                 );
 
             case 'users': {
-                const filteredUsers = users.filter(u => {
-                    const q = userSearch.toLowerCase();
-                    return (u.email || '').toLowerCase().includes(q) ||
-                           (u.name || '').toLowerCase().includes(q) ||
-                           (u.nickname || '').toLowerCase().includes(q);
-                });
-                
+                const isFiltered = userSearch !== '' || userRoleFilter !== 'ALL' || userStatusFilter !== 'ALL';
+                const sortArrow = (key) => userSortKey === key ? (userSortDir === 'asc' ? ' ▲' : ' ▼') : '';
+
                 return (
                     <div className={styles.adminCard}>
                         <div className={styles.cardHeader}>
-                            <div className={styles.cardTitle}>전체 회원 목록 ({filteredUsers.length}명)</div>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                                <input 
-                                    type="text" 
-                                    placeholder="이메일 또는 이름 검색..." 
-                                    style={{ width: '240px', padding: '8px 14px', border: '1px solid #ccc', borderRadius: '4px' }} 
+                            <div className={styles.cardTitle}>
+                                전체 회원 목록 ({filteredAndSortedUsers.length}명{isFiltered ? ` / 전체 ${users.length}명` : ''})
+                            </div>
+                            <div className={styles.filterBar}>
+                                <input
+                                    type="text"
+                                    placeholder="이메일·이름·닉네임 검색..."
+                                    className={styles.filterInput}
                                     value={userSearch}
                                     onChange={(e) => setUserSearch(e.target.value)}
                                 />
+                                <select
+                                    className={styles.filterSelect}
+                                    value={userRoleFilter}
+                                    onChange={(e) => setUserRoleFilter(e.target.value)}>
+                                    <option value="ALL">전체 권한</option>
+                                    <option value="USER">일반회원</option>
+                                    <option value="ADMIN">관리자</option>
+                                </select>
+                                <select
+                                    className={styles.filterSelect}
+                                    value={userStatusFilter}
+                                    onChange={(e) => setUserStatusFilter(e.target.value)}>
+                                    <option value="ALL">전체 상태</option>
+                                    <option value="NORMAL">정상</option>
+                                    <option value="LOCKED">잠금</option>
+                                    <option value="UNVERIFIED">이메일 미인증</option>
+                                </select>
+                                {isFiltered && (
+                                    <button className={styles.actionBtn} onClick={resetUserFilters}>초기화</button>
+                                )}
                                 <button className={styles.refreshBtn} onClick={fetchUsers}>새로고침</button>
                             </div>
                         </div>
-                        
+
                         <div className={styles.tableWrapper}>
                             {loading ? (
                                 <p style={{ textAlign: 'center', padding: '40px' }}>데이터를 불러오는 중입니다...</p>
+                            ) : filteredAndSortedUsers.length === 0 ? (
+                                <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-3)' }}>
+                                    조건에 맞는 회원이 없습니다.
+                                </p>
                             ) : (
                                 <table className={styles.adminTable}>
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
-                                            <th>이메일</th>
-                                            <th>이름/닉네임</th>
-                                            <th>가입일</th>
-                                            <th>권한</th>
+                                            <th className={styles.sortable} onClick={() => handleUserSort('userId')}>ID{sortArrow('userId')}</th>
+                                            <th className={styles.sortable} onClick={() => handleUserSort('email')}>이메일{sortArrow('email')}</th>
+                                            <th className={styles.sortable} onClick={() => handleUserSort('name')}>이름/닉네임{sortArrow('name')}</th>
+                                            <th className={styles.sortable} onClick={() => handleUserSort('createdAt')}>가입일{sortArrow('createdAt')}</th>
+                                            <th className={styles.sortable} onClick={() => handleUserSort('role')}>권한{sortArrow('role')}</th>
                                             <th>상태</th>
                                             <th>관리</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {filteredUsers.map(u => (
+                                        {paginatedUsers.map(u => (
                                             <tr key={u.userId}>
                                                 <td>{u.userId}</td>
                                                 <td>{u.email}</td>
@@ -274,9 +362,13 @@ export default function AdminPage() {
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <span className={u.accountLocked === 'Y' ? styles.badgeDanger : styles.badgeOk}>
-                                                        {u.accountLocked === 'Y' ? '잠금' : '정상'}
-                                                    </span>
+                                                    {u.accountLocked === 'Y' ? (
+                                                        <span className={styles.badgeDanger}>잠금</span>
+                                                    ) : u.emailVerified !== 'Y' ? (
+                                                        <span className={styles.badgeWarn}>미인증</span>
+                                                    ) : (
+                                                        <span className={styles.badgeOk}>정상</span>
+                                                    )}
                                                 </td>
                                                 <td className={styles.actions}>
                                                     {u.accountLocked === 'Y' && <button className={styles.actionBtn} onClick={() => handleUnlock(u.userId)}>잠금해제</button>}
@@ -288,6 +380,25 @@ export default function AdminPage() {
                                     </tbody>
                                 </table>
                             )}
+                            {!loading && totalUserPages > 1 && (
+                                <div className={styles.pagination}>
+                                    <button
+                                        className={styles.actionBtn}
+                                        disabled={userPage === 1}
+                                        onClick={() => setUserPage(p => p - 1)}>
+                                        이전
+                                    </button>
+                                    <span className={styles.pageIndicator}>
+                                        {userPage} / {totalUserPages}
+                                    </span>
+                                    <button
+                                        className={styles.actionBtn}
+                                        disabled={userPage === totalUserPages}
+                                        onClick={() => setUserPage(p => p + 1)}>
+                                        다음
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 );
@@ -298,18 +409,18 @@ export default function AdminPage() {
                     <div className={styles.adminCard}>
                         <div className={styles.cardHeader}>
                             <div className={styles.cardTitle}>주식 종목 관리 ({filteredAndSortedStocks.length}개)</div>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                                <input 
-                                    type="text" 
-                                    placeholder="종목명 또는 코드 검색..." 
-                                    style={{ width: '240px', padding: '8px 14px', border: '1px solid #ccc', borderRadius: '4px' }} 
+                            <div className={styles.filterBar}>
+                                <input
+                                    type="text"
+                                    placeholder="종목명 또는 코드 검색..."
+                                    className={styles.filterInput}
                                     value={stockSearch}
                                     onChange={(e) => { setStockSearch(e.target.value); setStockPage(1); }}
                                 />
                                 <button className={styles.refreshBtn} onClick={fetchStocks}>새로고침</button>
                             </div>
                         </div>
-                        
+
                         <div className={styles.tableWrapper}>
                             {stocksLoading ? (
                                 <p style={{ textAlign: 'center', padding: '40px' }}>데이터를 불러오는 중입니다...</p>
@@ -317,16 +428,16 @@ export default function AdminPage() {
                                 <table className={styles.adminTable}>
                                     <thead>
                                         <tr>
-                                            <th style={{ cursor: 'pointer' }} onClick={() => handleStockSort('ticker')}>
+                                            <th className={styles.sortable} onClick={() => handleStockSort('ticker')}>
                                                 종목코드 {stockSortKey === 'ticker' ? (stockSortDir === 'asc' ? '▲' : '▼') : ''}
                                             </th>
-                                            <th style={{ cursor: 'pointer' }} onClick={() => handleStockSort('name')}>
+                                            <th className={styles.sortable} onClick={() => handleStockSort('name')}>
                                                 종목명 {stockSortKey === 'name' ? (stockSortDir === 'asc' ? '▲' : '▼') : ''}
                                             </th>
-                                            <th style={{ cursor: 'pointer' }} onClick={() => handleStockSort('market')}>
+                                            <th className={styles.sortable} onClick={() => handleStockSort('market')}>
                                                 거래소 {stockSortKey === 'market' ? (stockSortDir === 'asc' ? '▲' : '▼') : ''}
                                             </th>
-                                            <th style={{ cursor: 'pointer' }} onClick={() => handleStockSort('createdAt')}>
+                                            <th className={styles.sortable} onClick={() => handleStockSort('createdAt')}>
                                                 등록일 {stockSortKey === 'createdAt' ? (stockSortDir === 'asc' ? '▲' : '▼') : ''}
                                             </th>
                                         </tr>
@@ -344,22 +455,20 @@ export default function AdminPage() {
                                 </table>
                             )}
                             {!stocksLoading && totalStockPages > 1 && (
-                                <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '20px' }}>
-                                    <button 
-                                        className={styles.actionBtn} 
-                                        disabled={stockPage === 1} 
-                                        onClick={() => setStockPage(p => p - 1)}
-                                    >
+                                <div className={styles.pagination}>
+                                    <button
+                                        className={styles.actionBtn}
+                                        disabled={stockPage === 1}
+                                        onClick={() => setStockPage(p => p - 1)}>
                                         이전
                                     </button>
-                                    <span style={{ fontSize: '14px', alignSelf: 'center', color: 'var(--text-2)' }}>
+                                    <span className={styles.pageIndicator}>
                                         {stockPage} / {totalStockPages}
                                     </span>
-                                    <button 
-                                        className={styles.actionBtn} 
-                                        disabled={stockPage === totalStockPages} 
-                                        onClick={() => setStockPage(p => p + 1)}
-                                    >
+                                    <button
+                                        className={styles.actionBtn}
+                                        disabled={stockPage === totalStockPages}
+                                        onClick={() => setStockPage(p => p + 1)}>
                                         다음
                                     </button>
                                 </div>

@@ -16,6 +16,7 @@ import {
 } from '../hooks/useQueries';
 import { uploadProfileImage } from '../api/profileApi';
 import AiAnalysis from '../components/AiAnalysis';
+import IdentityVerifyModal from '../components/IdentityVerifyModal';
 import styles from '../styles/pages/ProfilePage.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
@@ -43,16 +44,6 @@ function validateNickname(name) {
   } else {
     if (name.length < 4 || name.length > 8) return '영문·한글·숫자 혼합 시 4~8자여야 합니다.';
   }
-  return null;
-}
-
-function validatePassword(pw) {
-  if (pw.length < 6 || pw.length > 12) return '비밀번호는 6~12자여야 합니다.';
-  const hasLetter  = /[가-힣a-zA-Z]/.test(pw);
-  const hasNumber  = /[0-9]/.test(pw);
-  const hasSpecial = /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/.test(pw);
-  const types = [hasLetter, hasNumber, hasSpecial].filter(Boolean).length;
-  if (types < 2) return '영문·한글·숫자·특수문자 중 2가지 이상을 혼합해야 합니다.';
   return null;
 }
 
@@ -121,18 +112,12 @@ export default function ProfilePage() {
   const [avatarFile, setAvatarFile]           = useState(null);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
-  const [currentPw, setCurrentPw] = useState('');
-  const [newPw, setNewPw]         = useState('');
-  const [confirmPw, setConfirmPw] = useState('');
-  const [pwMsg, setPwMsg]         = useState('');
-  const [pwMsgType, setPwMsgType] = useState('');
-  const [loading, setLoading]     = useState(false);
-  const [pwVisible, setPwVisible] = useState({ current: false, new: false, confirm: false });
-
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [deletePassword, setDeletePassword]   = useState('');
-  const [deletePwVisible, setDeletePwVisible] = useState(false);
+  const [deleteReason, setDeleteReason]       = useState('');
   const [deleteMsg, setDeleteMsg]             = useState('');
+  const [deleteVerifyToken, setDeleteVerifyToken] = useState('');
+  const [identityModalOpen, setIdentityModalOpen] = useState(false);
+  const [identityPurpose, setIdentityPurpose]     = useState('');
 
   const kakaoLink  = socialLinks.find(s => s.provider === 'KAKAO');
   const googleLink = socialLinks.find(s => s.provider === 'GOOGLE');
@@ -179,6 +164,8 @@ export default function ProfilePage() {
   const [pfMsg,      setPfMsg]      = useState('');
   const [pfMsgType,  setPfMsgType]  = useState('');
   const [pfFormOpen, setPfFormOpen] = useState(false);
+  const [pfSortKey,  setPfSortKey]  = useState('pnl');
+  const [pfSortDir,  setPfSortDir]  = useState('desc');
 
   const handleAddPortfolio = async () => {
     if (!pfTicker || !pfName || !pfQty || !pfPrice || !pfDate) {
@@ -288,40 +275,38 @@ export default function ProfilePage() {
     }
   };
 
-  const handleChangePassword = async () => {
-    setPwMsg('');
-    if (!currentPw || !newPw || !confirmPw) {
-      setPwMsg('모든 항목을 입력해주세요.'); setPwMsgType('error'); return;
-    }
-    const pwErr = validatePassword(newPw);
-    if (pwErr) { setPwMsg(pwErr); setPwMsgType('error'); return; }
-    if (newPw !== confirmPw) {
-      setPwMsg('새 비밀번호가 일치하지 않습니다.'); setPwMsgType('error'); return;
-    }
-    setLoading(true);
-    try {
-      await api.put('/user/password', { currentPassword: currentPw, newPassword: newPw });
-      setPwMsg('변경됐습니다. 다시 로그인해주세요.'); setPwMsgType('success');
-      setTimeout(() => { logout(); navigate('/login'); }, 2000);
-    } catch { setPwMsg('현재 비밀번호가 틀렸습니다.'); setPwMsgType('error'); }
-    finally { setLoading(false); }
+  const handleIdentityVerifyForPw = () => {
+    setIdentityPurpose('password');
+    setIdentityModalOpen(true);
   };
 
-  const openDeleteModal = () => {
-    setDeletePassword('');
-    setDeleteMsg('');
-    setDeletePwVisible(false);
-    setDeleteModalOpen(true);
+  const handleIdentityVerifyForDelete = () => {
+    setIdentityPurpose('delete');
+    setIdentityModalOpen(true);
+  };
+
+  const handleIdentityVerified = (verifyToken) => {
+    setIdentityModalOpen(false);
+    if (identityPurpose === 'password') {
+      navigate('/change-password', { state: { verifyToken } });
+    } else if (identityPurpose === 'delete') {
+      setDeleteVerifyToken(verifyToken);
+      setDeleteReason('');
+      setDeleteMsg('');
+      setDeleteModalOpen(true);
+    }
   };
 
   const handleDeleteAccount = async () => {
-    if (!deletePassword) { setDeleteMsg('비밀번호를 입력해주세요.'); return; }
+    if (!deleteReason.trim()) { setDeleteMsg('탈퇴 사유를 입력해주세요.'); return; }
     try {
-      await api.delete('/user/account', { data: { password: deletePassword } });
+      await api.delete('/user/account', {
+        data: { verifyToken: deleteVerifyToken, deleteReason: deleteReason }
+      });
       logout();
       navigate('/login');
-    } catch {
-      setDeleteMsg('비밀번호가 일치하지 않거나 오류가 발생했습니다.');
+    } catch (err) {
+      setDeleteMsg(err.response?.data?.message || '탈퇴 처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -427,7 +412,19 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* ── 회원탈퇴 모달 ── */}
+        {/* ── 본인인증 모달 ── */}
+        {identityModalOpen && (
+          <IdentityVerifyModal
+            title={identityPurpose === 'password' ? '비밀번호 변경 본인인증' : '회원 탈퇴 본인인증'}
+            description={identityPurpose === 'password'
+              ? '비밀번호 변경을 위해 본인인증이 필요합니다.'
+              : '회원 탈퇴를 위해 본인인증이 필요합니다.'}
+            onVerified={handleIdentityVerified}
+            onClose={() => setIdentityModalOpen(false)}
+          />
+        )}
+
+        {/* ── 회원탈퇴 모달 (본인인증 완료 후) ── */}
         {deleteModalOpen && (
           <div className={styles['profile-modal-overlay']} onClick={() => setDeleteModalOpen(false)}>
             <div className={styles['profile-modal']} onClick={e => e.stopPropagation()}>
@@ -438,21 +435,19 @@ export default function ProfilePage() {
 
               <div className={styles['profile-modal-body']}>
                 <p className={styles['delete-modal-desc']}>
-                  탈퇴 시 모든 데이터가 <strong>영구 삭제</strong>됩니다.<br/>
-                  현재 비밀번호를 입력하여 탈퇴를 확인해주세요.
+                  탈퇴 후 <strong>2주간 보류 상태</strong>로 유지되며, 이후 영구 삭제됩니다.<br/>
+                  2주 내 재가입 시 계정을 복구할 수 있습니다.
                 </p>
-                <div className="input-wrap" style={{ marginTop: 14 }}>
-                  <input
+                <div style={{ marginTop: 14 }}>
+                  <label className="form-label" style={{ marginBottom: 6, display: 'block' }}>탈퇴 사유</label>
+                  <textarea
                     className="form-input"
-                    type={deletePwVisible ? 'text' : 'password'}
-                    placeholder="현재 비밀번호"
-                    value={deletePassword}
-                    onChange={e => { setDeletePassword(e.target.value); setDeleteMsg(''); }}
-                    onKeyDown={e => e.key === 'Enter' && handleDeleteAccount()}
+                    placeholder="탈퇴 사유를 입력해주세요"
+                    value={deleteReason}
+                    onChange={e => { setDeleteReason(e.target.value); setDeleteMsg(''); }}
+                    rows={3}
+                    style={{ resize: 'vertical', minHeight: 80 }}
                   />
-                  <button className="pw-toggle" type="button" onClick={() => setDeletePwVisible(v => !v)}>
-                    {deletePwVisible ? '숨기기' : '보기'}
-                  </button>
                 </div>
                 {deleteMsg && <p className={`${styles['nick-modal-msg']} ${styles.error}`}>{deleteMsg}</p>}
               </div>
@@ -594,51 +589,23 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* 오른쪽: 비밀번호 변경 + 회원 탈퇴 */}
+              {/* 오른쪽: 비밀번호 변경 버튼 + 회원 탈퇴 */}
               <div className={styles['account-right']}>
                 <div className={styles['pw-section']}>
                   <div className="section-title">비밀번호 변경</div>
-                  <form onSubmit={(e) => { e.preventDefault(); handleChangePassword(); }}>
-                    {[
-                      { label: '현재 비밀번호', value: currentPw, setter: setCurrentPw, key: 'current', placeholder: '현재 비밀번호' },
-                      { label: '새 비밀번호',   value: newPw,     setter: setNewPw,     key: 'new',     placeholder: '영문·한글·숫자·특수문자 중 2가지 이상 혼합 / 6~12자' },
-                      { label: '비밀번호 확인', value: confirmPw, setter: setConfirmPw, key: 'confirm', placeholder: '새 비밀번호 재입력' },
-                    ].map(({ label, value, setter, key, placeholder }) => (
-                      <div className="form-group" key={key}>
-                        <label className="form-label">{label}</label>
-                        <div className="input-wrap">
-                          <input
-                            className="form-input"
-                            type={pwVisible[key] ? 'text' : 'password'}
-                            placeholder={placeholder}
-                            value={value}
-                            onChange={e => setter(e.target.value)}
-                          />
-                          <button
-                            className="pw-toggle"
-                            type="button"
-                            onClick={() => setPwVisible(prev => ({ ...prev, [key]: !prev[key] }))}>
-                            {pwVisible[key] ? '숨기기' : '보기'}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    {pwMsg && <p className={`feedback-msg ${pwMsgType}`}>{pwMsg}</p>}
-                    <button
-                      className="btn btn-primary btn-full"
-                      type="submit"
-                      disabled={loading}
-                      style={{ marginBottom: 16 }}>
-                      {loading ? '변경 중...' : '비밀번호 변경'}
-                    </button>
-                  </form>
+                  <p className={styles['pw-section-desc']}>본인인증 후 비밀번호를 변경할 수 있습니다.</p>
+                  <button
+                    className={styles['btn-change-pw']}
+                    onClick={handleIdentityVerifyForPw}>
+                    비밀번호 변경하기
+                  </button>
                 </div>
 
                 <div className={styles['danger-zone']}>
                   <div className={styles['danger-zone-text']}>
-                    <p className={styles['danger-desc']}>탈퇴 시 모든 데이터가 영구 삭제됩니다.</p>
+                    <p className={styles['danger-desc']}>탈퇴 후 2주간 보류 상태로 유지됩니다.</p>
                   </div>
-                  <button className={styles['btn-delete']} onClick={openDeleteModal}>회원 탈퇴</button>
+                  <button className={styles['btn-delete']} onClick={handleIdentityVerifyForDelete}>회원 탈퇴</button>
                 </div>
               </div>
 
@@ -779,12 +746,44 @@ export default function ProfilePage() {
               stockPrices.map(s => [s.srtnCd, s.clpr || 0])
             );
 
-            const totalBuy  = portfolio.reduce((s, p) => s + p.buyPrice  * p.quantity, 0);
-            const totalNow  = portfolio.reduce((s, p) => s + (priceMap[p.ticker] ?? p.buyPrice) * p.quantity, 0);
+            const enriched = portfolio.map(p => {
+              const curPrice  = priceMap[p.ticker] ?? p.buyPrice;
+              const hasPrice  = !!priceMap[p.ticker];
+              const invested  = p.buyPrice * p.quantity;
+              const evaluated = curPrice    * p.quantity;
+              const pnl       = evaluated - invested;
+              const rate      = p.buyPrice > 0 ? ((curPrice - p.buyPrice) / p.buyPrice * 100) : 0;
+              return { ...p, curPrice, hasPrice, invested, evaluated, pnl, rate };
+            });
+
+            const totalBuy  = enriched.reduce((s, p) => s + p.invested,  0);
+            const totalNow  = enriched.reduce((s, p) => s + p.evaluated, 0);
             const totalPnl  = totalNow - totalBuy;
             const totalRate = totalBuy > 0 ? (totalPnl / totalBuy * 100) : 0;
             const totalCls  = totalPnl > 0 ? 'up' : totalPnl < 0 ? 'down' : '';
             const totalSign = totalPnl > 0 ? '+' : '';
+
+            const pricedOnly = enriched.filter(p => p.hasPrice);
+            const topGainer  = pricedOnly.length
+              ? [...pricedOnly].sort((a, b) => b.rate - a.rate)[0]
+              : null;
+            const topLoser   = pricedOnly.length
+              ? [...pricedOnly].sort((a, b) => a.rate - b.rate)[0]
+              : null;
+
+            const chartOrdered = [...enriched].sort((a, b) => b.pnl - a.pnl);
+            const pnlColor  = pnl => pnl > 0 ? 'rgba(226,76,75,0.75)' : pnl < 0 ? 'rgba(59,122,217,0.75)' : 'rgba(142,142,147,0.5)';
+            const pnlBorder = pnl => pnl > 0 ? '#E24C4B' : pnl < 0 ? '#3B7AD9' : '#8E8E93';
+
+            const sortedList = [...enriched].sort((a, b) => {
+              const dir = pfSortDir === 'asc' ? 1 : -1;
+              if (pfSortKey === 'pnl')   return (a.pnl - b.pnl) * dir;
+              if (pfSortKey === 'rate')  return (a.rate - b.rate) * dir;
+              if (pfSortKey === 'value') return (a.evaluated - b.evaluated) * dir;
+              if (pfSortKey === 'name')  return a.stockName.localeCompare(b.stockName, 'ko') * dir;
+              if (pfSortKey === 'date')  return String(a.buyDate || '').localeCompare(String(b.buyDate || '')) * dir;
+              return 0;
+            });
 
             return (
               <>
@@ -813,28 +812,38 @@ export default function ProfilePage() {
                   </div>
                 )}
 
+                {(topGainer || topLoser) && (
+                  <div className={styles['pf-highlight-row']}>
+                    {topGainer && topGainer.rate > 0 && (
+                      <div className={`${styles['pf-highlight']} ${styles['pf-highlight-up']}`}>
+                        <span className={styles['pf-highlight-badge']}>🏆 최고 수익</span>
+                        <p className={styles['pf-highlight-name']}>{topGainer.stockName}</p>
+                        <p className={styles['pf-highlight-rate']}>+{topGainer.rate.toFixed(2)}%</p>
+                        <p className={styles['pf-highlight-pnl']}>+{Math.round(topGainer.pnl).toLocaleString()}원</p>
+                      </div>
+                    )}
+                    {topLoser && topLoser.rate < 0 && (
+                      <div className={`${styles['pf-highlight']} ${styles['pf-highlight-down']}`}>
+                        <span className={styles['pf-highlight-badge']}>⚠ 최대 손실</span>
+                        <p className={styles['pf-highlight-name']}>{topLoser.stockName}</p>
+                        <p className={styles['pf-highlight-rate']}>{topLoser.rate.toFixed(2)}%</p>
+                        <p className={styles['pf-highlight-pnl']}>{Math.round(topLoser.pnl).toLocaleString()}원</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {portfolio.length > 0 && (
                   <div className={styles['pf-chart-wrap']}>
-                    <div className="section-title" style={{ marginBottom: 12 }}>종목별 손익</div>
+                    <div className="section-title" style={{ marginBottom: 12 }}>종목별 손익 (손익 큰 순)</div>
                     <Bar
                       data={{
-                        labels: portfolio.map(p => p.stockName),
+                        labels: chartOrdered.map(p => p.stockName),
                         datasets: [{
                           label: '손익 (원)',
-                          data: portfolio.map(p => {
-                            const cur = priceMap[p.ticker] ?? p.buyPrice;
-                            return (cur - p.buyPrice) * p.quantity;
-                          }),
-                          backgroundColor: portfolio.map(p => {
-                            const cur = priceMap[p.ticker] ?? p.buyPrice;
-                            const pnl = (cur - p.buyPrice) * p.quantity;
-                            return pnl > 0 ? 'rgba(226,76,75,0.75)' : pnl < 0 ? 'rgba(59,122,217,0.75)' : 'rgba(142,142,147,0.5)';
-                          }),
-                          borderColor: portfolio.map(p => {
-                            const cur = priceMap[p.ticker] ?? p.buyPrice;
-                            const pnl = (cur - p.buyPrice) * p.quantity;
-                            return pnl > 0 ? '#E24C4B' : pnl < 0 ? '#3B7AD9' : '#8E8E93';
-                          }),
+                          data: chartOrdered.map(p => p.pnl),
+                          backgroundColor: chartOrdered.map(p => pnlColor(p.pnl)),
+                          borderColor:     chartOrdered.map(p => pnlBorder(p.pnl)),
                           borderWidth: 1.5,
                           borderRadius: 4,
                         }]
@@ -847,7 +856,11 @@ export default function ProfilePage() {
                             callbacks: {
                               label: ctx => {
                                 const v = ctx.raw;
-                                return `${v >= 0 ? '+' : ''}${Math.round(v).toLocaleString()}원`;
+                                const item = chartOrdered[ctx.dataIndex];
+                                return [
+                                  `${v >= 0 ? '+' : ''}${Math.round(v).toLocaleString()}원`,
+                                  `수익률 ${item.rate >= 0 ? '+' : ''}${item.rate.toFixed(2)}%`,
+                                ];
                               }
                             }
                           }
@@ -862,28 +875,57 @@ export default function ProfilePage() {
                 )}
 
                 {portfolio.length > 0 && (
+                  <div className={styles['pf-chart-wrap']}>
+                    <div className="section-title" style={{ marginBottom: 12 }}>투자금 vs 평가금 비교</div>
+                    <Bar
+                      data={{
+                        labels: chartOrdered.map(p => p.stockName),
+                        datasets: [
+                          {
+                            label: '투자금',
+                            data: chartOrdered.map(p => p.invested),
+                            backgroundColor: 'rgba(142,142,147,0.45)',
+                            borderColor: '#8E8E93',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                          },
+                          {
+                            label: '평가금',
+                            data: chartOrdered.map(p => p.evaluated),
+                            backgroundColor: chartOrdered.map(p => pnlColor(p.pnl)),
+                            borderColor:     chartOrdered.map(p => pnlBorder(p.pnl)),
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                          },
+                        ]
+                      }}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } },
+                          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${Math.round(ctx.raw).toLocaleString()}원` } }
+                        },
+                        scales: {
+                          y: { ticks: { callback: v => `${Number(v).toLocaleString()}` }, grid: { color: 'rgba(128,128,128,0.08)' } },
+                          x: { grid: { display: false } }
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+
+                {portfolio.length > 0 && (
                   <div className={styles['pf-charts-row']}>
                     <div className={styles['pf-chart-wrap']}>
                       <div className="section-title" style={{ marginBottom: 12 }}>종목별 수익률</div>
                       <Bar
                         data={{
-                          labels: portfolio.map(p => p.stockName),
+                          labels: chartOrdered.map(p => p.stockName),
                           datasets: [{
                             label: '수익률 (%)',
-                            data: portfolio.map(p => {
-                              const cur = priceMap[p.ticker] ?? p.buyPrice;
-                              return p.buyPrice > 0 ? ((cur - p.buyPrice) / p.buyPrice * 100) : 0;
-                            }),
-                            backgroundColor: portfolio.map(p => {
-                              const cur = priceMap[p.ticker] ?? p.buyPrice;
-                              const r = p.buyPrice > 0 ? ((cur - p.buyPrice) / p.buyPrice * 100) : 0;
-                              return r > 0 ? 'rgba(226,76,75,0.75)' : r < 0 ? 'rgba(59,122,217,0.75)' : 'rgba(142,142,147,0.5)';
-                            }),
-                            borderColor: portfolio.map(p => {
-                              const cur = priceMap[p.ticker] ?? p.buyPrice;
-                              const r = p.buyPrice > 0 ? ((cur - p.buyPrice) / p.buyPrice * 100) : 0;
-                              return r > 0 ? '#E24C4B' : r < 0 ? '#3B7AD9' : '#8E8E93';
-                            }),
+                            data: chartOrdered.map(p => p.rate),
+                            backgroundColor: chartOrdered.map(p => pnlColor(p.pnl)),
+                            borderColor:     chartOrdered.map(p => pnlBorder(p.pnl)),
                             borderWidth: 1.5,
                             borderRadius: 4,
                           }]
@@ -902,13 +944,13 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className={styles['pf-chart-wrap']}>
-                      <div className="section-title" style={{ marginBottom: 12 }}>포트폴리오 구성</div>
+                      <div className="section-title" style={{ marginBottom: 12 }}>포트폴리오 구성 (투자금 기준)</div>
                       <Doughnut
                         data={{
-                          labels: portfolio.map(p => p.stockName),
+                          labels: enriched.map(p => p.stockName),
                           datasets: [{
-                            data: portfolio.map(p => p.buyPrice * p.quantity),
-                            backgroundColor: ['#4f8ef7','#f76e6e','#4ec980','#f7c94f','#9b59b6','#1abc9c','#e67e22','#3498db','#e74c3c','#2ecc71'].slice(0, portfolio.length),
+                            data: enriched.map(p => p.invested),
+                            backgroundColor: ['#4f8ef7','#f76e6e','#4ec980','#f7c94f','#9b59b6','#1abc9c','#e67e22','#3498db','#e74c3c','#2ecc71'].slice(0, enriched.length),
                             borderWidth: 1,
                             borderColor: 'var(--surface-2)',
                           }]
@@ -927,9 +969,31 @@ export default function ProfilePage() {
 
                 <div className={styles['pf-header']}>
                   <div className="section-title" style={{ margin: 0 }}>보유 종목 ({portfolio.length})</div>
-                  <button className={styles['btn-pf-add']} onClick={() => { setPfFormOpen(v => !v); setPfMsg(''); }}>
-                    {pfFormOpen ? '✕ 닫기' : '+ 종목 추가'}
-                  </button>
+                  <div className={styles['pf-header-actions']}>
+                    {portfolio.length > 1 && (
+                      <>
+                        <select
+                          className={styles['pf-sort-select']}
+                          value={pfSortKey}
+                          onChange={e => setPfSortKey(e.target.value)}>
+                          <option value="pnl">손익순</option>
+                          <option value="rate">수익률순</option>
+                          <option value="value">평가금액순</option>
+                          <option value="name">이름순</option>
+                          <option value="date">매수일순</option>
+                        </select>
+                        <button
+                          className={styles['pf-sort-dir']}
+                          onClick={() => setPfSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+                          title={pfSortDir === 'asc' ? '오름차순' : '내림차순'}>
+                          {pfSortDir === 'asc' ? '↑ 오름' : '↓ 내림'}
+                        </button>
+                      </>
+                    )}
+                    <button className={styles['btn-pf-add']} onClick={() => { setPfFormOpen(v => !v); setPfMsg(''); }}>
+                      {pfFormOpen ? '✕ 닫기' : '+ 종목 추가'}
+                    </button>
+                  </div>
                 </div>
 
                 {pfFormOpen && (
@@ -977,13 +1041,9 @@ export default function ProfilePage() {
                   <div className={styles['profile-empty']}>보유 종목이 없습니다.</div>
                 ) : (
                   <div className={styles['pf-list']}>
-                    {portfolio.map(p => {
-                      const curPrice = priceMap[p.ticker] ?? p.buyPrice;
-                      const pnl      = (curPrice - p.buyPrice) * p.quantity;
-                      const rate     = p.buyPrice > 0 ? ((curPrice - p.buyPrice) / p.buyPrice * 100) : 0;
-                      const cls      = pnl > 0 ? 'up' : pnl < 0 ? 'down' : '';
-                      const sign     = pnl > 0 ? '+' : '';
-                      const hasPrice = !!priceMap[p.ticker];
+                    {sortedList.map(p => {
+                      const cls  = p.pnl > 0 ? 'up' : p.pnl < 0 ? 'down' : '';
+                      const sign = p.pnl > 0 ? '+' : '';
                       return (
                         <div key={p.portfolioId} className={styles['pf-item']}>
                           <div className={styles['pf-item-left']}>
@@ -993,11 +1053,11 @@ export default function ProfilePage() {
                             </p>
                           </div>
                           <div className={styles['pf-item-right']}>
-                            {hasPrice ? (
+                            {p.hasPrice ? (
                               <>
-                                <p className={styles['pf-item-cur']}>{curPrice.toLocaleString()}원</p>
+                                <p className={styles['pf-item-cur']}>{p.curPrice.toLocaleString()}원</p>
                                 <p className={`${styles['pf-item-pnl']} ${cls}`}>
-                                  {sign}{pnl.toLocaleString()}원 ({sign}{rate.toFixed(2)}%)
+                                  {sign}{Math.round(p.pnl).toLocaleString()}원 ({sign}{p.rate.toFixed(2)}%)
                                 </p>
                               </>
                             ) : (
