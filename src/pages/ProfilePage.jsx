@@ -88,6 +88,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (userInfo?.nickname) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setNickname(userInfo.nickname);
     }
   }, [userInfo]);
@@ -121,6 +122,7 @@ export default function ProfilePage() {
     const params = new URLSearchParams(location.search);
     if (params.get('linked')) {
       const p = params.get('linked');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSocialMsg(`${p === 'kakao' ? '카카오' : '구글'} 계정 연동이 완료됐습니다.`);
       setSocialMsgType('success');
     } else if (params.get('linkError')) {
