@@ -74,6 +74,9 @@ export default function SignupFormStep({ certInfo, onComplete }) {
     const [showPw, setShowPw]     = useState(false);
     const [showPwC, setShowPwC]   = useState(false);
     const [touched, setTouched]   = useState({});
+    const [recoverModal, setRecoverModal] = useState(false);
+    const [recoverLoading, setRecoverLoading] = useState(false);
+    const [recoverMsg, setRecoverMsg] = useState('');
 
     const change = (e) => {
         const { name, value, type, checked } = e.target;
@@ -185,6 +188,16 @@ export default function SignupFormStep({ certInfo, onComplete }) {
 
         setLoading(true);
         try {
+            const { data: deletedCheck } = await axios.post(`${API}/check-deleted`, {
+                email: form.email
+            }, { withCredentials: true });
+
+            if (deletedCheck.deleted && deletedCheck.recoverable) {
+                setLoading(false);
+                setRecoverModal(true);
+                return;
+            }
+
             await axios.post(`${API}/signup`, {
                 email:         form.email,
                 password:      form.password,
@@ -204,6 +217,23 @@ export default function SignupFormStep({ certInfo, onComplete }) {
         }
     };
 
+    const handleRecover = async () => {
+        setRecoverLoading(true);
+        setRecoverMsg('');
+        try {
+            const { data } = await axios.post(`${API}/recover-account`, {
+                email: form.email,
+                name: certInfo.name,
+                phone: certInfo.phone,
+            }, { withCredentials: true });
+            setRecoverMsg(data.message);
+        } catch (err) {
+            setRecoverMsg(err.response?.data?.message || '계정 복구에 실패했습니다.');
+        } finally {
+            setRecoverLoading(false);
+        }
+    };
+
     const ic = (field) => {
         const hasError = !!errors[field];
         const isOk     = touched[field] && !hasError && form[field];
@@ -217,6 +247,37 @@ export default function SignupFormStep({ certInfo, onComplete }) {
 
     return (
         <div className={styles.card}>
+            {recoverModal && (
+                <div className={styles.recoverOverlay} onClick={() => setRecoverModal(false)}>
+                    <div className={styles.recoverModal} onClick={e => e.stopPropagation()}>
+                        <h3 className={styles.recoverTitle}>탈퇴된 계정 발견</h3>
+                        <p className={styles.recoverDesc}>
+                            <strong>{form.email}</strong> 계정이 탈퇴 보류 상태입니다.<br/>
+                            복구하시면 해당 이메일로 임시 비밀번호가 발송됩니다.
+                        </p>
+                        {recoverMsg && (
+                            <p className={styles.recoverMsg}>{recoverMsg}</p>
+                        )}
+                        {!recoverMsg ? (
+                            <div className={styles.recoverBtnRow}>
+                                <button
+                                    className={styles.recoverBtnCancel}
+                                    onClick={() => setRecoverModal(false)}>
+                                    취소
+                                </button>
+                                <button
+                                    className={styles.recoverBtnConfirm}
+                                    onClick={handleRecover}
+                                    disabled={recoverLoading}>
+                                    {recoverLoading ? '처리 중...' : '계정 복구'}
+                                </button>
+                            </div>
+                        ) : (
+                            <a href="/login" className={styles.recoverLoginLink}>로그인 페이지로 이동</a>
+                        )}
+                    </div>
+                </div>
+            )}
             <h2 className={styles.title}>정보 입력</h2>
             <p className={styles.desc}>계정을 만들고 주식 정보보기를 시작하세요</p>
 

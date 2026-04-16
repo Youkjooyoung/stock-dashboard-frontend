@@ -133,8 +133,7 @@ function renderText(text) {
 export default function FloatingAiChat() {
   const [open,        setOpen]        = useState(false);
   const [mode,        setMode]        = useState('faq');
-  const [openCat,     setOpenCat]     = useState(0);
-  const [ticker,      setTicker]      = useState('');
+  const [openCat,     setOpenCat]     = useState(null);
   const [input,       setInput]       = useState('');
   const [faqMessages, setFaqMessages] = useState([]);
   const [aiMessages,  setAiMessages]  = useState([]);
@@ -188,9 +187,9 @@ export default function FloatingAiChat() {
   };
 
   const handleSend = async () => {
-    if (!ticker.trim() || !input.trim() || loading) return;
+    if (!input.trim() || loading) return;
     const userText = input.trim();
-    setMessages(prev => [...prev, { role: 'user', text: `[${ticker.toUpperCase()}] ${userText}` }]);
+    setMessages(prev => [...prev, { role: 'user', text: userText }]);
     setInput('');
     setLoading(true);
     try {
@@ -214,7 +213,6 @@ export default function FloatingAiChat() {
     setOpen(false);
     setFaqMessages([]);
     setAiMessages([]);
-    setTicker('');
     setInput('');
     setMode('faq');
   };
@@ -287,8 +285,8 @@ export default function FloatingAiChat() {
             {messages.length === 0 && mode === 'ai' && (
               <div className={styles.empty}>
                 <span className={styles.emptyIcon}>✦</span>
-                <p>종목을 입력하고 궁금한 점을 물어보세요.</p>
-                <p className={styles.emptyHint}>예: "현재 매수 타이밍인가요?", "리스크 요인 분석해줘"</p>
+                <p>종목명과 궁금한 점을 함께 입력해보세요.</p>
+                <p className={styles.emptyHint}>예: "삼성전자 매수 타이밍인가요?", "SK하이닉스 리스크 분석해줘"</p>
               </div>
             )}
 
@@ -314,33 +312,23 @@ export default function FloatingAiChat() {
           </div>
 
           {mode === 'ai' && (
-            <>
-              <div className={styles.tickerBar}>
-                <input
-                  className={styles.tickerInput}
-                  placeholder="종목명 또는 코드 (예: 삼성전자, 005930)"
-                  value={ticker}
-                  onChange={e => setTicker(e.target.value)}
-                />
-              </div>
-              <div className={styles.inputBar}>
-                <textarea
-                  className={styles.input}
-                  placeholder="질문을 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)"
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  rows={2}
-                  disabled={loading}
-                />
-                <button
-                  className={styles.sendBtn}
-                  onClick={handleSend}
-                  disabled={loading || !ticker.trim() || !input.trim()}>
-                  전송
-                </button>
-              </div>
-            </>
+            <div className={styles.inputBar}>
+              <textarea
+                className={styles.input}
+                placeholder="종목명과 질문을 입력하세요... (예: 삼성전자 매수 타이밍인가요?)"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                rows={2}
+                disabled={loading}
+              />
+              <button
+                className={styles.sendBtn}
+                onClick={handleSend}
+                disabled={loading || !input.trim()}>
+                전송
+              </button>
+            </div>
           )}
 
           {mode === 'faq' && (

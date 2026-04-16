@@ -14,6 +14,7 @@ const ForgotPasswordPage   = lazy(() => import('../pages/ForgotPasswordPage'));
 const ResetPasswordPage    = lazy(() => import('../pages/ResetPasswordPage'));
 const AdminPage            = lazy(() => import('../pages/AdminPage'));
 const ComparePage          = lazy(() => import('../pages/ComparePage'));
+const ChangePasswordPage   = lazy(() => import('../pages/ChangePasswordPage'));
 
 export default function AppRouter() {
     return (
@@ -30,6 +31,7 @@ export default function AppRouter() {
                     <Route path="/forgot-password"  element={<ForgotPasswordPage />} />
                     <Route path="/reset-password"   element={<ResetPasswordPage />} />
                     <Route path="/admin"            element={<AdminPage />} />
+                    <Route path="/change-password"  element={<ChangePasswordPage />} />
 
                     <Route element={<AppLayout />}>
                         <Route path="/" element={

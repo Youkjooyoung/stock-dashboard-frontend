@@ -25,8 +25,9 @@ export default function OAuthCallbackPage() {
       const nickname = params.get('nickname') || '';
       const provider = params.get('provider') || 'kakao';
       const role     = params.get('role') || 'USER';
+      const userId   = params.get('userId') || null;
       window.history.replaceState(null, '', window.location.pathname);
-      setAuth(email, accessToken, refreshToken, null, role);
+      setAuth(email, accessToken, refreshToken, userId, role);
       localStorage.setItem('kakaoNickname', nickname);
       localStorage.setItem('provider', provider);
       navigate(role === 'ADMIN' ? '/admin' : '/');
@@ -34,8 +35,8 @@ export default function OAuthCallbackPage() {
       const provider = window.location.pathname.includes('kakao') ? 'kakao' : 'google';
       api.get(`/auth/${provider}/exchange?code=${encodeURIComponent(code)}`)
         .then(res => {
-          const { accessToken, refreshToken, email, nickname, role } = res.data;
-          setAuth(email, accessToken, refreshToken, null, role || 'USER');
+          const { accessToken, refreshToken, email, nickname, role, userId } = res.data;
+          setAuth(email, accessToken, refreshToken, userId || null, role || 'USER');
           localStorage.setItem('kakaoNickname', nickname || '');
           localStorage.setItem('provider', provider);
           navigate(role === 'ADMIN' ? '/admin' : '/');
