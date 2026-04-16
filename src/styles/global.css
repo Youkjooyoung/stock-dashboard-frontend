@@ -121,6 +121,7 @@
 html {
   scroll-behavior: smooth;
   font-family: var(--font-sans);
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -138,6 +139,34 @@ body {
 
 body.modal-open {
   overflow: hidden;
+}
+
+/* 전역 스크롤바 — OS 자동숨김 무시하고 항상 표시 (Windows 11 대응) */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 6px;
+  border: 3px solid var(--bg);
+  background-clip: padding-box;
+}
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: var(--text-3);
+  background-clip: padding-box;
+  border: 3px solid var(--bg);
+}
+html {
+  scrollbar-color: var(--border-strong) var(--bg);
+  scrollbar-width: thin;
 }
 
 a { text-decoration: none; color: inherit; }
