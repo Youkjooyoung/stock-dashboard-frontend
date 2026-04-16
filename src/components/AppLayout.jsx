@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import FloatingAiChat from './FloatingAiChat';
 import Header from './Header';
 import StockTicker from './StockTicker';
@@ -8,6 +8,7 @@ export default function AppLayout() {
   const [autoRefresh, setAutoRefresh] = useState(
     () => localStorage.getItem('autoRefresh') === 'true'
   );
+  const { pathname } = useLocation();
 
   const token = localStorage.getItem('accessToken');
 
@@ -24,7 +25,9 @@ export default function AppLayout() {
     <>
       <Header autoRefresh={autoRefresh} onToggleRefresh={toggleRefresh} />
       <StockTicker />
-      <Outlet context={{ autoRefresh, setAutoRefresh }} />
+      <div key={pathname} className="route-fade">
+        <Outlet context={{ autoRefresh, setAutoRefresh }} />
+      </div>
       <FloatingAiChat />
     </>
   );

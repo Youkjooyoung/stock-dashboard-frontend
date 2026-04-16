@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import usePriceFlash from '../hooks/usePriceFlash';
 import styles from '../styles/components/StockTable.module.css';
 
 const SS_KEY = 'stockTableState';
@@ -274,10 +275,12 @@ export default function StockTable({
   }, [stocks, watchlist, tab, search, filterMarket, filterRateMin, filterRateMax, filterVolMin, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / pageSize);
-  
+
   const paginated = useMemo(() => {
     return filtered.slice((page - 1) * pageSize, page * pageSize);
   }, [filtered, page, pageSize]);
+
+  const flashMap = usePriceFlash(paginated);
 
   const getPageNumbers = () => {
     const delta = 2;
@@ -433,8 +436,10 @@ export default function StockTable({
             const cls       = rate > 0 ? 'up' : rate < 0 ? 'down' : 'zero';
             const sign      = rate > 0 ? '▲' : rate < 0 ? '▼' : '-';
             const isWatched = watchlist.includes(d.itemId);
+            const flash     = flashMap.get(d.itemId);
+            const flashCls  = flash === 'up' ? styles['flash-up'] : flash === 'down' ? styles['flash-down'] : '';
             return (
-              <tr key={i} onClick={() => onRowClick(d)}>
+              <tr key={i} onClick={() => onRowClick(d)} className={flashCls}>
                 <td><span className={styles['stock-code']}>{d.srtnCd}</span></td>
                 <td><span className={styles['stock-name']}>{d.itmsNm}</span></td>
                 <td>
@@ -476,8 +481,10 @@ export default function StockTable({
           const cls       = rate > 0 ? 'up' : rate < 0 ? 'down' : 'zero';
           const sign      = rate > 0 ? '▲' : rate < 0 ? '▼' : '-';
           const isWatched = watchlist.includes(d.itemId);
+          const flash     = flashMap.get(d.itemId);
+          const flashCls  = flash === 'up' ? styles['flash-up'] : flash === 'down' ? styles['flash-down'] : '';
           return (
-            <div key={i} className={styles['stock-card']} onClick={() => onRowClick(d)}>
+            <div key={i} className={`${styles['stock-card']} ${flashCls}`} onClick={() => onRowClick(d)}>
               <div className={styles['stock-card-top']}>
                 <div className={styles['stock-card-info']}>
                   <span className={styles['stock-name']}>{d.itmsNm}</span>
