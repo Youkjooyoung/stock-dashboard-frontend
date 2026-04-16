@@ -14,7 +14,6 @@
   justify-content: center;
   z-index: 1000;
   padding: 24px 16px;
-  overflow-y: auto;
   overscroll-behavior: contain;
 }
 
@@ -24,12 +23,11 @@
   border-radius: var(--radius-xl);
   width: 760px;
   max-width: 100%;
-  max-height: calc(100vh - 48px);
+  height: min(720px, calc(100vh - 48px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  margin: auto;
 }
 
 /* ===================================================================
@@ -123,6 +121,61 @@
 /* ===================================================================
    본문 스크롤
    =================================================================== */
+/* ===================================================================
+   탭 바
+   =================================================================== */
+.modal-tabs {
+  display: flex;
+  align-items: stretch;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.modal-tabs::-webkit-scrollbar { display: none; }
+
+.modal-tab {
+  position: relative;
+  padding: 12px 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  transition: color var(--transition);
+}
+
+.modal-tab:hover {
+  color: var(--text-1);
+}
+
+.modal-tab.active {
+  color: var(--text-1);
+  font-weight: 700;
+}
+
+.modal-tab.active::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--text-1);
+  border-radius: 1px;
+}
+
+/* ===================================================================
+   본문 (탭 패널)
+   =================================================================== */
 .modal-body {
   padding: 20px 22px 24px;
   overflow-y: auto;
@@ -130,6 +183,16 @@
   overflow-anchor: none;
   flex: 1 1 auto;
   min-height: 0;
+}
+
+.modal-tab-pane {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-chart-canvas {
+  min-height: 320px;
 }
 
 .modal-body::-webkit-scrollbar { width: 8px; }
@@ -238,9 +301,7 @@
    차트 영역
    =================================================================== */
 .modal-chart-wrap {
-  margin-bottom: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
+  margin-bottom: 0;
 }
 
 .modal-chart-header {
@@ -398,9 +459,7 @@
    뉴스 섹션
    =================================================================== */
 .modal-news-wrap {
-  margin-bottom: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
+  margin-bottom: 0;
 }
 
 .modal-news-item {
@@ -467,17 +526,12 @@
 }
 
 /* ===================================================================
-   섹션 래퍼 (AlertSetter / AiAnalysis / StockChat 위 디바이더)
+   섹션 래퍼 (개요 탭에서 AlertSetter 위 디바이더)
    =================================================================== */
 .modal-section-wrap {
-  margin-bottom: 24px;
+  margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid var(--border);
-}
-
-.modal-section-wrap:first-of-type {
-  padding-top: 0;
-  border-top: none;
 }
 
 /* ===================================================================
@@ -492,9 +546,17 @@
   .modal-box {
     width: 100%;
     max-width: 100%;
-    max-height: 94vh;
+    height: 94vh;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    margin: 0;
+  }
+
+  .modal-tabs {
+    padding: 0 6px;
+  }
+
+  .modal-tab {
+    padding: 11px 10px;
+    font-size: 12px;
   }
 
   .modal-stats {

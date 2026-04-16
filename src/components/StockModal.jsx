@@ -1,4 +1,4 @@
-import { useState, useRef, useLayoutEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
 import { Line } from 'react-chartjs-2';
@@ -14,6 +14,7 @@ import styles from '../styles/components/StockModal.module.css';
 
 const chartOptions = {
   responsive: true,
+  maintainAspectRatio: false,
   interaction: { mode: 'index', intersect: false },
   plugins: {
     legend: { display: false },
@@ -47,6 +48,14 @@ const COLLECT_RANGES = [
   { label: '최대', months: 240 },
 ];
 
+const TABS = [
+  { key: 'overview', label: '개요' },
+  { key: 'chart',    label: '차트' },
+  { key: 'news',     label: '뉴스' },
+  { key: 'ai',       label: 'AI 분석' },
+  { key: 'chat',     label: '토론' },
+];
+
 const modalVariants = {
   hidden:  { opacity: 0, scale: 0.97, y: 8 },
   visible: {
@@ -68,21 +77,6 @@ const IconClose = () => (
   </svg>
 );
 
-const IconChart = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 3v18h18" />
-    <path d="M7 15l4-4 3 3 5-6" />
-  </svg>
-);
-
-const IconNews = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 4h13a3 3 0 013 3v11a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
-    <path d="M4 4v14a2 2 0 002 2" />
-    <path d="M8 8h8M8 12h8M8 16h5" />
-  </svg>
-);
-
 const IconDownload = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 3v12" />
@@ -95,28 +89,25 @@ export default function StockModal({ stock, onClose }) {
   const [chartType, setChartType] = useState('candle');
   const [period, setPeriod] = useState('일');
   const [collectOpen, setCollectOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
   const tabGroupRef = useRef(null);
   const modalBodyRef = useRef(null);
 
   const { data: detailData = [], isLoading: chartLoading } = useStockDetail(stock?.srtnCd);
   const { data: news = [], isLoading: newsLoading } = useStockNews(stock?.itmsNm);
 
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   useLayoutEffect(() => {
     const el = modalBodyRef.current;
     if (!el) return;
-    const reset = () => { el.scrollTop = 0; };
-    reset();
-    const raf1 = requestAnimationFrame(reset);
-    const t1 = setTimeout(reset, 50);
-    const t2 = setTimeout(reset, 150);
-    const t3 = setTimeout(reset, 350);
-    return () => {
-      cancelAnimationFrame(raf1);
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
-  }, [stock?.srtnCd]);
+    el.scrollTop = 0;
+  }, [stock?.srtnCd, activeTab]);
+
   const collectMutation = useCollectTickerHistory(stock?.srtnCd);
 
   function handleCollect(months) {
@@ -168,7 +159,7 @@ export default function StockModal({ stock, onClose }) {
           animate="visible"
           exit="exit">
 
-          {/* 헤더 */}
+          {/* 헤더 (항상 상단 고정) */}
           <div className={styles['modal-header']}>
             <div className={styles['modal-title-block']}>
               <h2 className={styles['modal-stock-name']}>{stock.itmsNm}</h2>
@@ -188,176 +179,195 @@ export default function StockModal({ stock, onClose }) {
             </button>
           </div>
 
-          {/* 본문 */}
+          {/* 탭 바 (헤더 아래 고정) */}
+          <div className={styles['modal-tabs']} role="tablist">
+            {TABS.map(t => (
+              <button
+                key={t.key}
+                role="tab"
+                aria-selected={activeTab === t.key}
+                className={`${styles['modal-tab']} ${activeTab === t.key ? styles.active : ''}`}
+                onClick={() => setActiveTab(t.key)}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* 본문 (탭별 스크롤 가능) */}
           <div className={styles['modal-body']} ref={modalBodyRef}>
 
-            {/* 핵심 지표 */}
-            <div className={styles['modal-stats']}>
-              {stats.map((s, i) => (
-                <div key={i} className={styles['modal-stat-item']}>
-                  <div className={styles['modal-stat-label']}>{s.label}</div>
-                  <div className={`${styles['modal-stat-value']} ${s.cls || ''}`}>
-                    {s.isRate ? (
-                      <>
-                        <span>{sign}</span>
-                        <AnimatedNumber value={Math.abs(s.diff)} formatter={formatters.comma} duration={0.5} />
-                        <span>원</span>
-                        <span>(</span>
-                        <AnimatedNumber value={Math.abs(s.value)} decimals={2} duration={0.5} />
-                        <span>%)</span>
-                      </>
-                    ) : s.isVolume ? (
-                      <AnimatedNumber value={s.value} formatter={formatters.comma} duration={0.6} />
-                    ) : (
-                      <>
-                        <AnimatedNumber value={s.value} formatter={formatters.comma} duration={0.6} />
-                        <span>원</span>
-                      </>
-                    )}
-                  </div>
+            {/* 개요 탭 */}
+            {activeTab === 'overview' && (
+              <>
+                <div className={styles['modal-stats']}>
+                  {stats.map((s, i) => (
+                    <div key={i} className={styles['modal-stat-item']}>
+                      <div className={styles['modal-stat-label']}>{s.label}</div>
+                      <div className={`${styles['modal-stat-value']} ${s.cls || ''}`}>
+                        {s.isRate ? (
+                          <>
+                            <span>{sign}</span>
+                            <AnimatedNumber value={Math.abs(s.diff)} formatter={formatters.comma} duration={0.5} />
+                            <span>원</span>
+                            <span>(</span>
+                            <AnimatedNumber value={Math.abs(s.value)} decimals={2} duration={0.5} />
+                            <span>%)</span>
+                          </>
+                        ) : s.isVolume ? (
+                          <AnimatedNumber value={s.value} formatter={formatters.comma} duration={0.6} />
+                        ) : (
+                          <>
+                            <AnimatedNumber value={s.value} formatter={formatters.comma} duration={0.6} />
+                            <span>원</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* 알림 설정 */}
-            <div className={styles['modal-section-wrap']}>
-              <AlertSetter stock={stock} />
-            </div>
-
-            {/* 종가 추이 차트 */}
-            <div className={styles['modal-chart-wrap']}>
-              <div className={styles['modal-chart-header']}>
-                <div className={styles['modal-section-title']}>
-                  <IconChart />
-                  종가 추이
-                  <span className={styles['modal-data-count']}>({detailData.length}일)</span>
+                <div className={styles['modal-section-wrap']}>
+                  <AlertSetter stock={stock} />
                 </div>
-                <div className={styles['modal-chart-controls']}>
-                  {/* 과거 데이터 수집 */}
-                  <div className={styles['collect-wrap']}>
-                    <button
-                      className={styles['btn-collect']}
-                      onClick={() => setCollectOpen(v => !v)}
-                      disabled={collectMutation.isPending}>
-                      <IconDownload />
-                      {collectMutation.isPending ? '수집 중' : '과거 데이터'}
-                    </button>
-                    <AnimatePresence>
-                      {collectOpen && (
-                        <motion.div
-                          className={styles['collect-dropdown']}
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -4 }}
-                          transition={{ duration: 0.12 }}>
-                          {COLLECT_RANGES.map(r => (
-                            <button
-                              key={r.label}
-                              className={styles['collect-option']}
-                              onClick={() => handleCollect(r.months)}>
-                              {r.label}
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+              </>
+            )}
 
-                  {/* 기간 선택 */}
-                  <div className={styles['modal-chart-tab-group']} ref={tabGroupRef}>
-                    {PERIODS.map((p) => (
+            {/* 차트 탭 */}
+            {activeTab === 'chart' && (
+              <div className={styles['modal-chart-wrap']}>
+                <div className={styles['modal-chart-header']}>
+                  <div className={styles['modal-section-title']}>
+                    종가 추이
+                    <span className={styles['modal-data-count']}>({detailData.length}일)</span>
+                  </div>
+                  <div className={styles['modal-chart-controls']}>
+                    <div className={styles['collect-wrap']}>
                       <button
-                        key={p}
-                        className={`${styles['modal-chart-tab']} ${period === p ? styles.active : ''}`}
-                        onClick={() => setPeriod(p)}>
-                        {p}
+                        className={styles['btn-collect']}
+                        onClick={() => setCollectOpen(v => !v)}
+                        disabled={collectMutation.isPending}>
+                        <IconDownload />
+                        {collectMutation.isPending ? '수집 중' : '과거 데이터'}
                       </button>
-                    ))}
-                  </div>
+                      <AnimatePresence>
+                        {collectOpen && (
+                          <motion.div
+                            className={styles['collect-dropdown']}
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.12 }}>
+                            {COLLECT_RANGES.map(r => (
+                              <button
+                                key={r.label}
+                                className={styles['collect-option']}
+                                onClick={() => handleCollect(r.months)}>
+                                {r.label}
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
 
-                  {/* 차트 타입 */}
-                  <div className={styles['modal-chart-tab-group']}>
-                    <button
-                      className={`${styles['modal-chart-tab']} ${chartType === 'candle' ? styles.active : ''}`}
-                      onClick={() => setChartType('candle')}>
-                      캔들
-                    </button>
-                    <button
-                      className={`${styles['modal-chart-tab']} ${chartType === 'line' ? styles.active : ''}`}
-                      onClick={() => setChartType('line')}>
-                      라인
-                    </button>
+                    <div className={styles['modal-chart-tab-group']} ref={tabGroupRef}>
+                      {PERIODS.map((p) => (
+                        <button
+                          key={p}
+                          className={`${styles['modal-chart-tab']} ${period === p ? styles.active : ''}`}
+                          onClick={() => setPeriod(p)}>
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className={styles['modal-chart-tab-group']}>
+                      <button
+                        className={`${styles['modal-chart-tab']} ${chartType === 'candle' ? styles.active : ''}`}
+                        onClick={() => setChartType('candle')}>
+                        캔들
+                      </button>
+                      <button
+                        className={`${styles['modal-chart-tab']} ${chartType === 'line' ? styles.active : ''}`}
+                        onClick={() => setChartType('line')}>
+                        라인
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {chartLoading ? (
-                <SkeletonChart />
-              ) : detailData.length > 0 ? (
-                chartType === 'candle' ? (
-                  <CandlestickChart data={detailData} period={period} height={280} />
+                <div className={styles['modal-chart-canvas']}>
+                  {chartLoading ? (
+                    <SkeletonChart />
+                  ) : detailData.length > 0 ? (
+                    chartType === 'candle' ? (
+                      <CandlestickChart data={detailData} period={period} height={320} />
+                    ) : (
+                      <Line
+                        data={{
+                          labels: detailData.map(d => {
+                            const dt = d.basDt;
+                            return `${dt.slice(4,6)}/${dt.slice(6,8)}`;
+                          }),
+                          datasets: [{
+                            label: '종가',
+                            data: detailData.map(d => d.clpr),
+                            borderColor: 'var(--text-1)',
+                            backgroundColor: 'rgba(11,13,16,0.05)',
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 2,
+                            pointHoverRadius: 4,
+                            pointBackgroundColor: 'var(--text-1)',
+                          }]
+                        }}
+                        options={chartOptions}
+                      />
+                    )
+                  ) : (
+                    <div className={styles['modal-chart-loading']}>데이터가 없습니다.</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* 뉴스 탭 */}
+            {activeTab === 'news' && (
+              <div className={styles['modal-news-wrap']}>
+                {newsLoading ? (
+                  <SkeletonNews />
+                ) : news.length > 0 ? (
+                  news.map((n, i) => (
+                    <a
+                      key={i}
+                      href={n.originallink || n.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={styles['modal-news-item']}>
+                      <div className={styles['modal-news-title']}>{n.title}</div>
+                      <div className={styles['modal-news-desc']}>{n.description}</div>
+                      <div className={styles['modal-news-date']}>{formatNewsDate(n.pubDate)}</div>
+                    </a>
+                  ))
                 ) : (
-                  <Line
-                    data={{
-                      labels: detailData.map(d => {
-                        const dt = d.basDt;
-                        return `${dt.slice(4,6)}/${dt.slice(6,8)}`;
-                      }),
-                      datasets: [{
-                        label: '종가',
-                        data: detailData.map(d => d.clpr),
-                        borderColor: 'var(--text-1)',
-                        backgroundColor: 'rgba(11,13,16,0.05)',
-                        tension: 0.3,
-                        fill: true,
-                        pointRadius: 2,
-                        pointHoverRadius: 4,
-                        pointBackgroundColor: 'var(--text-1)',
-                      }]
-                    }}
-                    options={chartOptions}
-                  />
-                )
-              ) : (
-                <div className={styles['modal-chart-loading']}>데이터가 없습니다.</div>
-              )}
-            </div>
-
-            {/* 관련 뉴스 */}
-            <div className={styles['modal-news-wrap']}>
-              <div className={styles['modal-section-title']}>
-                <IconNews />
-                관련 뉴스
+                  <div className={styles['modal-news-empty']}>관련 뉴스가 없습니다.</div>
+                )}
               </div>
-              {newsLoading ? (
-                <SkeletonNews />
-              ) : news.length > 0 ? (
-                news.map((n, i) => (
-                  <a
-                    key={i}
-                    href={n.originallink || n.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={styles['modal-news-item']}>
-                    <div className={styles['modal-news-title']}>{n.title}</div>
-                    <div className={styles['modal-news-desc']}>{n.description}</div>
-                    <div className={styles['modal-news-date']}>{formatNewsDate(n.pubDate)}</div>
-                  </a>
-                ))
-              ) : (
-                <div className={styles['modal-news-empty']}>관련 뉴스가 없습니다.</div>
-              )}
-            </div>
+            )}
 
-            {/* AI 종목 분석 */}
-            <div className={styles['modal-section-wrap']}>
-              <AiAnalysis type="stock" stock={stock} />
-            </div>
+            {/* AI 분석 탭 */}
+            {activeTab === 'ai' && (
+              <div className={styles['modal-tab-pane']}>
+                <AiAnalysis type="stock" stock={stock} />
+              </div>
+            )}
 
-            {/* 실시간 토론 채팅 */}
-            <div className={styles['modal-section-wrap']}>
-              <StockChat ticker={stock.srtnCd} stockName={stock.itmsNm} />
-            </div>
+            {/* 토론 탭 */}
+            {activeTab === 'chat' && (
+              <div className={styles['modal-tab-pane']}>
+                <StockChat ticker={stock.srtnCd} stockName={stock.itmsNm} />
+              </div>
+            )}
 
           </div>
         </motion.div>
