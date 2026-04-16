@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import usePriceFlash from '../hooks/usePriceFlash';
 import styles from '../styles/components/StockTable.module.css';
 
 const SS_KEY = 'stockTableState';
@@ -125,7 +126,12 @@ function AutocompleteSearch({ stocks, value, onChange }) {
 
   return (
     <div ref={wrapRef} className={styles['search-wrap']}>
-      <span className={styles['search-icon']}>🔍</span>
+      <span className={styles['search-icon']} aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="7" cy="7" r="5"/>
+          <path d="m14 14-3.5-3.5"/>
+        </svg>
+      </span>
       <input
         className={styles['search-input']}
         placeholder="종목명 또는 코드 검색"
@@ -147,8 +153,15 @@ function AutocompleteSearch({ stocks, value, onChange }) {
                   key={i}
                   className={`${styles['autocomplete-item']} ${styles['history-item']}`}
                   onMouseDown={() => handleHistorySelect(term)}>
-                  <span className={styles['autocomplete-history-icon']}>🕐</span>
-                  <span className={styles['autocomplete-name']}>{term}</span>
+                  <span className={styles['autocomplete-name']}>
+                    <span className={styles['autocomplete-history-icon']} aria-hidden="true">
+                      <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="8" cy="8" r="6"/>
+                        <path d="M8 4.5V8l2.5 1.5"/>
+                      </svg>
+                    </span>
+                    {term}
+                  </span>
                 </div>
               ))}
             </>
@@ -262,10 +275,12 @@ export default function StockTable({
   }, [stocks, watchlist, tab, search, filterMarket, filterRateMin, filterRateMax, filterVolMin, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / pageSize);
-  
+
   const paginated = useMemo(() => {
     return filtered.slice((page - 1) * pageSize, page * pageSize);
   }, [filtered, page, pageSize]);
+
+  const flashMap = usePriceFlash(paginated);
 
   const getPageNumbers = () => {
     const delta = 2;
@@ -311,7 +326,12 @@ export default function StockTable({
             className={styles['csv-export-btn']}
             onClick={() => exportCSV(filtered)}
             title="현재 목록 CSV 다운로드">
-            ⬇ CSV
+            <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M8 2v9"/>
+              <path d="M4.5 7.5 8 11l3.5-3.5"/>
+              <path d="M2.5 13.5h11"/>
+            </svg>
+            CSV
           </button>
           <div className={styles['page-size-wrap']}>
             <span className={styles['page-size-label']}>페이지당</span>
@@ -416,8 +436,10 @@ export default function StockTable({
             const cls       = rate > 0 ? 'up' : rate < 0 ? 'down' : 'zero';
             const sign      = rate > 0 ? '▲' : rate < 0 ? '▼' : '-';
             const isWatched = watchlist.includes(d.itemId);
+            const flash     = flashMap.get(d.itemId);
+            const flashCls  = flash === 'up' ? styles['flash-up'] : flash === 'down' ? styles['flash-down'] : '';
             return (
-              <tr key={i} onClick={() => onRowClick(d)}>
+              <tr key={i} onClick={() => onRowClick(d)} className={flashCls}>
                 <td><span className={styles['stock-code']}>{d.srtnCd}</span></td>
                 <td><span className={styles['stock-name']}>{d.itmsNm}</span></td>
                 <td>
@@ -459,8 +481,10 @@ export default function StockTable({
           const cls       = rate > 0 ? 'up' : rate < 0 ? 'down' : 'zero';
           const sign      = rate > 0 ? '▲' : rate < 0 ? '▼' : '-';
           const isWatched = watchlist.includes(d.itemId);
+          const flash     = flashMap.get(d.itemId);
+          const flashCls  = flash === 'up' ? styles['flash-up'] : flash === 'down' ? styles['flash-down'] : '';
           return (
-            <div key={i} className={styles['stock-card']} onClick={() => onRowClick(d)}>
+            <div key={i} className={`${styles['stock-card']} ${flashCls}`} onClick={() => onRowClick(d)}>
               <div className={styles['stock-card-top']}>
                 <div className={styles['stock-card-info']}>
                   <span className={styles['stock-name']}>{d.itmsNm}</span>

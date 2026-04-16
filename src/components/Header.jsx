@@ -130,30 +130,48 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
           {/* 우측 유저 영역 */}
           <div className={styles['header-user']}>
 
-            {/* 자동갱신 표시 */}
-            {onToggleRefresh && (
-              <div className={styles['refresh-indicator']}>
-                <span className={`${styles['refresh-dot']} ${autoRefresh ? styles.on : ''}`} />
-              </div>
-            )}
-
-            {/* 자동갱신 토글 버튼 */}
+            {/* 자동갱신 토글 (dot 내장) */}
             {onToggleRefresh && (
               <button
-                className={`${styles['header-action-btn']} ${autoRefresh ? styles.active : ''}`}
+                className={`${styles['header-refresh-btn']} ${autoRefresh ? styles.on : ''}`}
                 onClick={onToggleRefresh}
                 title={autoRefresh ? '자동갱신 중지' : '자동갱신 시작'}>
-                {autoRefresh ? '갱신 ON' : '갱신 OFF'}
+                <span className={styles['refresh-dot']} />
+                <span className={styles['refresh-label']}>LIVE</span>
               </button>
             )}
 
+            {/* 다크 토글 (orb + 라벨 — 메인 기능으로 승격) */}
+            <button
+              className={styles['header-theme-toggle']}
+              onClick={() => setDark(d => !d)}
+              title={dark ? '라이트 모드로 전환' : '다크 모드로 전환'}
+              aria-label={dark ? '라이트 모드로 전환' : '다크 모드로 전환'}>
+              <span className={styles['theme-orb']} aria-hidden="true">
+                {dark ? (
+                  <svg viewBox="0 0 16 16" width="10" height="10" fill="currentColor">
+                    <path d="M8 3a5 5 0 1 0 0 10A5 5 0 0 0 8 3zm0-2a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V2a1 1 0 0 1 1-1zm0 12a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1zM2 8a1 1 0 0 1-1 1H0a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1zm14 0a1 1 0 0 1-1 1h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1zM3.05 3.05a1 1 0 0 1 1.41 0l.71.71a1 1 0 1 1-1.41 1.41l-.71-.71a1 1 0 0 1 0-1.41zm8.49 8.49a1 1 0 0 1 1.41 0l.71.71a1 1 0 1 1-1.41 1.41l-.71-.71a1 1 0 0 1 0-1.41zM3.05 12.95a1 1 0 0 1 0-1.41l.71-.71a1 1 0 1 1 1.41 1.41l-.71.71a1 1 0 0 1-1.41 0zm8.49-8.49a1 1 0 0 1 0-1.41l.71-.71a1 1 0 1 1 1.41 1.41l-.71.71a1 1 0 0 1-1.41 0z"/>
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 16 16" width="10" height="10" fill="currentColor">
+                    <path d="M6 0.278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+                  </svg>
+                )}
+              </span>
+              <span className={styles['theme-label']}>{dark ? 'DARK' : 'LIGHT'}</span>
+            </button>
+
             {/* 알림 배지 버튼 */}
-            <div className={styles['header-bell-wrap']} style={{ position: 'relative' }} ref={alertRef}>
+            <div className={styles['header-bell-wrap']} ref={alertRef}>
               <button
                 className={styles['header-bell-btn']}
                 onClick={handleBellClick}
-                title="알림 확인 (클릭시 초기화)">
-                🔔
+                title="알림 확인 (클릭시 초기화)"
+                aria-label="알림">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 6a5 5 0 0 1 10 0c0 3 1.5 4 1.5 4H1.5S3 9 3 6z"/>
+                  <path d="M6.5 13a1.5 1.5 0 0 0 3 0"/>
+                </svg>
                 {badgeCount > 0 && (
                   <span className={styles['alert-badge']}>
                     {badgeCount > 99 ? '99+' : badgeCount}
@@ -216,14 +234,6 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
               )}
             </div>
 
-            {/* 다크모드 토글 */}
-            <button
-              className={styles['header-theme-btn']}
-              onClick={() => setDark(d => !d)}
-              title={dark ? '라이트 모드' : '다크 모드'}>
-              {dark ? '☀️' : '🌙'}
-            </button>
-
             {/* 사용자 이름 */}
             <div className={styles['header-user-name']}>
               {isKakao && <span className={`${styles['header-provider-badge']} ${styles.kakao}`}>K</span>}
@@ -264,15 +274,17 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
           <div className={styles['mobile-menu-actions']}>
             {onToggleRefresh && (
               <button
-                className={`${styles['header-action-btn']} ${autoRefresh ? styles.active : ''}`}
+                className={`${styles['header-refresh-btn']} ${autoRefresh ? styles.on : ''}`}
                 onClick={onToggleRefresh}>
-                {autoRefresh ? '갱신 ON' : '갱신 OFF'}
+                <span className={styles['refresh-dot']} />
+                <span className={styles['refresh-label']}>LIVE</span>
               </button>
             )}
             <button
-              className={styles['header-action-btn']}
+              className={styles['header-theme-toggle']}
               onClick={() => setDark(d => !d)}>
-              {dark ? '☀️ 라이트' : '🌙 다크'}
+              <span className={styles['theme-orb']} aria-hidden="true" />
+              <span className={styles['theme-label']}>{dark ? 'DARK' : 'LIGHT'}</span>
             </button>
             <button className={styles['header-logout-btn']} onClick={handleLogout}>
               로그아웃

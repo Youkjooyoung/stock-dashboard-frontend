@@ -20,14 +20,17 @@ export default function StockTicker() {
 
   return (
     <div className={styles['stock-ticker']}>
-      <div className={styles['ticker-label']}>실시간</div>
+      <div className={styles['ticker-label']}>LIVE</div>
       <div className={styles['ticker-track-wrap']}>
         <div className={styles['ticker-track']}>
           {items.map((s, i) => {
             const cls  = s.rate > 0 ? 'up' : s.rate < 0 ? 'down' : 'zero';
-            const sign = s.rate > 0 ? '▲' : s.rate < 0 ? '▼' : '-';
+            const sign = s.rate > 0 ? '▲' : s.rate < 0 ? '▼' : '−';
             return (
-              <span key={i} className={styles['ticker-item']}>
+              <span
+                key={i}
+                className={styles['ticker-item']}
+                title={`${s.itmsNm} ${(s.clpr || 0).toLocaleString()}원 (${sign}${Math.abs(s.rate).toFixed(2)}%)`}>
                 <span className={styles['ticker-name']}>{s.itmsNm}</span>
                 <span className={`${styles['ticker-price']} ${cls}`}>
                   {(s.clpr || 0).toLocaleString()}

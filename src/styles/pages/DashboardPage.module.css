@@ -1,8 +1,11 @@
 /* ===================================================================
-   DashboardPage — 메인 대시보드
+   DashboardPage v2 — Light-first Bloomberg
+   - max-width + 24px gutter, 모바일은 12px
+   - bulk-bar: ADMIN 전용 pill (그림자 제거, Quiet Rule)
+   - mid-row: 1fr + 340px 뉴스 스티키
    =================================================================== */
 
-/* 전체 과거 데이터 수집 바 */
+/* === ADMIN 전체 과거 데이터 수집 바 === */
 .bulk-bar {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -16,55 +19,54 @@
 }
 
 .btn-bulk {
-  padding: 8px 18px;
-  font-size: 12px;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  height: 28px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--text-2);
   cursor: pointer;
-  transition: all var(--transition);
-  letter-spacing: -0.01em;
-  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition), color var(--transition);
 }
 
 .btn-bulk:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: var(--primary-light);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
-}
-
-.btn-bulk:active {
-  transform: translateY(0);
+  border-color: var(--border-strong);
+  color: var(--text-1);
 }
 
 .bulk-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px);
   right: 0;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   z-index: 50;
-  min-width: 200px;
+  min-width: 220px;
   overflow: hidden;
   animation: slideDown 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: top right;
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .bulk-dropdown-title {
-  padding: 10px 16px 6px;
+  padding: 10px 14px 6px;
+  font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-3);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -74,55 +76,57 @@
 .bulk-option {
   display: block;
   width: 100%;
-  padding: 10px 16px;
-  font-size: 13px;
-  font-weight: 400;
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 500;
   text-align: left;
   border: none;
   background: transparent;
   color: var(--text-1);
   cursor: pointer;
   transition: background var(--transition);
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
 }
 
 .bulk-option:hover {
   background: var(--surface-hover);
-  color: var(--primary);
 }
 
 .bulk-option-skip {
   color: var(--warning);
 }
 
-.bulk-option-skip:hover {
-  color: var(--warning);
-  background: var(--surface-hover);
-}
-
 .bulk-progress {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
-  color: var(--text-2);
-  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-1);
+  background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  padding: 7px 16px;
+  padding: 5px 12px;
+  height: 28px;
+  letter-spacing: 0.02em;
 }
 
 .bulk-done {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-1);
-  background: var(--primary-light);
-  border: 1px solid var(--primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--up);
+  background: var(--up-bg);
+  border: 1px solid var(--up);
   border-radius: var(--radius-full);
-  padding: 7px 16px;
+  padding: 5px 12px;
+  height: 28px;
+  letter-spacing: 0.02em;
 }
 
 .bulk-close {
@@ -133,12 +137,16 @@
   color: var(--text-3);
   font-size: 13px;
   padding: 0 2px;
+  line-height: 1;
 }
 
+.bulk-close:hover { color: var(--text-1); }
+
+/* === 메인 === */
 .dashboard-main {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 20px 24px 48px;
+  padding: 16px 24px 48px;
 }
 
 .dashboard-loading {
@@ -153,12 +161,11 @@
   width: 28px;
   height: 28px;
   border: 2px solid var(--border);
-  border-top-color: var(--primary);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   margin: 0 auto 16px;
 }
-
 
 .dashboard-mid-row {
   display: grid;
@@ -170,32 +177,23 @@
 
 .dashboard-news-sticky {
   position: sticky;
-  top: calc(var(--header-h) + 14px);
+  top: calc(var(--header-h) + 42px);
 }
 
+/* === 반응형 === */
 @media (max-width: 1100px) {
-  .dashboard-mid-row {
-    grid-template-columns: 1fr 300px;
-  }
+  .dashboard-mid-row { grid-template-columns: 1fr 300px; }
 }
 
 @media (max-width: 900px) {
-  .dashboard-mid-row {
-    grid-template-columns: 1fr;
-  }
-  .dashboard-news-sticky {
-    position: static;
-  }
-  .dashboard-main {
-    padding: 16px 16px 36px;
-  }
+  .dashboard-mid-row { grid-template-columns: 1fr; }
+  .dashboard-news-sticky { position: static; }
+  .dashboard-main { padding: 14px 16px 36px; }
+  .bulk-bar { padding: 10px 16px 0; }
 }
 
 @media (max-width: 600px) {
-  .dashboard-main {
-    padding: 12px 12px 28px;
-  }
-  .bulk-bar {
-    padding: 10px 12px 0;
-  }
+  .dashboard-main { padding: 12px 12px 28px; }
+  .bulk-bar { padding: 10px 12px 0; justify-content: stretch; }
+  .btn-bulk { flex: 1; justify-content: center; }
 }

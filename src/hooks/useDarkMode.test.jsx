@@ -20,18 +20,18 @@ describe('useDarkMode', () => {
 		mockSystemPrefersDark(false);
 	});
 
-	it('저장된 값이 없고 시스템이 light이면 dark=false로 시작한다', () => {
+	it('저장된 값이 없으면 시스템 선호와 무관하게 라이트로 시작한다 (v2 Light-first)', () => {
 		mockSystemPrefersDark(false);
 		const { result } = renderHook(() => useDarkMode());
 		expect(result.current[0]).toBe(false);
 		expect(document.documentElement.getAttribute('data-theme')).toBe('light');
 	});
 
-	it('저장된 값이 없고 시스템이 dark이면 dark=true로 시작한다', () => {
+	it('시스템이 dark 선호여도 저장값이 없으면 라이트로 시작한다 (v2 Light-first)', () => {
 		mockSystemPrefersDark(true);
 		const { result } = renderHook(() => useDarkMode());
-		expect(result.current[0]).toBe(true);
-		expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+		expect(result.current[0]).toBe(false);
+		expect(document.documentElement.getAttribute('data-theme')).toBe('light');
 	});
 
 	it('localStorage.theme=dark이면 시스템 선호와 무관하게 dark로 시작한다', () => {

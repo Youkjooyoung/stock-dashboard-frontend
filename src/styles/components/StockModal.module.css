@@ -1,42 +1,46 @@
 /* ===================================================================
-   StockModal — 종목 상세 모달 (프리미엄 고도화)
+   StockModal — Light-first Bloomberg v2
+   중앙 정렬 · 1px 디바이더 · 숫자는 tabular-nums mono · 색은 의미로만
    =================================================================== */
 
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(11, 13, 16, 0.38);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 16px;
+  padding: 24px 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .modal-box {
   background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   width: 760px;
   max-width: 100%;
-  max-height: 90vh;
+  max-height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow:
-    0 24px 48px rgba(0, 0, 0, 0.12),
-    0 8px 16px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(0, 0, 0, 0.04);
-  border: 1px solid var(--border);
-  overscroll-behavior: contain;
+  box-shadow: var(--shadow-lg);
+  margin: auto;
 }
 
+/* ===================================================================
+   헤더
+   =================================================================== */
 .modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  padding: 22px 26px 18px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   flex-shrink: 0;
@@ -44,15 +48,20 @@
 
 .modal-title-block {
   flex: 1;
+  min-width: 0;
 }
 
 .modal-stock-name {
-  font-size: 20px;
-  font-weight: 800;
+  font-family: var(--font-sans);
+  font-size: 19px;
+  font-weight: 700;
   color: var(--text-1);
-  margin-bottom: 6px;
-  line-height: 1.2;
+  line-height: 1.25;
   letter-spacing: -0.02em;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .modal-stock-meta {
@@ -65,41 +74,57 @@
 }
 
 .modal-stock-code {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-weight: 600;
   color: var(--text-2);
-  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 12px;
+  letter-spacing: 0;
 }
 
 .modal-stock-sep {
   color: var(--text-4);
 }
 
+.modal-stock-date {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
 .modal-close {
   width: 32px;
   height: 32px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
   background: var(--surface-2);
   border: 1px solid var(--border);
-  font-size: 16px;
   color: var(--text-2);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
-  margin-left: 16px;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
 .modal-close:hover {
-  background: var(--danger-light);
-  border-color: var(--danger);
-  color: var(--danger);
-  box-shadow: 0 4px 12px rgba(224, 49, 49, 0.15);
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text-1);
 }
 
+.modal-close svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+/* ===================================================================
+   본문 스크롤
+   =================================================================== */
 .modal-body {
-  padding: 20px 26px 26px;
+  padding: 20px 22px 24px;
   overflow-y: auto;
   overscroll-behavior: contain;
   overflow-anchor: none;
@@ -108,16 +133,12 @@
 }
 
 .modal-body::-webkit-scrollbar { width: 8px; }
-.modal-body::-webkit-scrollbar-track {
-  background: transparent;
-  margin: 6px 0;
-}
+.modal-body::-webkit-scrollbar-track { background: transparent; }
 .modal-body::-webkit-scrollbar-thumb {
   background: var(--border-strong);
   border-radius: 10px;
   border: 2px solid var(--surface);
   background-clip: padding-box;
-  transition: background var(--transition);
 }
 .modal-body::-webkit-scrollbar-thumb:hover {
   background: var(--text-3);
@@ -126,114 +147,91 @@
 }
 
 /* ===================================================================
-   핵심 지표 그리드
+   핵심 지표 그리드 (OHLC + 거래량 + 등락률)
    =================================================================== */
 .modal-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 0;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
 }
 
 .modal-stat-item {
+  padding: 14px 16px;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  text-align: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: background var(--transition);
 }
 
-.modal-stat-item::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, transparent 0%, var(--primary-light) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.modal-stat-item:nth-child(3n) {
+  border-right: none;
+}
+
+.modal-stat-item:nth-last-child(-n+3) {
+  border-bottom: none;
 }
 
 .modal-stat-item:hover {
-  border-color: var(--primary);
-  box-shadow:
-    0 8px 24px rgba(99, 102, 241, 0.12),
-    0 4px 8px rgba(99, 102, 241, 0.08);
-  transform: translateY(-2px);
-}
-
-.modal-stat-item:hover::before {
-  opacity: 0.5;
+  background: var(--surface-2);
 }
 
 .modal-stat-label {
+  font-family: var(--font-sans);
   font-size: 11px;
   color: var(--text-3);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-  position: relative;
-  z-index: 1;
+  letter-spacing: 0;
+  line-height: 1;
 }
 
 .modal-stat-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-1);
-  line-height: 1.3;
-  position: relative;
-  z-index: 1;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
-/* 등락 색상 강화 */
-.modal-stat-value.up {
-  color: var(--up);
-  text-shadow: 0 0 20px rgba(240, 68, 82, 0.2);
-}
-
-.modal-stat-value.down {
-  color: var(--down);
-  text-shadow: 0 0 20px rgba(30, 110, 235, 0.2);
-}
-
-/* 실시간 펄스 효과 */
-@keyframes pulse-glow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-.modal-stat-value.up,
-.modal-stat-value.down {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
+.modal-stat-value:global(.up)   { color: var(--up); }
+.modal-stat-value:global(.down) { color: var(--down); }
+.modal-stat-value:global(.zero) { color: var(--flat); }
 
 /* ===================================================================
    섹션 제목
    =================================================================== */
 .modal-section-title {
-  font-size: 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-1);
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--border);
-  position: relative;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
 }
 
-.modal-section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: var(--primary);
-  border-radius: 2px;
+.modal-section-title svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-2);
+  stroke-width: 2;
+  flex-shrink: 0;
 }
 
 /* ===================================================================
@@ -241,6 +239,8 @@
    =================================================================== */
 .modal-chart-wrap {
   margin-bottom: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
 .modal-chart-header {
@@ -249,7 +249,7 @@
   justify-content: space-between;
   margin-bottom: 14px;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
 .modal-chart-header .modal-section-title {
@@ -260,31 +260,31 @@
 .modal-chart-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .modal-chart-tab-group {
-  display: flex;
-  gap: 4px;
+  display: inline-flex;
+  gap: 0;
   background: var(--surface-2);
-  border-radius: var(--radius);
-  padding: 3px;
-  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 2px;
 }
 
 .modal-chart-tab {
-  padding: 6px 16px;
+  padding: 4px 12px;
+  font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 600;
   border: none;
-  border-radius: calc(var(--radius) - 2px);
+  border-radius: 3px;
   background: transparent;
   color: var(--text-3);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  z-index: 1;
+  transition: background var(--transition), color var(--transition);
+  letter-spacing: -0.01em;
 }
 
 .modal-chart-tab:hover {
@@ -293,18 +293,18 @@
 
 .modal-chart-tab.active {
   background: var(--surface);
-  color: var(--primary);
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    0 1px 3px rgba(0, 0, 0, 0.05);
+  color: var(--text-1);
+  border: 1px solid var(--border);
   font-weight: 700;
 }
 
 .modal-data-count {
-  font-weight: 400;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
   color: var(--text-3);
-  font-size: 12px;
-  margin-left: 4px;
+  font-weight: 500;
+  margin-left: 2px;
 }
 
 /* ===================================================================
@@ -315,24 +315,34 @@
 }
 
 .btn-collect {
-  padding: 6px 12px;
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  font-family: var(--font-sans);
+  font-size: 11px;
   font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface-2);
+  border-radius: var(--radius-md);
+  background: var(--surface);
   color: var(--text-2);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
   white-space: nowrap;
 }
 
+.btn-collect svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2;
+}
+
 .btn-collect:hover:not(:disabled) {
-  background: var(--surface);
-  border-color: var(--primary);
-  color: var(--primary);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
-  transform: translateY(-1px);
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  color: var(--text-1);
 }
 
 .btn-collect:disabled {
@@ -342,14 +352,12 @@
 
 .collect-dropdown {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 4px);
   right: 0;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: 
-    0 12px 32px rgba(0, 0, 0, 0.12),
-    0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -358,15 +366,16 @@
 }
 
 .collect-option {
-  padding: 10px 16px;
-  font-size: 13px;
+  padding: 8px 14px;
+  font-family: var(--font-sans);
+  font-size: 12px;
   font-weight: 600;
   text-align: left;
   border: none;
   background: transparent;
   color: var(--text-1);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background var(--transition);
   border-bottom: 1px solid var(--border);
 }
 
@@ -375,36 +384,34 @@
 }
 
 .collect-option:hover {
-  background: var(--primary-light);
-  color: var(--primary);
-  padding-left: 20px;
+  background: var(--surface-2);
 }
 
 .modal-chart-loading {
   text-align: center;
-  padding: 60px 20px;
+  padding: 40px 20px;
   color: var(--text-3);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* ===================================================================
    뉴스 섹션
    =================================================================== */
 .modal-news-wrap {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
 .modal-news-item {
   display: block;
-  padding: 14px 0;
+  padding: 12px 10px;
+  margin: 0 -10px;
+  border-radius: var(--radius-md);
   border-bottom: 1px solid var(--border);
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: var(--radius);
-  margin: 0 -4px;
-  padding-left: 4px;
-  padding-right: 4px;
+  transition: background var(--transition);
 }
 
 .modal-news-item:last-child {
@@ -412,27 +419,29 @@
 }
 
 .modal-news-item:hover {
-  background: var(--surface-hover);
-  padding-left: 12px;
+  background: var(--surface-2);
 }
 
 .modal-news-item:hover .modal-news-title {
-  color: var(--primary);
+  color: var(--text-1);
 }
 
 .modal-news-title {
-  font-size: 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-1);
-  line-height: 1.5;
-  margin-bottom: 6px;
-  transition: color 0.2s ease;
+  line-height: 1.45;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+  transition: color var(--transition);
 }
 
 .modal-news-desc {
-  font-size: 13px;
+  font-family: var(--font-sans);
+  font-size: 12px;
   color: var(--text-2);
-  line-height: 1.6;
+  line-height: 1.55;
   margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -441,122 +450,149 @@
 }
 
 .modal-news-date {
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
   color: var(--text-3);
   font-weight: 500;
+  letter-spacing: 0;
 }
 
 .modal-news-empty,
 .modal-news-loading {
   text-align: center;
-  padding: 32px 0;
+  padding: 24px 0;
   color: var(--text-3);
-  font-size: 14px;
+  font-size: 13px;
+}
+
+/* ===================================================================
+   섹션 래퍼 (AlertSetter / AiAnalysis / StockChat 위 디바이더)
+   =================================================================== */
+.modal-section-wrap {
+  margin-bottom: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.modal-section-wrap:first-of-type {
+  padding-top: 0;
+  border-top: none;
 }
 
 /* ===================================================================
    반응형
    =================================================================== */
 @media (max-width: 768px) {
-  .modal-overlay { 
-    padding: 0; 
-    align-items: flex-end; 
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
   }
-  
+
   .modal-box {
     width: 100%;
     max-width: 100%;
-    max-height: 93vh;
+    max-height: 94vh;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    margin: 0;
   }
-  
-  .modal-stats { 
+
+  .modal-stats {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
   }
-  
-  .modal-header { 
-    padding: 18px 16px 14px; 
+
+  .modal-stat-item:nth-child(3n) {
+    border-right: 1px solid var(--border);
   }
-  
-  .modal-body { 
-    padding: 16px; 
+  .modal-stat-item:nth-child(2n) {
+    border-right: none;
   }
-  
-  .modal-stock-name { 
-    font-size: 18px; 
+  .modal-stat-item:nth-last-child(-n+3) {
+    border-bottom: 1px solid var(--border);
   }
-  
-  .modal-chart-tab { 
-    padding: 5px 12px; 
-    font-size: 11px; 
+  .modal-stat-item:nth-last-child(-n+2) {
+    border-bottom: none;
   }
-  
+
+  .modal-header {
+    padding: 16px 16px 14px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .modal-stock-name {
+    font-size: 17px;
+  }
+
+  .modal-chart-tab {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
   .modal-chart-controls {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-end;
   }
-  
+
   .modal-stat-item {
-    padding: 14px;
+    padding: 12px 14px;
   }
-  
+
   .modal-stat-value {
     font-size: 15px;
   }
 }
 
 @media (max-width: 480px) {
-  .modal-stats {
-    gap: 8px;
-  }
-  
   .modal-stat-item {
-    padding: 12px 10px;
+    padding: 10px 12px;
   }
-  
+
   .modal-stat-label {
     font-size: 10px;
   }
-  
+
   .modal-stat-value {
     font-size: 14px;
   }
-  
+
   .modal-chart-tab-group {
     flex: 1;
+    justify-content: center;
   }
 }
 
 /* ===================================================================
-   다크 모드 최적화
+   다크 모드
    =================================================================== */
-[data-theme="dark"] .modal-stat-item::before {
-  background: linear-gradient(135deg, transparent 0%, rgba(76, 110, 245, 0.1) 100%);
+[data-theme="dark"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.6);
 }
 
 [data-theme="dark"] .modal-stat-item:hover {
-  box-shadow: 
-    0 8px 24px rgba(76, 110, 245, 0.2),
-    0 4px 8px rgba(76, 110, 245, 0.15);
-}
-
-[data-theme="dark"] .modal-stat-value.up {
-  text-shadow: 0 0 20px rgba(240, 62, 62, 0.3);
-}
-
-[data-theme="dark"] .modal-stat-value.down {
-  text-shadow: 0 0 20px rgba(51, 154, 240, 0.3);
+  background: var(--surface-2);
 }
 
 /* ===================================================================
-   접근성
+   접근성 · 애니메이션 감소
    =================================================================== */
 .modal-close:focus-visible,
 .modal-chart-tab:focus-visible,
-.btn-collect:focus-visible {
-  outline: 2px solid var(--primary);
+.btn-collect:focus-visible,
+.collect-option:focus-visible {
+  outline: 2px solid var(--border-focus);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay,
+  .modal-box,
+  .modal-stat-item,
+  .modal-news-item {
+    transition: none !important;
+  }
 }
 
 /* ===================================================================
@@ -567,12 +603,13 @@
     position: static;
     background: white;
   }
-  
+
   .modal-box {
     box-shadow: none;
     max-height: none;
+    border: 1px solid #000;
   }
-  
+
   .modal-close,
   .modal-chart-controls {
     display: none;

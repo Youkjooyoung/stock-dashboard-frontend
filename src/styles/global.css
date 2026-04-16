@@ -1,78 +1,101 @@
 
 /* ===================================================================
-   Design Tokens — Instagram Calm (Soft Indigo · Warm Neutrals)
-   의도적으로 네이버(#03C75A 계열) 그린을 피하고 차분한 인디고 톤 사용
+   Design Tokens — Light-first Bloomberg (stock-dashboard v2)
+   라이트 기본 · 데이터 밀도 ↑ · 숫자는 고정폭 · 색은 의미로만
+   - up(상승)=빨강 / down(하락)=파랑 (한국 컨벤션 유지)
+   - 크롬(UI)은 무채색, 색은 등락 의미에만 사용
+   - 그림자 대신 1px 디바이더로 레이어링
    =================================================================== */
 :root {
-  --primary:          #6366F1;
-  --primary-dark:     #4F46E5;
-  --primary-light:    #EEF0FF;
-  --primary-soft:     #F5F6FF;
-  --primary-text:     #ffffff;
+  /* === 표면 === */
+  --bg:               #FAFAF7;
+  --surface:          #FFFFFF;
+  --surface-2:        #F4F3EE;
+  --surface-hover:    #EEEDE6;
 
-  --accent:           #F472B6;
-  --accent-soft:      #FDF2F8;
+  /* === 경계선 === */
+  --border:           #E8E6DE;
+  --border-strong:    #CECBBF;
+  --border-focus:     #0B0D10;
 
-  --up:               #E24C4B;
-  --up-light:         #FDEEEE;
-  --down:             #3B7AD9;
-  --down-light:       #ECF2FB;
-  --flat:             #a0a4ad;
+  /* === 텍스트 === */
+  --text-1:           #0B0D10;
+  --text-2:           #3C4049;
+  --text-3:           #6B6F78;
+  --text-4:           #A4A8B0;
 
-  /* 위험 / 성공 */
-  --danger:           #E11D48;
-  --danger-light:     #FFF1F2;
-  --success:          #10B981;
-  --warning:          #F59E0B;
+  /* === 등락 (한국 컨벤션: 빨강=상승, 파랑=하락) === */
+  --up:               #E8334A;
+  --up-light:         rgba(232,51,74,0.08);
+  --up-bg:            rgba(232,51,74,0.08);
+  --down:             #1F6FEB;
+  --down-light:       rgba(31,111,235,0.08);
+  --down-bg:          rgba(31,111,235,0.08);
+  --flat:             #8A8F97;
 
-  /* 소셜 로그인 */
+  /* === 악센트 (라이트=블랙, 다크=크림옐로우) === */
+  --accent:           #0B0D10;
+  --accent-text:      #FFFFFF;
+  --accent-soft:      #F4F3EE;
+
+  /* === 레거시 alias — 기존 컴포넌트 호환 ===
+     이전엔 인디고 프라이머리가 전역적으로 쓰였으나, v2 에선 악센트(블랙/크림)
+     가 그 자리를 대체. 기존 --primary-* 변수는 악센트로 재매핑해서 컴포넌트
+     CSS 를 일괄 수정하지 않아도 된다.
+  */
+  --primary:          var(--accent);
+  --primary-dark:     #000000;
+  --primary-light:    var(--surface-2);
+  --primary-soft:     var(--surface);
+  --primary-text:     var(--accent-text);
+
+  /* === 위험 / 성공 / 경고 — 메시지용 의미 색상 === */
+  --danger:           #E8334A;
+  --danger-light:     rgba(232,51,74,0.08);
+  --success:          #1F8A3E;
+  --warning:          #D48B00;
+
+  /* === 소셜 로그인 (브랜드 고정색) === */
   --kakao:            #FEE500;
   --kakao-text:       #3C1E1E;
   --google:           #4285F4;
 
-  --bg:               #FAFAFA;
-  --surface:          #ffffff;
-  --surface-2:        #F7F7F9;
-  --surface-hover:    #F2F2F5;
+  /* === 반지름 — 작고 날카롭게 (데이터 밀도↑) === */
+  --radius-xs:        2px;
+  --radius-sm:        4px;
+  --radius-md:        6px;
+  --radius-lg:        8px;
+  --radius-xl:        12px;
+  --radius-full:      999px;
+  --radius:           4px; /* 레거시 alias */
 
-  --border:           #ECECEE;
-  --border-strong:    #D6D6DB;
-  --border-focus:     #6366F1;
+  /* === 그림자 — 1px 디바이더가 주역, 그림자는 극최소 === */
+  --shadow-sm:        none;
+  --shadow-md:        0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg:        0 8px 24px rgba(0,0,0,0.06);
 
-  --text-1:           #262626;
-  --text-2:           #545454;
-  --text-3:           #8E8E93;
-  --text-4:           #C7C7CC;
-
-  /* 반지름 — 더 크고 부드럽게 */
-  --radius-xs:        4px;
-  --radius-sm:        8px;
-  --radius-md:        12px;
-  --radius-lg:        16px;
-  --radius-xl:        24px;
-  --radius-full:      20px;
-  --radius:           8px; /* 레거시 alias */
-
-  /* 그림자 — 아주 가볍게 */
-  --shadow-sm:        0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
-  --shadow-md:        0 4px 16px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
-  --shadow-lg:        0 8px 32px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
-
-  /* 폰트 */
-  --font-sans:        'Noto Sans KR', -apple-system, BlinkMacSystemFont,
+  /* === 폰트 === */
+  --font-sans:        'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
                       'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-mono:        'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
+                      'Cascadia Code', Consolas, monospace;
 
-  /* 트랜지션 — 살짝 더 부드럽게 */
-  --transition:       0.2s ease;
-  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* === 트랜지션 === */
+  --transition:        160ms cubic-bezier(0.2, 0.6, 0.2, 1);
+  --transition-smooth: 240ms cubic-bezier(0.2, 0.6, 0.2, 1);
 
-  /* 최대 너비 */
+  /* === 레이아웃 === */
   --max-width:        1440px;
-
   --header-h:         56px;
   --subnav-h:         44px;
+  --ticker-h:         32px;
 
-  --color-primary: var(--primary);
+  /* === 포커스 링 (라이트=블랙8%, 다크=크림10%) === */
+  --focus-ring:       rgba(11, 13, 16, 0.08);
+  --focus-glow:       rgba(11, 13, 16, 0.18);
+
+  /* === 레거시 color-* alias === */
+  --color-primary: var(--accent);
   --color-primary-dark: var(--primary-dark);
   --color-primary-light: var(--primary-light);
   --color-rise: var(--up);
@@ -105,17 +128,32 @@ body {
   background: var(--bg);
   color: var(--text-1);
   overflow-y: scroll;
-  line-height: 1.65;
-  font-size: 14px;
+  line-height: 1.55;
+  font-size: 13px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.01em;
+  transition: background var(--transition), color var(--transition);
 }
 
 a { text-decoration: none; color: inherit; }
 button { cursor: pointer; font-family: var(--font-sans); }
 input, select, textarea { font-family: var(--font-sans); }
 img { max-width: 100%; }
+
+/* ===================================================================
+   숫자 유틸리티 — 시세/등락률은 고정폭 + tabular-nums 로 열 정렬
+   =================================================================== */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.02em;
+}
+.num-sans {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
 
 /* ===================================================================
    공통 레이아웃
@@ -238,7 +276,7 @@ img { max-width: 100%; }
 }
 .input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 .input::placeholder { color: var(--text-4); }
 
@@ -326,7 +364,7 @@ img { max-width: 100%; }
 }
 .form-input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 .form-input::placeholder { color: var(--text-4); }
 
@@ -358,7 +396,7 @@ img { max-width: 100%; }
   vertical-align: middle; margin-right: 5px;
 }
 .spinner-green {
-  border-color: rgba(99, 102, 241, 0.15);
+  border-color: var(--focus-ring);
   border-top-color: var(--primary);
 }
 .spinner-dark {
@@ -474,6 +512,21 @@ img { max-width: 100%; }
    애니메이션
    =================================================================== */
 @keyframes fadeIn    { from { opacity: 0; } to { opacity: 1; } }
+@keyframes routeFade {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* AppLayout <Outlet> 래퍼 — 페이지 전환 시 120ms subtle fade */
+.route-fade {
+  animation: routeFade 140ms cubic-bezier(0.2, 0, 0.1, 1) both;
+}
+
+/* 모션 감속 선호 사용자 존중 */
+@media (prefers-reduced-motion: reduce) {
+  .route-fade { animation: none; }
+}
+
 @keyframes slideUp   { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes slideDown { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes slideLeft { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -495,8 +548,8 @@ img { max-width: 100%; }
   75% { transform: translateX(5px); }
 }
 @keyframes glow      {
-  0%, 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
+  0%, 100% { box-shadow: 0 0 5px var(--focus-ring); }
+  50% { box-shadow: 0 0 20px var(--focus-glow); }
 }
 @keyframes ripple    {
   to { transform: scale(2); opacity: 0; }
@@ -541,7 +594,7 @@ img { max-width: 100%; }
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 20px var(--focus-glow);
 }
 
 /* ===================================================================
@@ -567,39 +620,51 @@ img { max-width: 100%; }
 }
 
 /* ===================================================================
-   다크 모드 — 인스타그램 다크 감성
+   다크 모드 — Light-first Bloomberg (크림옐로우 악센트)
    =================================================================== */
 [data-theme="dark"] {
-  --primary:          #818CF8;
-  --primary-dark:     #6366F1;
-  --primary-light:    #1E1F3D;
-  --primary-soft:     #161726;
+  --bg:               #0B0D10;
+  --surface:          #12151A;
+  --surface-2:        #1A1E25;
+  --surface-hover:    #22262E;
 
-  --accent:           #F472B6;
-  --accent-soft:      #2A1421;
+  --border:           #1C1F25;
+  --border-strong:    #2D313A;
+  --border-focus:     #FFF9E6;
+
+  --text-1:           #E8EAED;
+  --text-2:           #B4B8BF;
+  --text-3:           #787D86;
+  --text-4:           #4A4F57;
 
   --up:               #F04452;
-  --up-light:         #2D1517;
+  --up-light:         rgba(240,68,82,0.12);
+  --up-bg:            rgba(240,68,82,0.12);
   --down:             #4C89E4;
-  --down-light:       #0F1B33;
+  --down-light:       rgba(76,137,228,0.12);
+  --down-bg:          rgba(76,137,228,0.12);
 
-  --bg:               #0A0A0B;
-  --surface:          #121214;
-  --surface-2:        #1A1A1D;
-  --surface-hover:    #222228;
+  --accent:           #FFF9E6;
+  --accent-text:      #0B0D10;
+  --accent-soft:      #1A1E25;
 
-  --border:           #262629;
-  --border-strong:    #36363B;
-  --border-focus:     #818CF8;
+  --primary:          var(--accent);
+  --primary-dark:     #FFEFBF;
+  --primary-light:    var(--surface-2);
+  --primary-soft:     var(--surface);
+  --primary-text:     var(--accent-text);
 
-  --text-1:           #F5F5F7;
-  --text-2:           #A8A8AE;
-  --text-3:           #75757C;
-  --text-4:           #3D3D42;
+  --danger:           #F04452;
+  --danger-light:     rgba(240,68,82,0.12);
+  --success:          #4ADE80;
+  --warning:          #F59E0B;
 
-  --shadow-sm:        0 1px 3px rgba(0,0,0,0.4);
-  --shadow-md:        0 4px 16px rgba(0,0,0,0.5);
-  --shadow-lg:        0 8px 32px rgba(0,0,0,0.6);
+  --shadow-sm:        none;
+  --shadow-md:        none;
+  --shadow-lg:        0 8px 24px rgba(0,0,0,0.5);
+
+  --focus-ring:       rgba(255, 249, 230, 0.10);
+  --focus-glow:       rgba(255, 249, 230, 0.22);
 }
 
 [data-theme="dark"] input,
