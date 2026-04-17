@@ -11,14 +11,18 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "docs:export": "node scripts/export-docs.mjs"
   },
   "dependencies": {
     "@stomp/stompjs": "^7.3.0",
     "@tanstack/react-query": "^5.95.2",
     "axios": "^1.13.6",
     "chart.js": "^4.5.1",
+    "github-markdown-css": "^5.9.0",
     "lightweight-charts": "^5.1.0",
+    "marked": "^18.0.1",
+    "mermaid": "^11.14.0",
     "motion": "^12.0.0",
     "react": "^19.2.4",
     "react-chartjs-2": "^5.3.1",
