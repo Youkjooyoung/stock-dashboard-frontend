@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
 import { Line } from 'react-chartjs-2';
@@ -11,6 +12,25 @@ import { useStockDetail, useStockNews, useCollectTickerHistory } from '../hooks/
 import { SkeletonChart, SkeletonNews } from './StockModalSkeleton';
 import { toYYYYMMDD, formatNewsDate } from '../utils/dateUtils';
 import styles from '../styles/components/StockModal.module.css';
+
+let scrollLockCount = 0;
+let savedHtmlOverflow = '';
+
+function lockBodyScroll() {
+  if (scrollLockCount === 0) {
+    const html = document.documentElement;
+    savedHtmlOverflow = html.style.overflow;
+    html.style.overflow = 'hidden';
+  }
+  scrollLockCount += 1;
+}
+
+function unlockBodyScroll() {
+  scrollLockCount = Math.max(0, scrollLockCount - 1);
+  if (scrollLockCount === 0) {
+    document.documentElement.style.overflow = savedHtmlOverflow;
+  }
+}
 
 const chartOptions = {
   responsive: true,
@@ -97,13 +117,10 @@ export default function StockModal({ stock, onClose }) {
   const { data: news = [], isLoading: newsLoading } = useStockNews(stock?.itmsNm);
 
   useEffect(() => {
-    document.body.style.overflow = '';
-    document.body.classList.add('modal-open');
-    return () => {
-      document.body.classList.remove('modal-open');
-      document.body.style.overflow = '';
-    };
-  }, []);
+    if (!stock) return;
+    lockBodyScroll();
+    return unlockBodyScroll;
+  }, [stock]);
 
   useLayoutEffect(() => {
     const el = modalBodyRef.current;
@@ -144,7 +161,7 @@ export default function StockModal({ stock, onClose }) {
     { label: '등락률', value: rate, diff, cls, isRate: true },
   ];
 
-  return (
+  return createPortal(
     <AnimatePresence>
       <motion.div
         className={styles['modal-overlay']}
@@ -375,6 +392,7 @@ export default function StockModal({ stock, onClose }) {
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

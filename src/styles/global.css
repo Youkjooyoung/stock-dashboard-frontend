@@ -121,14 +121,21 @@
 html {
   scroll-behavior: smooth;
   font-family: var(--font-sans);
+  overflow-y: scroll;
   scrollbar-gutter: stable;
+  color-scheme: light;
+  scrollbar-color: var(--text-1) var(--surface-2);
+  scrollbar-width: auto;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
   font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text-1);
-  overflow-y: scroll;
   line-height: 1.55;
   font-size: 13px;
   -webkit-font-smoothing: antialiased;
@@ -137,36 +144,44 @@ body {
   transition: background var(--transition), color var(--transition);
 }
 
-body.modal-open {
-  overflow: hidden;
-}
-
-/* 전역 스크롤바 — OS 자동숨김 무시하고 항상 표시 (Windows 11 대응) */
+::-webkit-scrollbar,
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
+  background: var(--surface-2);
 }
+::-webkit-scrollbar-track,
 html::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: var(--surface-2);
+  border-left: 1px solid var(--border);
 }
+::-webkit-scrollbar-thumb,
 html::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 6px;
-  border: 3px solid var(--bg);
+  background: var(--text-1);
+  border-radius: 7px;
+  border: 3px solid var(--surface-2);
   background-clip: padding-box;
+  min-height: 48px;
 }
+::-webkit-scrollbar-thumb:hover,
 html::-webkit-scrollbar-thumb:hover,
 body::-webkit-scrollbar-thumb:hover {
-  background: var(--text-3);
+  background: #000;
   background-clip: padding-box;
-  border: 3px solid var(--bg);
+  border: 3px solid var(--surface-2);
 }
-html {
-  scrollbar-color: var(--border-strong) var(--bg);
-  scrollbar-width: thin;
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] html::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] body::-webkit-scrollbar-thumb:hover {
+  background: #fff;
+  background-clip: padding-box;
+  border: 3px solid var(--surface-2);
+}
+::-webkit-scrollbar-corner {
+  background: var(--surface-2);
 }
 
 a { text-decoration: none; color: inherit; }
