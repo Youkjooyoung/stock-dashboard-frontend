@@ -5,15 +5,22 @@ import api from '../api/axiosInstance';
 import styles from '../styles/components/StockChat.module.css';
 
 export default function StockChat({ ticker, stockName }) {
-  const [messages, setMessages]   = useState([]);
-  const [input, setInput]         = useState('');
-  const [connected, setConnected] = useState(false);
+  const [messages, setMessages]       = useState([]);
+  const [input, setInput]             = useState('');
+  const [connected, setConnected]     = useState(false);
+  const [profileImageUrl, setProfileImageUrl] = useState('');
   const clientRef = useRef(null);
   const listRef = useRef(null);
 
   const email    = localStorage.getItem('userEmail') || '';
   const nickname = localStorage.getItem('kakaoNickname') || email.split('@')[0] || '익명';
   const token    = localStorage.getItem('accessToken') || '';
+
+  useEffect(() => {
+    api.get('/user/info')
+      .then(res => setProfileImageUrl(res.data.profileImageUrl || ''))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     api.get(`/chat/${ticker}`)
@@ -100,7 +107,9 @@ export default function StockChat({ ticker, stockName }) {
               </div>
               {isMine && (
                 <div className={`${styles['chat-avatar']} ${styles.mine}`}>
-                  {nickname?.charAt(0).toUpperCase()}
+                  {profileImageUrl
+                    ? <img src={profileImageUrl} alt={nickname} className={styles['chat-avatar-img']} />
+                    : nickname?.charAt(0).toUpperCase()}
                 </div>
               )}
             </div>
