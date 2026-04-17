@@ -3,32 +3,27 @@ import { marked } from 'marked';
 import 'github-markdown-css/github-markdown.css';
 import styles from '../styles/pages/DocsPreviewPage.module.css';
 
-const docModules = import.meta.glob('/docs/*.md', { query: '?raw', import: 'default', eager: true });
-
-const DOC_META = {
-  'portfolio-intro.md': '📋 프로젝트 소개서',
-  'README.md': '📖 README',
-  'api-reference.md': '🔌 API 명세',
-  'architecture.md': '🏗 아키텍처',
-  'erd.md': '🗄 ERD',
-};
-
-function getDocList() {
-  return Object.keys(docModules).map((path) => {
-    const filename = path.split('/').pop();
-    return { path, filename, label: DOC_META[filename] || filename };
-  }).sort((a, b) => {
-    const order = Object.keys(DOC_META);
-    return order.indexOf(a.filename) - order.indexOf(b.filename);
-  });
-}
+const DOC_LIST = [
+  { filename: 'portfolio-intro.md', label: '📋 프로젝트 소개서' },
+  { filename: 'README.md',          label: '📖 README' },
+  { filename: 'api-reference.md',   label: '🔌 API 명세' },
+  { filename: 'architecture.md',    label: '🏗 아키텍처' },
+  { filename: 'erd.md',             label: '🗄 ERD' },
+];
 
 export default function DocsPreviewPage() {
-  const docList = getDocList();
-  const [selected, setSelected] = useState(docList[0]?.path || '');
+  const [selected, setSelected] = useState(DOC_LIST[0].filename);
+  const [rawContent, setRawContent] = useState('');
   const contentRef = useRef(null);
 
-  const rawContent = selected ? docModules[selected] : '';
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/docs/${selected}`)
+      .then(res => res.ok ? res.text() : '')
+      .then(text => { if (!cancelled) setRawContent(text); })
+      .catch(() => { if (!cancelled) setRawContent(''); });
+    return () => { cancelled = true; };
+  }, [selected]);
 
   const html = rawContent
     ? marked.parse(rawContent, { gfm: true, breaks: false })
@@ -58,11 +53,11 @@ export default function DocsPreviewPage() {
       <aside className={styles['docs-sidebar']}>
         <div className={styles['docs-sidebar-title']}>문서 목록</div>
         <nav>
-          {docList.map(({ path, label }) => (
+          {DOC_LIST.map(({ filename, label }) => (
             <button
-              key={path}
-              className={`${styles['docs-nav-item']} ${selected === path ? styles['docs-nav-item--active'] : ''}`}
-              onClick={() => setSelected(path)}
+              key={filename}
+              className={`${styles['docs-nav-item']} ${selected === filename ? styles['docs-nav-item--active'] : ''}`}
+              onClick={() => setSelected(filename)}
             >
               {label}
             </button>
