@@ -115,7 +115,7 @@
 
 .chat-bubble.mine {
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border-bottom-right-radius: 3px;
 }
 
