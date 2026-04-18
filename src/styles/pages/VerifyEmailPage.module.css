@@ -76,7 +76,7 @@
   display: inline-block;
   padding: 11px 24px;
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
@@ -132,7 +132,7 @@
 
 .btn-resend:hover:not(:disabled) {
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
 }
 
 .btn-resend:disabled {

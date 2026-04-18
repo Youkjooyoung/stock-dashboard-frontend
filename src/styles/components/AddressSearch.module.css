@@ -14,5 +14,5 @@
 
 .button:hover {
     background: var(--primary);
-    color: white;
+    color: var(--primary-text);
 }

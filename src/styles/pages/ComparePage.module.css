@@ -163,7 +163,7 @@ input[type="date"].control-input {
 .btn-search {
   padding: 9px 20px;
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 13px;

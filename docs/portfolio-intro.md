@@ -80,7 +80,7 @@ priceByTicker → 30분  (종목별 상세 — 중간 빈도)
 
 | 지표 | 내용 |
 |------|------|
-| **번들 최적화** | Vite `manualChunks` 4개 청크 분리 (`vendor-react`, `vendor-chart`, `vendor-stomp`, `vendor`) + `lazy()` 전 페이지 적용 → 초기 로딩 청크 최소화 |
+| **번들 최적화** | Vite `manualChunks` 4개 청크 분리 (`vendor-react`, `vendor-chart`(chart.js·react-chartjs-2·recharts), `vendor-stomp`, `vendor`) + `lazy()` 전 페이지 적용 → 초기 로딩 청크 최소화 |
 | **테스트 커버리지** | 백엔드: JUnit5 + Mockito 단위 35케이스, Testcontainers MySQL 통합 7케이스 / 프론트: Vitest + RTL 28케이스 |
 | **캐시 효과** | Redis TTL 도입으로 주식 시세 조회 API DB 히트 제거 (로컬: ConcurrentMap, 운영: Redis 7-alpine) |
 | **관측성** | Prometheus + Grafana 6-패널 대시보드 (JVM Heap, CPU, HTTP req/rate, p95 latency, HikariCP, 캐시 hit/miss) |

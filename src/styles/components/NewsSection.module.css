@@ -54,7 +54,7 @@
 .news-search-btn {
   padding: 5px 10px;
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 12px;

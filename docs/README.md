@@ -2,11 +2,15 @@
 
 > 실시간 주식 시세 조회 · 포트폴리오 관리 · AI 종목 분석 웹 애플리케이션
 
-[![Backend CI](https://github.com/actions/workflows/badge.svg)](https://github.com)
-[![Frontend CI](https://github.com/actions/workflows/badge.svg)](https://github.com)
 [![Java](https://img.shields.io/badge/Java-21-orange)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.10-brightgreen)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-19.2-blue)](https://react.dev)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1)](https://www.mysql.com/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D)](https://redis.io/)
+
+<!-- CI/CD 배지는 리포지토리 공개 후 실제 워크플로 URL로 교체 필요.
+     워크플로 파일: .github/workflows/ci.yml, deploy-backend.yml, deploy-frontend.yml -->
+
 
 ---
 
@@ -113,9 +117,8 @@ docker-compose up --build
 ```bash
 cd stock-dashboard
 
-# 환경변수 파일 생성
-cp application.properties.example src/main/resources/application-local.properties
-# application-local.properties 편집 (DB, JWT Secret, API 키 등)
+# src/main/resources/application-local.properties 파일을 직접 생성하고
+# 아래 "환경변수" 섹션의 키를 채워 넣습니다 (예제 파일은 별도로 제공하지 않음).
 
 ./mvnw spring-boot:run
 # 실행 후: http://localhost:8080
@@ -126,9 +129,8 @@ cp application.properties.example src/main/resources/application-local.propertie
 ```bash
 cd stock-dashboard-react
 
-# 환경변수 파일 생성
-cp .env.example .env.local
-# .env.local 편집
+# 프로젝트 루트에 .env.local 파일을 직접 생성하고 아래 항목을 기입합니다.
+# VITE_API_BASE_URL=https://localhost:8443
 
 npm install
 npm run dev

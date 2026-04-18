@@ -74,7 +74,7 @@
 
 .confirm {
     background: var(--primary);
-    color: white;
+    color: var(--primary-text);
     border-color: var(--primary);
     font-size: 12px;
     font-weight: 700;

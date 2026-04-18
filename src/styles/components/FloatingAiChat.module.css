@@ -452,7 +452,7 @@
 
 .userMsg .bubble {
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border-bottom-right-radius: 4px;
 }
 
@@ -543,7 +543,7 @@
 .sendBtn {
   padding: 0 16px;
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 13px;

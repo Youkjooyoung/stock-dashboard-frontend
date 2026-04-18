@@ -68,11 +68,9 @@ export default function StockChat({ ticker, stockName }) {
   };
 
   const formatTime = (dateStr) => {
+    if (!dateStr) return '';
     try {
-      const utcStr = dateStr && !dateStr.endsWith('Z') && !dateStr.includes('+')
-        ? dateStr.replace(' ', 'T') + 'Z'
-        : dateStr;
-      return new Date(utcStr).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+      return new Date(dateStr).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
     } catch { return ''; }
   };
 

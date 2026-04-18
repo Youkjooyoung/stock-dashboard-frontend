@@ -28,7 +28,7 @@
 
 .step.active {
     background: var(--primary);
-    color: white;
+    color: var(--primary-text);
     font-weight: 700;
     border-color: var(--primary);
 }

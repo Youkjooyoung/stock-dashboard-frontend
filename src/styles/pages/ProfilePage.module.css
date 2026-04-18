@@ -80,7 +80,7 @@
   height: 22px;
   border-radius: 50%;
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border: 2px solid var(--surface);
   font-size: 11px;
   display: flex;
@@ -121,7 +121,7 @@
 
 .btn-nickname-change:hover {
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
@@ -886,7 +886,7 @@
 .btn-pf-add {
   padding: 5px 13px;
   background: var(--primary);
-  color: white;
+  color: var(--primary-text);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 12px;

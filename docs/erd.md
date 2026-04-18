@@ -30,8 +30,8 @@ erDiagram
         int LOGIN_FAIL_CNT
         tinyint ACCOUNT_LOCKED
         varchar ROLE "USER / ADMIN"
-        varchar PW_RESET_TOKEN
-        datetime PW_RESET_EXPIRES
+        varchar PASSWORD_RESET_TOKEN
+        datetime PASSWORD_RESET_EXPIRY
         varchar PROFILE_IMAGE_URL
         datetime CREATED_AT
         datetime DELETED_AT "소프트 삭제 일시"
@@ -70,7 +70,7 @@ erDiagram
         int WATCHLIST_ID PK
         int USER_ID FK
         int ITEM_ID FK
-        datetime CREATED_AT
+        datetime ADDED_AT "즐겨찾기 추가 시각"
     }
 
     PORTFOLIO {
@@ -92,7 +92,7 @@ erDiagram
         varchar STOCK_NAME
         decimal TARGET_PRICE
         varchar ALERT_TYPE "ABOVE / BELOW"
-        tinyint IS_TRIGGERED
+        char IS_TRIGGERED "Y / N"
         datetime CREATED_AT
         datetime TRIGGERED_AT
     }
@@ -157,7 +157,7 @@ KRX(한국거래소) 기준 종목 코드와 종목명. `MARKET`: `KOSPI`, `KOSD
 
 ### USER_WATCHLIST — 즐겨찾기
 
-`USER_ID` + `ITEM_ID` 복합 유니크로 중복 방지 (INSERT IGNORE INTO 사용).
+`USER_ID` + `ITEM_ID` 복합 유니크로 중복 방지 (INSERT IGNORE INTO 사용). 추가 시각 컬럼명은 `ADDED_AT` (다른 테이블의 `CREATED_AT`과 구분되는 레거시 네이밍).
 
 ---
 
@@ -170,7 +170,7 @@ KRX(한국거래소) 기준 종목 코드와 종목명. `MARKET`: `KOSPI`, `KOSD
 ### PRICE_ALERT — 목표가 알림
 
 `ALERT_TYPE`: `ABOVE` (목표가 이상 시 알림) / `BELOW` (목표가 이하 시 알림).
-`IS_TRIGGERED`: 알림 발송 여부. 스케줄러(`StockScheduler`)가 주기적으로 확인.
+`IS_TRIGGERED`: `CHAR(1)` `'Y'`(발송 완료) / `'N'`(대기). 스케줄러(`StockScheduler`)가 주기적으로 확인.
 
 ---
 

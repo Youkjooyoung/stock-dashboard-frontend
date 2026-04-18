@@ -256,7 +256,7 @@ sequenceDiagram
 graph TB
     subgraph Router["react-router-dom 7.13"]
         AppLayout["AppLayout\n(인증 가드)"]
-        Public["Public Routes\n/login · /signup · /oauth/**\n/verify-email · /forgot-password\n/reset-password · /admin · /change-password"]
+        Public["Public Routes\n/login · /signup · /oauth/**\n/verify-email · /forgot-password\n/reset-password · /admin · /change-password · /docs"]
         Protected["Protected Routes\n/ · /compare · /profile"]
     end
 
@@ -271,7 +271,7 @@ graph TB
 
     subgraph Bundle["번들 최적화 (manualChunks)"]
         VendorReact["vendor-react\nreact · react-dom · react-router-dom"]
-        VendorChart["vendor-chart\nchart.js · react-chartjs-2"]
+        VendorChart["vendor-chart\nchart.js · react-chartjs-2 · recharts"]
         VendorStomp["vendor-stomp\n@stomp · sockjs"]
         Vendor["vendor\n나머지 node_modules"]
     end
