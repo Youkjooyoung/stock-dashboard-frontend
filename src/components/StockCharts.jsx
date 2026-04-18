@@ -1,11 +1,31 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import styles from '../styles/components/StockCharts.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-function buildOptions({ isPercent = false, signed = false } = {}) {
+function useThemeAttr() {
+  const [theme, setTheme] = useState(
+    () => document.documentElement.dataset.theme || 'light'
+  );
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setTheme(document.documentElement.dataset.theme || 'light');
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    return () => observer.disconnect();
+  }, []);
+  return theme;
+}
+
+function buildOptions({ isPercent = false, signed = false, dark = false } = {}) {
+  const tickX    = dark ? '#A4A8B0' : '#6B6F78';
+  const tickY    = dark ? '#C7CAD1' : '#A4A8B0';
+  const gridLine = dark ? 'rgba(232,230,222,0.08)' : 'rgba(11,13,16,0.05)';
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -40,18 +60,18 @@ function buildOptions({ isPercent = false, signed = false } = {}) {
         border: { display: false },
         ticks: {
           font: { size: 11, weight: '500' },
-          color: '#6B6F78',
+          color: tickX,
           maxRotation: 0,
           padding: 6,
           autoSkip: false
         }
       },
       y: {
-        grid: { color: 'rgba(11,13,16,0.05)', drawTicks: false },
+        grid: { color: gridLine, drawTicks: false },
         border: { display: false },
         ticks: {
           font: { size: 10, family: "'JetBrains Mono', ui-monospace, Consolas, monospace" },
-          color: '#A4A8B0',
+          color: tickY,
           padding: 8,
           callback: v => {
             if (isPercent) {
@@ -107,6 +127,9 @@ function ChartSkeleton() {
 }
 
 export default function StockCharts({ stocks, loading }) {
+  const theme = useThemeAttr();
+  const dark  = theme === 'dark';
+
   const { topVolume, topPrice, topGainers, topLosers } = useMemo(() => {
     if (!stocks || stocks.length === 0) {
       return { topVolume: [], topPrice: [], topGainers: [], topLosers: [] };
@@ -125,25 +148,28 @@ export default function StockCharts({ stocks, loading }) {
 
   if (loading || !stocks || stocks.length === 0) return <ChartSkeleton />;
 
+  const volumeColor = dark ? 'rgba(148,163,184,0.92)' : 'rgba(11,13,16,0.85)';
+  const priceColor  = dark ? 'rgba(100,116,139,0.88)' : 'rgba(60,64,73,0.80)';
+
   const charts = [
     {
       title: '거래량 TOP 10',
       badge: 'VOLUME',
-      data: makeDataset(topVolume, 'trqu', 'rgba(11,13,16,0.85)'),
-      options: buildOptions({ isPercent: false }),
+      data: makeDataset(topVolume, 'trqu', volumeColor),
+      options: buildOptions({ isPercent: false, dark }),
     },
     {
       title: '종가 TOP 10',
       badge: 'PRICE',
-      data: makeDataset(topPrice, 'clpr', 'rgba(60,64,73,0.80)'),
-      options: buildOptions({ isPercent: false }),
+      data: makeDataset(topPrice, 'clpr', priceColor),
+      options: buildOptions({ isPercent: false, dark }),
     },
     {
       title: '상승률 TOP 10',
       badge: 'GAINERS',
       badgeColor: 'up',
       data: makeDataset(topGainers, 'rate', 'rgba(232,51,74,0.88)'),
-      options: buildOptions({ isPercent: true, signed: true }),
+      options: buildOptions({ isPercent: true, signed: true, dark }),
       empty: topGainers.length === 0 && '상승 종목 없음',
     },
     {
@@ -151,7 +177,7 @@ export default function StockCharts({ stocks, loading }) {
       badge: 'LOSERS',
       badgeColor: 'down',
       data: makeDataset(topLosers, 'rate', 'rgba(31,111,235,0.88)'),
-      options: buildOptions({ isPercent: true, signed: true }),
+      options: buildOptions({ isPercent: true, signed: true, dark }),
       empty: topLosers.length === 0 && '하락 종목 없음',
     },
   ];
