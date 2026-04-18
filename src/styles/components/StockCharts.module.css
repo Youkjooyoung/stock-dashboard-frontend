@@ -1,52 +1,109 @@
 /* ===================================================================
-   StockCharts — 차트 컴포넌트
+   StockCharts — 네 개의 TOP10 bar 차트 (2x2 그리드)
    =================================================================== */
 
-.charts-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .chart-box {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 16px 18px;
-  box-shadow: var(--shadow-sm);
+  padding: 14px 16px 10px;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+.chart-box:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+  min-height: 22px;
 }
 
 .chart-title {
   font-size: 13px;
   font-weight: 700;
   color: var(--text-1);
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
   letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.chart-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  background: var(--surface-2);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.badge-up {
+  color: var(--up);
+  background: var(--up-light);
+}
+
+.badge-down {
+  color: var(--down);
+  background: var(--down-light);
 }
 
 .chart-canvas-wrap {
   position: relative;
+  height: 220px;
 }
+
+.chart-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-4);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ===================================================================
+   Skeleton
+   =================================================================== */
 
 .chart-skeleton-title {
   height: 14px;
   width: 120px;
   border-radius: var(--radius-sm);
-  margin-bottom: 12px;
 }
+
 .chart-skeleton-canvas {
-  min-height: 180px;
+  min-height: 220px;
 }
+
 .chart-skeleton-bars {
   display: flex;
   align-items: flex-end;
   gap: 8px;
-  height: 160px;
+  height: 100%;
   padding: 0 4px;
 }
+
 .chart-skeleton-bar {
   flex: 1;
   border-radius: 3px 3px 0 0;
