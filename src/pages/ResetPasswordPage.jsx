@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
+import LogoMark from '../components/LogoMark';
 import styles from '../styles/pages/ResetPasswordPage.module.css';
 
 function validatePassword(pw) {
@@ -56,7 +57,7 @@ export default function ResetPasswordPage() {
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                <div className={styles.logo}>S</div>
+                <LogoMark size={38} />
                 <span className={styles.brand}>주식<span>대시보드</span></span>
             </div>
 

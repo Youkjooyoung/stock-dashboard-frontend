@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
+import LogoMark from '../components/LogoMark';
 import styles from '../styles/pages/VerifyEmailPage.module.css';
 
 export default function VerifyEmailPage() {
@@ -41,7 +42,7 @@ export default function VerifyEmailPage() {
   return (
     <div className={styles['verify-page']}>
       <div className={styles['verify-page-header']}>
-        <div className={styles['verify-page-logo']}>S</div>
+        <LogoMark size={38} />
         <span className={styles['verify-page-brand']}>주식<span>대시보드</span></span>
       </div>
       <div className={styles['verify-card']}>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../api/axiosInstance';
+import LogoMark from '../components/LogoMark';
 import styles from '../styles/pages/ForgotPasswordPage.module.css';
 
 export default function ForgotPasswordPage() {
@@ -24,7 +25,7 @@ export default function ForgotPasswordPage() {
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                <div className={styles.logo}>S</div>
+                <LogoMark size={38} />
                 <span className={styles.brand}>주식<span>대시보드</span></span>
             </div>
 

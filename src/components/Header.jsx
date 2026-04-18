@@ -6,6 +6,7 @@ import useDarkMode from '../hooks/useDarkMode';
 import { useAlerts, useDeleteAlert } from '../hooks/useQueries';
 import { useToast } from '../hooks/useToast';
 import TweaksPanel from './TweaksPanel';
+import LogoMark from './LogoMark';
 import styles from '../styles/components/Header.module.css';
 
 const NAV_ITEMS = [
@@ -112,7 +113,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
 
           {/* 로고 */}
           <div className={styles['header-logo']} onClick={() => navigate('/')}>
-            <div className={styles['header-logo-mark']}>S</div>
+            <LogoMark size={28} />
             <span className={styles['header-logo-text']}>주식<span>대시보드</span></span>
           </div>
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import useAuthStore from '../store/authStore';
+import LogoMark from '../components/LogoMark';
 import styles from '../styles/pages/LoginPage.module.css';
 
 export default function LoginPage() {
@@ -83,7 +84,7 @@ export default function LoginPage() {
   return (
     <div className={styles['login-page']}>
       <div className={styles['login-page-header']}>
-        <div className={styles['login-page-logo']}>S</div>
+        <LogoMark size={38} />
         <span className={styles['login-page-brand']}>주식<span>대시보드</span></span>
       </div>
 
