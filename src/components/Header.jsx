@@ -5,6 +5,7 @@ import useAlertStore from '../store/alertStore';
 import useDarkMode from '../hooks/useDarkMode';
 import { useAlerts, useDeleteAlert } from '../hooks/useQueries';
 import { useToast } from '../hooks/useToast';
+import TweaksPanel from './TweaksPanel';
 import styles from '../styles/components/Header.module.css';
 
 const NAV_ITEMS = [
@@ -140,6 +141,9 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
                 <span className={styles['refresh-label']}>LIVE</span>
               </button>
             )}
+
+            {/* Tweaks — 팔레트/밀도/상승색 */}
+            <TweaksPanel />
 
             {/* 다크 토글 (orb + 라벨 — 메인 기능으로 승격) */}
             <button
@@ -286,6 +290,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
               <span className={styles['theme-orb']} aria-hidden="true" />
               <span className={styles['theme-label']}>{dark ? 'DARK' : 'LIGHT'}</span>
             </button>
+            <TweaksPanel />
             <button className={styles['header-logout-btn']} onClick={handleLogout}>
               로그아웃
             </button>
