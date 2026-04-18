@@ -332,12 +332,12 @@ PortOne 본인인증 검증.
 
 ### PUT /api/user/password
 
-비밀번호 변경.
+비밀번호 변경. **PortOne 본인인증 선행 필수** — `/api/auth/verify-identity`에서 받은 5분 만료 `verifyToken`을 바디에 포함해야 한다.
 
 **Request Body**
 ```json
 {
-  "currentPassword": "oldPassword123!",
+  "verifyToken": "eyJhbGciOi...",
   "newPassword": "newPassword123!"
 }
 ```
@@ -701,7 +701,7 @@ AI 종목 분석 (Anthropic Claude API).
 
 종목 채팅방 최근 **50건** 메시지 조회 (페이지네이션 없음).
 
-**인증 불필요**
+**인증 필요** (`Authorization: Bearer <token>`) — 응답에 `userEmail`이 포함되므로 PII 보호 차원에서 permitAll 대상에서 제외됨.
 
 **Path Params**: `ticker` — 종목코드 (예: `005930`)
 
@@ -714,10 +714,12 @@ AI 종목 분석 (Anthropic Claude API).
     "userEmail": "user@example.com",
     "nickname": "길동이",
     "content": "실적 발표가 기대됩니다.",
-    "createdAt": "2026-04-17T10:20:00.000+09:00"
+    "createdAt": "2026-04-17T01:20:00.000Z"
   }
 ]
 ```
+
+> `createdAt`은 **UTC ISO-8601** (`Z` 접미) 문자열. 서버 TZ 설정과 무관하게 MySQL `UTC_TIMESTAMP()` + `DATE_FORMAT` 조합으로 생성되며, 프론트에서 `new Date(createdAt)`로 파싱 후 `toLocaleTimeString()`으로 로컬 표기한다.
 
 ---
 
@@ -772,9 +774,7 @@ client.publish({
 
 ### GET /api/admin/users
 
-회원 목록 (검색, 권한 필터, 상태 필터, 컬럼 정렬, 페이지네이션).
-
-**Query Params**: `keyword=`, `role=`, `status=`, `sort=`, `page=`, `size=`
+전체 회원 목록 반환. **쿼리 파라미터 없음** — 검색/권한·상태 필터/정렬/페이지네이션은 프론트(`AdminPage.jsx`) 클라이언트 사이드에서 처리한다.
 
 ### POST /api/admin/users/{userId}/unlock
 
@@ -786,11 +786,11 @@ client.publish({
 
 ### POST /api/admin/users/{userId}/role
 
-권한 변경.
+권한 토글. 현재 권한을 반대 값으로 전환한다 (`USER` ↔ `ADMIN`). **요청 바디 없음** — `userId`만으로 동작.
 
-**Request Body**
+**Response 200**
 ```json
-{ "role": "ADMIN" }
+{ "message": "권한을 변경했습니다." }
 ```
 
 ### GET /api/admin/watchlist/top

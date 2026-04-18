@@ -63,7 +63,11 @@ function buildOptions({ isPercent = false, signed = false, dark = false } = {}) 
           color: tickX,
           maxRotation: 0,
           padding: 6,
-          autoSkip: false
+          autoSkip: false,
+          callback: function (value) {
+            const label = this.getLabelForValue(value);
+            return label.length > 4 ? label.slice(0, 4) + '…' : label;
+          }
         }
       },
       y: {
