@@ -22,7 +22,7 @@ Access Token 만료 시 `/api/auth/refresh`로 재발급합니다.
 
 ## 1. 인증 (`/api/auth`)
 
-> 모든 인증 엔드포인트는 인증 불필요 (permitAll)
+> 대부분의 `/api/auth/*` 엔드포인트는 permitAll(인증 불필요). 단, **`POST /api/auth/logout`**과 **`POST /api/auth/verify-identity`**는 Access Token 필수이며 각 엔드포인트 하위 설명을 확인할 것. (`SecurityConfig`는 `/api/auth/**` 와일드카드가 아닌 경로별 화이트리스트 방식으로 permitAll 관리)
 
 ### POST /api/auth/login
 
@@ -500,7 +500,7 @@ PortOne 본인인증 검증.
 
 전체 종목 최신 시세 목록.
 
-**캐시**: `latestPrices` (TTL 10분)
+**캐시**: `StockService.getLatestPrices()`에 `@Cacheable("latestPrices")` 적용, TTL 10분
 
 **Response 200**
 ```json
@@ -525,7 +525,7 @@ PortOne 본인인증 검증.
 
 종목 상세 시세 (최근 N일).
 
-**캐시**: `priceByTicker` (TTL 30분)
+**캐시**: `StockService.getPriceByTicker()`에 `@Cacheable("priceByTicker")` 적용, TTL 30분
 
 **Path Params**: `ticker` — 종목코드 (예: `005930`)
 
@@ -535,7 +535,7 @@ PortOne 본인인증 검증.
 
 전체 종목 마스터 목록.
 
-**캐시**: `allItems` (TTL 1시간)
+**캐시**: `StockService.getAllItems()`에 `@Cacheable("allItems")` 적용, TTL 1시간
 
 **Response 200**
 ```json
@@ -807,7 +807,7 @@ client.publish({
 
 ### GET /api/admin/chats
 
-AI 채팅 이력 (최신 500건, CHAT_MESSAGE).
+종목 채팅방 이력 (최신 500건, `CHAT_MESSAGE`). 사용자 간 종목별 실시간 채팅 로그이며, AI 분석(`/api/ai/analyze`) 호출 기록과는 무관.
 
 ---
 

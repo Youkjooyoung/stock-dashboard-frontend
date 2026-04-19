@@ -25,10 +25,10 @@ erDiagram
         varchar ADDRESS
         varchar ADDRESS_DETAIL
         varchar RESIDENT_NO "AES-256 암호화"
-        tinyint EMAIL_VERIFIED
+        char EMAIL_VERIFIED "Y / N"
         varchar EMAIL_VERIFY_TOKEN
         int LOGIN_FAIL_CNT
-        tinyint ACCOUNT_LOCKED
+        char ACCOUNT_LOCKED "Y / N"
         varchar ROLE "USER / ADMIN"
         varchar PASSWORD_RESET_TOKEN
         datetime PASSWORD_RESET_EXPIRY
@@ -107,7 +107,7 @@ erDiagram
 
     CHAT_MESSAGE {
         int MSG_ID PK
-        varchar TICKER "종목코드 (비정규화)"
+        varchar TICKER "종목 채팅방 식별자"
         varchar USER_EMAIL
         varchar NICKNAME
         text CONTENT
@@ -181,9 +181,11 @@ KRX(한국거래소) 기준 종목 코드와 종목명. `MARKET`: `KOSPI`, `KOSD
 
 ---
 
-### CHAT_MESSAGE — AI 채팅 이력
+### CHAT_MESSAGE — 종목 채팅방 메시지 (실시간 채팅)
 
-`TICKER` 컬럼으로 종목 채팅방 구분. STOCK_ITEM과 외래키 없이 비정규화 (독립적 저장, CHAT 삭제 시 종목 정보 영향 없음).
+종목별 실시간 채팅방의 사용자 간 메시지 저장소. `ChatController` WebSocket(`/app/chat/{ticker}`)으로 수신한 메시지를 `chatDao.insertMessage`로 저장 후 `/topic/chat/{ticker}`로 브로드캐스트한다. AI 분석(`/api/ai/analyze`) 호출 이력은 별도로 영속화하지 않으며 이 테이블과 무관하다.
+
+`TICKER` 컬럼으로 종목 채팅방을 구분. STOCK_ITEM과 외래키 없이 비정규화 (독립적 저장, 채팅 삭제 시 종목 정보 영향 없음).
 
 ---
 
