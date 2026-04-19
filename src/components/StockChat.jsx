@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+import useStomp from '../hooks/useStomp';
 import api from '../api/axiosInstance';
 import styles from '../styles/components/StockChat.module.css';
 
@@ -9,7 +8,6 @@ export default function StockChat({ ticker, stockName }) {
   const [input, setInput]             = useState('');
   const [connected, setConnected]     = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState('');
-  const clientRef = useRef(null);
   const listRef = useRef(null);
 
   const email    = localStorage.getItem('userEmail') || '';
@@ -28,24 +26,16 @@ export default function StockChat({ ticker, stockName }) {
       .catch(() => {});
   }, [ticker]);
 
-  useEffect(() => {
-    const client = new Client({
-      webSocketFactory: () => new SockJS(import.meta.env.VITE_API_BASE_URL + '/ws'),
-      connectHeaders: { Authorization: `Bearer ${token}` },
-      onConnect: () => {
-        setConnected(true);
-        client.subscribe(`/topic/chat/${ticker}`, msg => {
-          const data = JSON.parse(msg.body);
-          setMessages(prev => [...prev, data]);
-        });
-      },
-      onDisconnect: () => setConnected(false),
-      reconnectDelay: 3000,
-    });
-    client.activate();
-    clientRef.current = client;
-    return () => client.deactivate();
-  }, [ticker]);
+  const clientRef = useStomp(`/topic/chat/${ticker}`, {
+    connectHeaders: { Authorization: `Bearer ${token}` },
+    reconnectDelay: 3000,
+    onMessage: (msg) => {
+      const data = JSON.parse(msg.body);
+      setMessages(prev => [...prev, data]);
+    },
+    onConnect: () => setConnected(true),
+    onDisconnect: () => setConnected(false),
+  });
 
   useEffect(() => {
     const el = listRef.current;

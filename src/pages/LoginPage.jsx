@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import useAuthStore from '../store/authStore';
+import { API_BASE_URL } from '../config/env';
 import LogoMark from '../components/LogoMark';
 import styles from '../styles/pages/LoginPage.module.css';
 
@@ -25,11 +26,11 @@ export default function LoginPage() {
   }, []);
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/auth/google/login`;
+    window.location.href = `${API_BASE_URL}/api/auth/google/login`;
   };
 
   const handleKakaoLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/auth/kakao/login`;
+    window.location.href = `${API_BASE_URL}/api/auth/kakao/login`;
   };
 
   const handleLogin = async () => {

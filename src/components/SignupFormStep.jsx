@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/env';
 import AddressSearch from './AddressSearch';
 import SecureKeypad from './SecureKeypad';
 import { useToast } from '../hooks/useToast';
 import styles from '../styles/components/SignupFormStep.module.css';
 
-const API = `${import.meta.env.VITE_API_BASE_URL}/api/auth`;
+const API = `${API_BASE_URL}/api/auth`;
 
 const STRENGTH_COLORS = ['', '#ff4d4d', '#ff9800', '#8bc34a', '#00e676'];
 const STRENGTH_LABELS = ['', '약함', '보통', '강함', '매우 강함'];

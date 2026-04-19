@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/env';
 import { useToast } from '../hooks/useToast';
 import styles from '../styles/components/PhoneVerifyStep.module.css';
 
@@ -28,7 +29,7 @@ export default function PhoneVerifyStep({ onCertified }) {
 
             try {
                 const { data } = await axios.post(
-                    `${import.meta.env.VITE_API_BASE_URL}/api/auth/certify`,
+                    `${API_BASE_URL}/api/auth/certify`,
                     { impUid: rsp.imp_uid },
                     { withCredentials: true }
                 );

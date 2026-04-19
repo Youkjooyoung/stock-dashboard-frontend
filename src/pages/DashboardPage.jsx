@@ -3,8 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../hooks/useToast';
 import { toYYYYMMDD } from '../utils/dateUtils';
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+import useStomp from '../hooks/useStomp';
 import {
   Chart as ChartJS, CategoryScale, LinearScale,
   BarElement, LineElement, PointElement, Title, Tooltip, Legend
@@ -38,7 +37,6 @@ export default function DashboardPage() {
   const [bulkOpen,   setBulkOpen]   = useState(false);
   const [bulkStatus, setBulkStatus] = useState(null); // null | { status, current, total }
   const intervalRef    = useRef(null);
-  const stompRef       = useRef(null);
   const bulkPollRef    = useRef(null);
   const userId = localStorage.getItem('userId');
 
@@ -51,29 +49,11 @@ export default function DashboardPage() {
   const { data: watchlist = [] } = useWatchlist();
   const toggleWatchMutation = useToggleWatchlist();
 
-  useEffect(() => {
-    const client = new Client({
-      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_API_BASE_URL}/ws`, null, { transports: ['websocket'] }),
-      reconnectDelay: 5000,
-      onConnect: () => {
-        client.subscribe('/topic/prices', () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stocks });
-        });
-      },
-      onStompError: (frame) => {
-        console.warn('[WebSocket] STOMP error:', frame.headers?.message);
-      },
-      onDisconnect: () => {
-        console.info('[WebSocket] disconnected, reconnecting in 5s');
-      },
-      onWebSocketError: (e) => {
-        console.warn('[WebSocket] socket error:', e);
-      },
-    });
-    client.activate();
-    stompRef.current = client;
-    return () => { client.deactivate(); };
-  }, [queryClient]);
+  useStomp('/topic/prices', {
+    reconnectDelay: 5000,
+    sockjsOptions: { transports: ['websocket'] },
+    onMessage: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stocks }),
+  });
 
   // ?�동갱신 ?�터�?(WebSocket 미연�????�백)
   useEffect(() => {

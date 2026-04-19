@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import AutocompleteSearch, { matchesInitial } from './AutocompleteSearch';
 import usePriceFlash from '../hooks/usePriceFlash';
 import styles from '../styles/components/StockTable.module.css';
 
@@ -9,24 +10,7 @@ function loadState() {
 }
 
 function saveState(state) {
-  try { sessionStorage.setItem(SS_KEY, JSON.stringify(state)); } catch { /* ignore */ }
-}
-
-// ── 한국어 초성 검색 ────────────────────────────────────────
-const INITIALS = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
-
-function extractInitials(str) {
-  return [...str].map(ch => {
-    const code = ch.codePointAt(0);
-    if (code >= 0xAC00 && code <= 0xD7A3)
-      return INITIALS[Math.floor((code - 0xAC00) / 588)];
-    return ch;
-  }).join('');
-}
-
-function matchesInitial(name, query) {
-  if (!/^[ㄱ-ㅎ]+$/.test(query)) return false;
-  return extractInitials(name).includes(query);
+  try { sessionStorage.setItem(SS_KEY, JSON.stringify(state)); } catch {}
 }
 
 const COLUMNS = [
@@ -43,145 +27,7 @@ const COLUMNS = [
 ];
 
 const PAGE_SIZE_OPTIONS = [10, 20, 30, 50];
-const HISTORY_KEY = 'stockSearchHistory';
-const MAX_HISTORY = 8;
 
-function getHistory() {
-  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
-}
-
-function saveHistory(term) {
-  if (!term.trim()) return;
-  const prev = getHistory().filter(t => t !== term);
-  localStorage.setItem(HISTORY_KEY, JSON.stringify([term, ...prev].slice(0, MAX_HISTORY)));
-}
-
-/* 검색 자동완성 + 검색 히스토리 */
-function AutocompleteSearch({ stocks, value, onChange }) {
-  const [suggestions, setSuggestions] = useState([]);
-  const [history, setHistory]         = useState([]);
-  const [show, setShow]               = useState(false);
-  const wrapRef = useRef(null);
-
-  useEffect(() => {
-    const handleClick = (e) => {
-      if (!wrapRef.current?.contains(e.target)) setShow(false);
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
-
-  const handleChange = (val) => {
-    onChange(val);
-    if (val.trim().length < 1) {
-      setSuggestions([]);
-      const h = getHistory();
-      setHistory(h);
-      setShow(h.length > 0);
-      return;
-    }
-    const matched = stocks
-      .filter(s =>
-        s.itmsNm?.includes(val) ||
-        s.srtnCd?.includes(val) ||
-        matchesInitial(s.itmsNm || '', val)
-      )
-      .slice(0, 8);
-    setSuggestions(matched);
-    setHistory([]);
-    setShow(matched.length > 0);
-  };
-
-  const handleFocus = () => {
-    if (!value.trim()) {
-      const h = getHistory();
-      setHistory(h);
-      setShow(h.length > 0);
-    }
-  };
-
-  const handleSelect = (stock) => {
-    onChange(stock.itmsNm);
-    saveHistory(stock.itmsNm);
-    setSuggestions([]);
-    setHistory([]);
-    setShow(false);
-  };
-
-  const handleHistorySelect = (term) => {
-    onChange(term);
-    saveHistory(term);
-    setShow(false);
-  };
-
-  const clearHistory = (e) => {
-    e.stopPropagation();
-    localStorage.removeItem(HISTORY_KEY);
-    setHistory([]);
-    setShow(false);
-  };
-
-  const showHistorySection = history.length > 0 && !value.trim();
-  const showSuggestSection = suggestions.length > 0;
-
-  return (
-    <div ref={wrapRef} className={styles['search-wrap']}>
-      <span className={styles['search-icon']} aria-hidden="true">
-        <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="7" cy="7" r="5"/>
-          <path d="m14 14-3.5-3.5"/>
-        </svg>
-      </span>
-      <input
-        className={styles['search-input']}
-        placeholder="종목명 또는 코드 검색"
-        value={value}
-        onChange={e => handleChange(e.target.value)}
-        onFocus={handleFocus}
-        autoComplete="off"
-      />
-      {show && (showHistorySection || showSuggestSection) && (
-        <div className={styles['autocomplete-dropdown']}>
-          {showHistorySection && (
-            <>
-              <div className={styles['autocomplete-section-header']}>
-                <span>최근 검색</span>
-                <button className={styles['autocomplete-clear-btn']} onMouseDown={clearHistory}>지우기</button>
-              </div>
-              {history.map((term, i) => (
-                <div
-                  key={i}
-                  className={`${styles['autocomplete-item']} ${styles['history-item']}`}
-                  onMouseDown={() => handleHistorySelect(term)}>
-                  <span className={styles['autocomplete-name']}>
-                    <span className={styles['autocomplete-history-icon']} aria-hidden="true">
-                      <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="8" cy="8" r="6"/>
-                        <path d="M8 4.5V8l2.5 1.5"/>
-                      </svg>
-                    </span>
-                    {term}
-                  </span>
-                </div>
-              ))}
-            </>
-          )}
-          {showSuggestSection && suggestions.map((s, i) => (
-            <div
-              key={i}
-              className={styles['autocomplete-item']}
-              onMouseDown={() => handleSelect(s)}>
-              <span className={styles['autocomplete-name']}>{s.itmsNm}</span>
-              <span className={styles['autocomplete-code']}>{s.srtnCd}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* CSV 내보내기 */
 function exportCSV(data) {
   const headers = ['종목코드', '종목명', '시장', '시가', '종가', '고가', '저가', '거래량', '등락률(%)'];
   const rows = data.map(d => [
@@ -214,7 +60,6 @@ export default function StockTable({
   const [filterRateMax, setFilterRateMax] = useState(_s.filterRateMax ?? '');
   const [filterVolMin, setFilterVolMin]   = useState(_s.filterVolMin  ?? '');
 
-  // 상태 변경 시 sessionStorage에 저장
   useEffect(() => {
     saveState({ sortKey, sortDir, pageSize, filterMarket, filterRateMin, filterRateMax, filterVolMin });
   }, [sortKey, sortDir, pageSize, filterMarket, filterRateMin, filterRateMax, filterVolMin]);
@@ -240,7 +85,6 @@ export default function StockTable({
 
   const hasActiveFilter = filterMarket !== 'all' || filterRateMin !== '' || filterRateMax !== '' || filterVolMin !== '';
 
-  // 성능 최적화: 검색, 필터링, 정렬 로직 메모이제이션 (입력 지연 방지)
   const filtered = useMemo(() => {
     return stocks
       .filter(d => {
@@ -300,7 +144,6 @@ export default function StockTable({
   return (
     <div className={styles['table-box']}>
 
-      {/* 툴바 */}
       <div className={styles['table-toolbar']}>
         <div className={styles['table-toolbar-left']}>
           <div className={styles['stock-tab-group']}>
@@ -352,7 +195,6 @@ export default function StockTable({
         </div>
       </div>
 
-      {/* 필터 패널 */}
       {filterOpen && (
         <div className={styles['filter-panel']}>
           <div className={styles['filter-panel-inner']}>
@@ -406,7 +248,6 @@ export default function StockTable({
         </div>
       )}
 
-      {/* 테이블 (데스크톱) */}
       <table className={styles['stock-table']}>
         <thead>
           <tr>
@@ -467,7 +308,6 @@ export default function StockTable({
         </tbody>
       </table>
 
-      {/* 모바일 카드 뷰 */}
       <div className={styles['stock-cards']}>
         {paginated.length === 0 ? (
           <div className={styles['stock-cards-empty']}>
@@ -511,7 +351,6 @@ export default function StockTable({
         })}
       </div>
 
-      {/* 푸터 (페이지네이션) */}
       {filtered.length > 0 && (
         <div className={styles['table-footer']}>
           <span className={styles['table-count']}>
