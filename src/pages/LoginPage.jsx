@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import useAuthStore from '../store/authStore';
 import { API_BASE_URL } from '../config/env';
-import LogoMark from '../components/LogoMark';
-import styles from '../styles/pages/LoginPage.module.css';
+import styles from '../styles/pages/LoginPage.toss.module.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setAuth } = useAuthStore();
 
-  const [email, setEmail]           = useState(localStorage.getItem('savedEmail') || '');
+  const prefillEmail = location.state?.prefillEmail || '';
+  const [email, setEmail]           = useState(prefillEmail || localStorage.getItem('savedEmail') || '');
   const [error, setError]           = useState('');
   const [loading, setLoading]       = useState(false);
   const [password, setPassword]     = useState('');
@@ -83,21 +84,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles['login-page']}>
-      <div className={styles['login-page-header']}>
-        <LogoMark size={38} />
-        <span className={styles['login-page-brand']}>주식<span>대시보드</span></span>
-      </div>
+    <div className="auth-page">
+      <div className="auth-card">
+        <form className="auth-body" onSubmit={handleSubmit} noValidate>
+          <h1 className="auth-headline">반가워요!<br/>로그인해 주세요</h1>
+          <p className="auth-sub">관심 종목을 관리하고 시장을 분석하세요</p>
 
-      <div className={styles['login-card']}>
-        <h2 className={styles['login-card-title']}>로그인</h2>
-        <p className={styles['login-card-subtitle']}>관심 종목을 관리하고 시장을 분석하세요</p>
-
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
-            <label className="form-label">이메일</label>
+          <div className="auth-field">
+            <label className="auth-label">이메일</label>
             <input
-              className="form-input"
+              className="auth-input"
               type="email"
               placeholder="email@example.com"
               value={email}
@@ -106,19 +102,23 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">비밀번호</label>
-            <div className="input-wrap">
+          <div className="auth-field">
+            <label className="auth-label">비밀번호</label>
+            <div className="auth-input-row">
               <input
-                className="form-input"
+                className="auth-input"
                 type={showPw ? 'text' : 'password'}
                 placeholder="비밀번호 입력"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 autoComplete="current-password"
               />
-              <button className="pw-toggle" type="button" onClick={() => setShowPw(p => !p)}>
-                {showPw ? '숨기기' : '보기'}
+              <button
+                type="button"
+                className="auth-input-eye"
+                onClick={() => setShowPw(p => !p)}
+                aria-label={showPw ? '비밀번호 숨기기' : '비밀번호 보기'}>
+                {showPw ? '🙈' : '👁'}
               </button>
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function LoginPage() {
             <a href="/forgot-password" className={styles['forgot-link']}>비밀번호 찾기</a>
           </div>
 
-          {error && <p className="error-msg">{error}</p>}
+          {error && <p className="auth-error-msg">{error}</p>}
 
           {showResend && (
             <div className={styles['resend-box']}>
@@ -160,49 +160,38 @@ export default function LoginPage() {
             </div>
           )}
 
-          <button
-            className={styles['btn-login-submit']}
-            type="submit"
-            disabled={loading}>
-            {loading ? <><span className="spinner" />처리 중...</> : '로그인'}
-          </button>
+          <div className="auth-cta-bar">
+            <button
+              className="auth-btn"
+              type="submit"
+              disabled={loading}>
+              {loading ? '처리 중...' : '로그인'}
+            </button>
+
+            <div className="auth-divider">또는</div>
+
+            <div className="auth-social">
+              <button type="button" className="auth-social-btn kakao" onClick={handleKakaoLogin}>
+                <span className="icon-circle">K</span>
+                카카오로 로그인
+              </button>
+              <button type="button" className="auth-social-btn google" onClick={handleGoogleLogin}>
+                <span className="icon-circle">G</span>
+                Google로 로그인
+              </button>
+            </div>
+
+            <div className="auth-foot">
+              계정이 없으신가요?
+              <button
+                type="button"
+                className={styles['toggle-link']}
+                onClick={() => navigate('/signup')}>
+                회원가입
+              </button>
+            </div>
+          </div>
         </form>
-
-        <div className={styles['divider-or']}>또는</div>
-        <div className={styles['social-btn-group']}>
-          <button className={styles.kakaoBtn} onClick={handleKakaoLogin}>
-            <div className={styles.kakaoBtnState}></div>
-            <div className={styles.kakaoBtnContentWrapper}>
-              <div className={styles.kakaoBtnIcon}>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <path fill="rgba(0,0,0,0.85)" d="M12 3c-5.52 0-10 3.58-10 8 0 2.84 1.87 5.35 4.7 6.8-.19.65-.7 2.37-.8 2.74-.13.46.17.45.36.33.14-.1 2.28-1.54 3.2-2.17.83.12 1.68.18 2.54.18 5.52 0 10-3.58 10-8S17.52 3 12 3z"/>
-                </svg>
-              </div>
-              <span className={styles.kakaoBtnContents}>카카오로 로그인</span>
-            </div>
-          </button>
-          <button className={styles.googleBtn} onClick={handleGoogleLogin}>
-            <div className={styles.googleBtnState}></div>
-            <div className={styles.googleBtnContentWrapper}>
-              <div className={styles.googleBtnIcon}>
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                </svg>
-              </div>
-              <span className={styles.googleBtnContents}>Google로 로그인</span>
-            </div>
-          </button>
-        </div>
-
-        <p className={styles['login-toggle']}>
-          계정이 없으신가요?{' '}
-          <span className={styles['login-toggle-link']} onClick={() => navigate('/signup')}>
-            회원가입
-          </span>
-        </p>
       </div>
     </div>
   );

@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/env';
 import { useToast } from '../hooks/useToast';
-import styles from '../styles/components/PhoneVerifyStep.module.css';
+import shared from '../styles/pages/AuthShared.module.css';
+import styles from '../styles/components/PhoneVerifyStep.toss.module.css';
 
-export default function PhoneVerifyStep({ onCertified }) {
+export default function PhoneVerifyStep({ onCertified, onExistingFound }) {
+    const navigate = useNavigate();
     const { showToast } = useToast();
 
     useEffect(() => {
@@ -33,6 +36,16 @@ export default function PhoneVerifyStep({ onCertified }) {
                     { impUid: rsp.imp_uid },
                     { withCredentials: true }
                 );
+                if (data.existingMember === true && typeof onExistingFound === 'function') {
+                    onExistingFound({
+                        name: data.name,
+                        phone: data.phone,
+                        impUid: rsp.imp_uid,
+                        provider: data.existingProvider ?? null,
+                        maskedEmail: data.existingMaskedEmail ?? null,
+                    });
+                    return;
+                }
                 onCertified({ name: data.name, phone: data.phone, impUid: rsp.imp_uid });
             } catch {
                 showToast('본인인증 정보 확인에 실패했습니다.', 'error');
@@ -41,21 +54,32 @@ export default function PhoneVerifyStep({ onCertified }) {
     };
 
     return (
-        <div className={styles.card}>
-            <h2 className={styles.title}>본인인증</h2>
-            <p className={styles.desc}>
-                회원가입을 시작하려면 먼저 본인인증이 필요합니다.
-            </p>
-            <div className={styles.icon}>📱</div>
-            <ul className={styles.list}>
-                <li>휴대폰 택을 통해 본인인증을 진행합니다.</li>
-                <li>인증 후 휴대폰 번호가 자동으로 입력됩니다.</li>
-                <li>본인 명의의 휴대폰이 필요합니다.</li>
-            </ul>
-            <button className={styles.button} onClick={handleVerify}>
-                휴대폰 본인인증 시작
-            </button>
-            <a href="/login" className={styles.link}>이미 계정이 있으신가요? 로그인</a>
-        </div>
+        <>
+            <div className="auth-hero">
+                <div className="auth-hero-emoji">📱</div>
+                <h2 className="auth-hero-title">본인인증을<br/>진행해 주세요</h2>
+                <p className="auth-hero-sub">회원가입 시작 전 본인 명의 휴대폰으로<br/>인증해 주세요</p>
+            </div>
+
+            <div className="auth-body">
+                <ul className={styles['info-list']}>
+                    <li>휴대폰 본인인증을 통해 본인을 확인합니다.</li>
+                    <li>인증 후 휴대폰 번호가 자동으로 입력됩니다.</li>
+                    <li>본인 명의의 휴대폰이 필요합니다.</li>
+                </ul>
+            </div>
+
+            <div className="auth-cta-bar">
+                <button type="button" className="auth-btn" onClick={handleVerify}>
+                    휴대폰 본인인증 시작
+                </button>
+                <button
+                    type="button"
+                    className={`auth-btn auth-btn-secondary ${shared['btn-secondary-spaced']}`}
+                    onClick={() => navigate('/login')}>
+                    이미 계정이 있어요
+                </button>
+            </div>
+        </>
     );
 }
