@@ -1,0 +1,266 @@
+/* ============================================================
+   TOSS DESIGN SYSTEM TOKENS — Stock Dashboard
+   Adapted from Toss (TDS) — Pretendard, Toss Blue, KR semantic colors
+   ============================================================ */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-ui: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 14px;
+  --r-xl: 16px;
+  --r-2xl: 20px;
+  --r-pill: 999px;
+
+  --t-fast: 120ms cubic-bezier(.22,.61,.36,1);
+  --t-med: 220ms cubic-bezier(.22,.61,.36,1);
+
+  --c-up: #F04452;
+  --c-up-soft: rgba(240, 68, 82, 0.10);
+  --c-up-strong: #D1313F;
+  --c-down: #3182F6;
+  --c-down-soft: rgba(49, 130, 246, 0.10);
+  --c-down-strong: #1B64DA;
+  --c-flat: #8B95A1;
+
+  --c-toss-blue: #3182F6;
+  --c-toss-blue-soft: rgba(49, 130, 246, 0.08);
+}
+
+/* ---------- Light theme — Toss whites & slate grays ---------- */
+:root,
+[data-theme='light'] {
+  --bg: #F2F4F6;
+  --bg-elev: #FFFFFF;
+  --bg-soft: #F2F4F6;
+  --bg-table-stripe: #F9FAFB;
+  --bg-hover: #F2F4F6;
+
+  --card: #FFFFFF;
+  --card-border: rgba(0, 27, 55, 0.06);
+  --card-shadow: 0 1px 2px rgba(0, 27, 55, 0.04);
+  --card-shadow-hover: 0 4px 16px rgba(0, 27, 55, 0.08);
+
+  --text: #191F28;
+  --text-secondary: #4E5968;
+  --text-tertiary: #8B95A1;
+  --text-quaternary: #B0B8C1;
+  --text-inverse: #FFFFFF;
+
+  --border: rgba(0, 27, 55, 0.08);
+  --border-strong: rgba(0, 27, 55, 0.14);
+  --divider: rgba(0, 27, 55, 0.06);
+
+  --chip-bg: #F2F4F6;
+  --chip-bg-active: #191F28;
+  --chip-text-active: #FFFFFF;
+
+  --input-bg: #F2F4F6;
+  --input-border: transparent;
+  --input-border-focus: #3182F6;
+
+  --logo-mark-bg: #3182F6;
+  --logo-mark-line: #FFFFFF;
+  --logo-mark-dot: #FFFFFF;
+
+  --tooltip-bg: #191F28;
+  --tooltip-text: #FFFFFF;
+
+  --kospi: #F04452;
+  --kosdaq: #3182F6;
+
+  --warning-bg: rgba(240, 68, 82, 0.06);
+  --warning-border: rgba(240, 68, 82, 0.20);
+  --warning-text: #D1313F;
+
+  --success: #1F883D;
+  --success-soft: rgba(31, 136, 61, 0.10);
+}
+
+/* ---------- Dark theme — Toss night ---------- */
+[data-theme='dark'] {
+  --bg: #17171C;
+  --bg-elev: #1F2026;
+  --bg-soft: #2B2D34;
+  --bg-table-stripe: #1F2026;
+  --bg-hover: #2B2D34;
+
+  --card: #1F2026;
+  --card-border: rgba(255, 255, 255, 0.06);
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.40);
+
+  --text: #F2F4F6;
+  --text-secondary: #B0B8C1;
+  --text-tertiary: #6B7684;
+  --text-quaternary: #4E5968;
+  --text-inverse: #17171C;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --divider: rgba(255, 255, 255, 0.06);
+
+  --chip-bg: #2B2D34;
+  --chip-bg-active: #F2F4F6;
+  --chip-text-active: #17171C;
+
+  --input-bg: #2B2D34;
+  --input-border: transparent;
+  --input-border-focus: #4D8EFA;
+
+  --logo-mark-bg: #4D8EFA;
+  --logo-mark-line: #FFFFFF;
+  --logo-mark-dot: #FFFFFF;
+
+  --tooltip-bg: #0A0B0E;
+  --tooltip-text: #F2F4F6;
+
+  --c-up: #FF5C6A;
+  --c-up-soft: rgba(255, 92, 106, 0.14);
+  --c-down: #4D8EFA;
+  --c-down-soft: rgba(77, 142, 250, 0.14);
+  --c-toss-blue: #4D8EFA;
+  --c-toss-blue-soft: rgba(77, 142, 250, 0.14);
+
+  --kospi: #FF5C6A;
+  --kosdaq: #4D8EFA;
+
+  --warning-bg: rgba(255, 92, 106, 0.10);
+  --warning-border: rgba(255, 92, 106, 0.25);
+  --warning-text: #FF7A86;
+
+  --success: #4ED39A;
+  --success-soft: rgba(78, 211, 154, 0.12);
+}
+
+/* ============================================================
+   LEGACY ALIAS — Warm Sand 시절 토큰을 토스 토큰으로 매핑
+   기존 컴포넌트 CSS 깨짐 방지용. Phase 4 이후에도 유지.
+   ============================================================ */
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  --surface:          var(--card);
+  --surface-2:        var(--bg-soft);
+  --surface-hover:    var(--bg-hover);
+  --surface-ink:      var(--text);
+
+  --text-1:           var(--text);
+  --text-2:           var(--text-secondary);
+  --text-3:           var(--text-tertiary);
+  --text-4:           var(--text-quaternary);
+
+  --border-focus:     var(--input-border-focus);
+
+  --up-light:         var(--c-up-soft);
+  --up-bg:            var(--c-up-soft);
+  --up-soft:          var(--c-up-soft);
+  --up-bar:           var(--c-up);
+  --up:               var(--c-up);
+
+  --down-light:       var(--c-down-soft);
+  --down-bg:          var(--c-down-soft);
+  --down-soft:        var(--c-down-soft);
+  --down-bar:         var(--c-down);
+  --down:             var(--c-down);
+
+  --flat:             var(--c-flat);
+
+  --accent:           var(--c-toss-blue);
+  --accent-text:      #FFFFFF;
+  --accent-soft:      var(--c-toss-blue-soft);
+
+  --primary:          var(--c-toss-blue);
+  --primary-dark:     var(--c-down-strong);
+  --primary-light:    var(--c-toss-blue-soft);
+  --primary-soft:     var(--c-toss-blue-soft);
+  --primary-text:     #FFFFFF;
+  --primary-bg:       var(--c-toss-blue-soft);
+  --primary-hover:    var(--c-down-strong);
+
+  --danger:           var(--c-up);
+  --danger-light:     var(--c-up-soft);
+  --warning:          var(--warning-text);
+
+  --kakao:            #FEE500;
+  --kakao-text:       #391B1B;
+  --google:           #4285F4;
+  --red:              var(--c-up);
+  --green:            var(--success);
+
+  --radius-xs:        4px;
+  --radius-sm:        var(--r-sm);
+  --radius-md:        var(--r-md);
+  --radius-lg:        var(--r-lg);
+  --radius-xl:        var(--r-xl);
+  --radius-full:      var(--r-pill);
+  --radius:           var(--r-md);
+
+  --shadow-sm:        var(--card-shadow);
+  --shadow-md:        var(--card-shadow);
+  --shadow-lg:        var(--card-shadow-hover);
+
+  --font-sans:        var(--font-ui);
+
+  --transition:        var(--t-fast);
+  --transition-smooth: var(--t-med);
+
+  --focus-ring:       var(--c-toss-blue-soft);
+  --focus-glow:       var(--c-toss-blue-soft);
+
+  --max-width:        1440px;
+  --header-h:         64px;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.3px;
+}
+
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum';
+}
+
+.up { color: var(--c-up); }
+.down { color: var(--c-down); }
+.flat { color: var(--c-flat); }
+
+.scroll-y {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.scroll-y::-webkit-scrollbar { width: 6px; }
+.scroll-y::-webkit-scrollbar-track { background: transparent; }
+.scroll-y::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(240,68,82,0.5); }
+  50% { opacity: 0.85; box-shadow: 0 0 0 6px rgba(240,68,82,0); }
+}
+@keyframes flash-up { 0% { background: rgba(240,68,82,0.18); } 100% { background: transparent; } }
+@keyframes flash-down { 0% { background: rgba(49,130,246,0.18); } 100% { background: transparent; } }
+@keyframes fade-in {
+  from { transform: translateY(4px); }
+  to { transform: translateY(0); }
+}

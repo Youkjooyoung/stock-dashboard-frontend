@@ -6,6 +6,10 @@ import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastContainer } from './components/Toast';
 
+if (!document.documentElement.getAttribute('data-theme')) {
+  document.documentElement.setAttribute('data-theme', 'light');
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
