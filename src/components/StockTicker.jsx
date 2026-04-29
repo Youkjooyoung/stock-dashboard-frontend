@@ -1,5 +1,4 @@
 import { useStockPrices } from '../hooks/useQueries';
-import styles from '../styles/components/StockTicker.module.css';
 
 export default function StockTicker() {
   const { data: stocks = [] } = useStockPrices();
@@ -19,23 +18,23 @@ export default function StockTicker() {
   const items = [...tickerStocks, ...tickerStocks];
 
   return (
-    <div className={styles['stock-ticker']}>
-      <div className={styles['ticker-label']}>LIVE</div>
-      <div className={styles['ticker-track-wrap']}>
-        <div className={styles['ticker-track']}>
+    <div className="ticker">
+      <div className="ticker-label">LIVE</div>
+      <div className="ticker-track-wrap">
+        <div className="ticker-track">
           {items.map((s, i) => {
-            const cls  = s.rate > 0 ? 'up' : s.rate < 0 ? 'down' : 'zero';
+            const cls  = s.rate > 0 ? 'up' : s.rate < 0 ? 'down' : 'flat';
             const sign = s.rate > 0 ? '▲' : s.rate < 0 ? '▼' : '−';
             return (
               <span
                 key={i}
-                className={styles['ticker-item']}
+                className="ticker-item"
                 title={`${s.itmsNm} ${(s.clpr || 0).toLocaleString()}원 (${sign}${Math.abs(s.rate).toFixed(2)}%)`}>
-                <span className={styles['ticker-name']}>{s.itmsNm}</span>
-                <span className={`${styles['ticker-price']} ${cls}`}>
+                <span className="ticker-name">{s.itmsNm}</span>
+                <span className={`ticker-price ${cls}`}>
                   {(s.clpr || 0).toLocaleString()}
                 </span>
-                <span className={`${styles['ticker-rate']} ${cls}`}>
+                <span className={`ticker-rate ${cls}`}>
                   {sign}{Math.abs(s.rate).toFixed(2)}%
                 </span>
               </span>

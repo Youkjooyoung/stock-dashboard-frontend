@@ -204,7 +204,7 @@ export default function CandlestickChart({ data = [], period = '일', height = 3
 
   return (
     <div className={styles['candle-wrap']}>
-      <div style={{ position: 'relative' }}>
+      <div className={styles['candle-stage']}>
         <div ref={containerRef} className={styles['candle-container']} />
         <div ref={tooltipRef} className={styles['candle-tooltip']} />
       </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import AutocompleteSearch, { matchesInitial } from './AutocompleteSearch';
 import usePriceFlash from '../hooks/usePriceFlash';
 import styles from '../styles/components/StockTable.module.css';
+import utils from '../styles/inline-utils.module.css';
 
 const SS_KEY = 'stockTableState';
 
@@ -287,10 +288,10 @@ export default function StockTable({
                   <span className="market-badge">{d.mrktCtg || 'KOSPI'}</span>
                 </td>
                 <td>{open.toLocaleString()}</td>
-                <td className={cls} style={{ fontWeight: 700 }}>{close.toLocaleString()}</td>
+                <td className={`${cls} ${utils['fw-bold']}`}>{close.toLocaleString()}</td>
                 <td>{(d.hipr || 0).toLocaleString()}</td>
                 <td>{(d.lopr || 0).toLocaleString()}</td>
-                <td style={{ color: 'var(--text-3)' }}>{(d.trqu || 0).toLocaleString()}</td>
+                <td className={utils['text-tertiary']}>{(d.trqu || 0).toLocaleString()}</td>
                 <td className={cls}>
                   <div className={styles['change-cell']}>
                     <span className={styles['change-diff']}>{sign} {Math.abs(diff).toLocaleString()}</span>

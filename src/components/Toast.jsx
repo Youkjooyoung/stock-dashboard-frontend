@@ -157,7 +157,7 @@ function ToastItem({ id, type, message, onRemove }) {
 
   return (
     <motion.div 
-      className={`${styles.toast} ${styles[type]}`}
+      className={`${styles.toast} ${styles[type]} ${isPaused ? styles.paused : ''}`}
       variants={toastVariants}
       initial="initial"
       animate="animate"
@@ -165,8 +165,7 @@ function ToastItem({ id, type, message, onRemove }) {
       layout
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      whileHover={{ scale: 1.02 }}
-      style={{ cursor: isPaused ? 'pointer' : 'default' }}>
+      whileHover={{ scale: 1.02 }}>
       
       {/* 아이콘 */}
       <motion.span 
@@ -192,16 +191,12 @@ function ToastItem({ id, type, message, onRemove }) {
       </motion.button>
       
       {/* Progress bar */}
-      <motion.div 
-        className={styles.progress}
+      <motion.div
+        className={`${styles.progress} ${isPaused ? styles['progress-paused'] : ''}`}
         initial={{ scaleX: 1 }}
-        animate={{ 
+        animate={{
           scaleX: progress / 100,
           transition: { duration: 0.016, ease: 'linear' }
-        }}
-        style={{ 
-          transformOrigin: 'left',
-          opacity: isPaused ? 0.3 : 1
         }}
       />
     </motion.div>

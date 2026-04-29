@@ -1,0 +1,15 @@
+.topbar-spacer {
+  width: 36px;
+}
+
+.email-pill-icon {
+  color: var(--c-toss-blue);
+}
+
+.btn-submit-full {
+  flex: 1;
+}
+
+.btn-secondary-spaced {
+  margin-top: 10px;
+}

@@ -90,7 +90,7 @@ export default function AlertSetter({ stock }) {
       </div>
 
       {distanceInfo && (
-        <div className={styles['alert-distance']} style={{ color: distanceInfo.color }}>
+        <div className={styles['alert-distance']} style={{ '--distance-color': distanceInfo.color }}>
           {distanceInfo.label}
           {isDuplicate && <span className={styles['alert-duplicate']}> · 이미 등록됨</span>}
         </div>

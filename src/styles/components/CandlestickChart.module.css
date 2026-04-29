@@ -52,3 +52,7 @@
 
 .tt-up   { color: var(--up); }
 .tt-down { color: var(--down); }
+
+.candle-stage {
+  position: relative;
+}

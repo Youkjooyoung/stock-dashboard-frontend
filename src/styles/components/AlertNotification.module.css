@@ -111,3 +111,7 @@
     width: 100%;
   }
 }
+
+.alert-toast-body-mt {
+  margin-top: 4px;
+}

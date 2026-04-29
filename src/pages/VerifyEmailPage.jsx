@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
-import LogoMark from '../components/LogoMark';
-import styles from '../styles/pages/VerifyEmailPage.module.css';
+import shared from '../styles/pages/AuthShared.module.css';
 
 export default function VerifyEmailPage() {
   const navigate = useNavigate();
@@ -39,56 +38,84 @@ export default function VerifyEmailPage() {
       .catch(() => setStatus('error'));
   }, []);
 
-  return (
-    <div className={styles['verify-page']}>
-      <div className={styles['verify-page-header']}>
-        <LogoMark size={38} />
-        <span className={styles['verify-page-brand']}>주식<span>대시보드</span></span>
+  if (status === 'loading') {
+    return (
+      <div className="auth-page">
+        <div className="auth-card">
+          <div className="auth-hero">
+            <div className="auth-hero-emoji">⏳</div>
+            <h2 className="auth-hero-title">인증 처리 중...</h2>
+            <p className="auth-hero-sub">잠시만 기다려 주세요.</p>
+          </div>
+        </div>
       </div>
-      <div className={styles['verify-card']}>
-        {status === 'loading' && (
-          <>
-            <div className={styles['verify-icon']}>⏳</div>
-            <h2 className={styles['verify-title']}>인증 처리 중...</h2>
-          </>
-        )}
-        {status === 'success' && (
-          <>
-            <div className={styles['verify-icon']}>✅</div>
-            <h2 className={styles['verify-title']}>이메일 인증이 완료됐습니다.</h2>
-            <p className={styles['verify-desc']}>잠시 후 로그인 페이지로 이동합니다.</p>
-            <a href="/login" className={styles['verify-btn']}>로그인 페이지로 이동</a>
-          </>
-        )}
-        {status === 'error' && (
-          <>
-            <div className={styles['verify-icon']}>❌</div>
-            <h2 className={styles['verify-title']}>인증에 실패했습니다.</h2>
-            <p className={styles['verify-desc']}>인증 링크가 만료됐거나 유효하지 않습니다.</p>
-            <div className={styles['resend-form']}>
-              <input
-                className={styles['resend-input']}
-                type="email"
-                placeholder="가입한 이메일 주소"
-                value={resendEmail}
-                onChange={e => setResendEmail(e.target.value)}
-              />
-              <button
-                className={styles['btn-resend']}
-                onClick={handleResend}
-                disabled={resendStatus === 'loading' || resendStatus === 'sent'}>
-                {resendStatus === 'loading' ? '발송 중...' : '인증 메일 재발송'}
-              </button>
-            </div>
-            {resendStatus === 'sent' && (
-              <p className={styles['resend-msg-success']}>인증 메일을 재발송했습니다.</p>
-            )}
-            {resendStatus === 'error' && (
-              <p className={styles['resend-msg-error']}>이메일을 확인하거나 잠시 후 다시 시도해주세요.</p>
-            )}
-            <a href="/login" className={styles['verify-btn']}>로그인 페이지로 이동</a>
-          </>
-        )}
+    );
+  }
+
+  if (status === 'success') {
+    return (
+      <div className="auth-page">
+        <div className="auth-card">
+          <div className="auth-hero">
+            <div className="auth-hero-emoji success">✅</div>
+            <h2 className="auth-hero-title">이메일 인증이<br/>완료됐어요</h2>
+            <p className="auth-hero-sub">잠시 후 로그인 페이지로 이동합니다.</p>
+          </div>
+          <div className="auth-cta-bar">
+            <button type="button" className="auth-btn" onClick={() => navigate('/login')}>
+              로그인 페이지로 이동
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-hero">
+          <div className="auth-hero-emoji">❌</div>
+          <h2 className="auth-hero-title">인증에 실패했어요</h2>
+          <p className="auth-hero-sub">
+            인증 링크가 만료됐거나 유효하지 않아요.<br/>
+            이메일을 입력하고 인증 메일을 다시 받아보세요.
+          </p>
+        </div>
+        <div className="auth-body">
+          <div className="auth-field">
+            <label className="auth-label">이메일</label>
+            <input
+              className="auth-input"
+              type="email"
+              placeholder="가입한 이메일 주소"
+              value={resendEmail}
+              onChange={e => setResendEmail(e.target.value)}
+              autoComplete="email"
+            />
+          </div>
+          {resendStatus === 'sent' && (
+            <p className="auth-help-msg">인증 메일을 재발송했습니다. 받은 편지함을 확인해주세요.</p>
+          )}
+          {resendStatus === 'error' && (
+            <p className="auth-error-msg">이메일을 확인하거나 잠시 후 다시 시도해주세요.</p>
+          )}
+        </div>
+        <div className="auth-cta-bar">
+          <button
+            type="button"
+            className="auth-btn"
+            onClick={handleResend}
+            disabled={!resendEmail || resendStatus === 'loading' || resendStatus === 'sent'}>
+            {resendStatus === 'loading' ? '발송 중...' : '인증 메일 재발송'}
+          </button>
+          <button
+            type="button"
+            className={`auth-btn auth-btn-secondary ${shared['btn-secondary-spaced']}`}
+            onClick={() => navigate('/login')}>
+            로그인 페이지로 이동
+          </button>
+        </div>
       </div>
     </div>
   );

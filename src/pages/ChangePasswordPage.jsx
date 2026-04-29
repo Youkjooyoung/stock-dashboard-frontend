@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import useAuthStore from '../store/authStore';
 import IdentityVerifyModal from '../components/IdentityVerifyModal';
-import styles from '../styles/pages/ChangePasswordPage.module.css';
+import shared from '../styles/pages/AuthShared.module.css';
 
 function validatePassword(pw) {
   if (pw.length < 6 || pw.length > 12) return '비밀번호는 6~12자여야 합니다.';
@@ -30,7 +30,8 @@ export default function ChangePasswordPage() {
   const [msg, setMsg]             = useState('');
   const [msgType, setMsgType]     = useState('');
   const [loading, setLoading]     = useState(false);
-  const [pwVisible, setPwVisible] = useState({ new: false, confirm: false });
+  const [showNew, setShowNew]     = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     const forcePw = sessionStorage.getItem('forcePwChange');
@@ -77,7 +78,7 @@ export default function ChangePasswordPage() {
 
   if (showIdentityModal) {
     return (
-      <div className={styles['change-pw-page']}>
+      <div className="auth-page">
         <IdentityVerifyModal
           title="비밀번호 변경 본인인증"
           description="임시 비밀번호로 로그인되었습니다. 비밀번호 변경을 위해 본인인증이 필요합니다."
@@ -91,67 +92,95 @@ export default function ChangePasswordPage() {
   if (!verifyToken) return null;
 
   return (
-    <div className={styles['change-pw-page']}>
-      <div className={styles['change-pw-card']}>
+    <div className="auth-page">
+      <div className="auth-card">
+        {!isForcePwChange && (
+          <div className="auth-topbar">
+            <button type="button" className="auth-back" onClick={() => navigate('/profile')} aria-label="뒤로">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </button>
+            <span className={shared['topbar-spacer']} />
+          </div>
+        )}
 
-        <div className={styles['change-pw-header']}>
-          {!isForcePwChange && (
-            <button className={styles['btn-back']} onClick={() => navigate('/profile')}>← 프로필로 돌아가기</button>
-          )}
-          <h2 className={styles['change-pw-title']}>비밀번호 변경</h2>
-          <p className={styles['change-pw-desc']}>
+        <form className="auth-body" onSubmit={handleSubmit} noValidate>
+          <h1 className="auth-headline">비밀번호<br/>변경하기</h1>
+          <p className="auth-sub">
             {isForcePwChange
-              ? '계정이 복구되었습니다. 보안을 위해 새 비밀번호를 설정해주세요.'
-              : '본인인증이 완료되었습니다. 새 비밀번호를 설정해주세요.'}
+              ? '계정이 복구되었습니다.\n보안을 위해 새 비밀번호를 설정해주세요.'
+              : '본인인증이 완료되었습니다.\n새 비밀번호를 설정해주세요.'}
           </p>
-        </div>
 
-        <form className={styles['change-pw-form']} onSubmit={handleSubmit}>
-          {[
-            { label: '새 비밀번호',     value: newPw,     setter: setNewPw,     key: 'new',     placeholder: '영문·한글·숫자·특수문자 중 2가지 이상 혼합 / 6~12자' },
-            { label: '새 비밀번호 확인', value: confirmPw, setter: setConfirmPw, key: 'confirm', placeholder: '새 비밀번호를 다시 입력하세요' },
-          ].map(({ label, value, setter, key, placeholder }) => (
-            <div className={styles['form-group']} key={key}>
-              <label className={styles['form-label']}>{label}</label>
-              <div className={styles['input-wrap']}>
-                <input
-                  className={styles['form-input']}
-                  type={pwVisible[key] ? 'text' : 'password'}
-                  placeholder={placeholder}
-                  value={value}
-                  onChange={e => { setter(e.target.value); setMsg(''); }}
-                />
-                <button
-                  className={styles['pw-toggle']}
-                  type="button"
-                  onClick={() => setPwVisible(prev => ({ ...prev, [key]: !prev[key] }))}>
-                  {pwVisible[key] ? '숨기기' : '보기'}
-                </button>
-              </div>
+          <div className="auth-field">
+            <label className="auth-label">새 비밀번호</label>
+            <div className="auth-input-row">
+              <input
+                className="auth-input"
+                type={showNew ? 'text' : 'password'}
+                placeholder="6~12자, 2종류 이상 혼합"
+                value={newPw}
+                onChange={e => { setNewPw(e.target.value); setMsg(''); }}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="auth-input-eye"
+                onClick={() => setShowNew(p => !p)}
+                aria-label={showNew ? '비밀번호 숨기기' : '비밀번호 보기'}>
+                {showNew ? '🙈' : '👁'}
+              </button>
             </div>
-          ))}
+          </div>
 
-          {msg && <p className={`${styles['feedback-msg']} ${styles[msgType]}`}>{msg}</p>}
+          <div className="auth-field">
+            <label className="auth-label">새 비밀번호 확인</label>
+            <div className="auth-input-row">
+              <input
+                className={`auth-input ${confirmPw && newPw !== confirmPw ? 'error' : ''}`}
+                type={showConfirm ? 'text' : 'password'}
+                placeholder="다시 한 번 입력"
+                value={confirmPw}
+                onChange={e => { setConfirmPw(e.target.value); setMsg(''); }}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="auth-input-eye"
+                onClick={() => setShowConfirm(p => !p)}
+                aria-label={showConfirm ? '비밀번호 숨기기' : '비밀번호 보기'}>
+                {showConfirm ? '🙈' : '👁'}
+              </button>
+            </div>
+            {confirmPw && newPw !== confirmPw && (
+              <p className="auth-error-msg">비밀번호가 일치하지 않아요</p>
+            )}
+          </div>
 
-          <div className={styles['btn-row']}>
+          {msg && (
+            msgType === 'success'
+              ? <p className="auth-help-msg">{msg}</p>
+              : <p className="auth-error-msg">{msg}</p>
+          )}
+
+          <div className="auth-cta-bar">
+            <button
+              type="submit"
+              className={`auth-btn ${isForcePwChange ? shared['btn-submit-full'] : ''}`}
+              disabled={loading || !newPw || newPw !== confirmPw}>
+              {loading ? '변경 중...' : '비밀번호 변경'}
+            </button>
             {!isForcePwChange && (
               <button
                 type="button"
-                className={styles['btn-cancel']}
+                className={`auth-btn auth-btn-secondary ${shared['btn-secondary-spaced']}`}
                 onClick={() => navigate('/profile')}>
                 취소
               </button>
             )}
-            <button
-              type="submit"
-              className={styles['btn-submit']}
-              disabled={loading}
-              style={isForcePwChange ? { flex: 1 } : undefined}>
-              {loading ? '변경 중...' : '비밀번호 변경'}
-            </button>
           </div>
         </form>
-
       </div>
     </div>
   );

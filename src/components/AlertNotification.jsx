@@ -80,7 +80,7 @@ export default function AlertNotification({ userId }) {
                   <span className={styles['alert-toast-highlight']}>{alert.stockName}</span>이(가){' '}
                   {isUp ? '목표가 이상' : '목표가 이하'}으로
                 </div>
-                <div className={styles['alert-toast-body']} style={{ marginTop: 4 }}>
+                <div className={`${styles['alert-toast-body']} ${styles['alert-toast-body-mt']}`}>
                   현재가{' '}
                   <span className={styles['alert-toast-highlight']}>
                     {Number(alert.currentPrice).toLocaleString()}원

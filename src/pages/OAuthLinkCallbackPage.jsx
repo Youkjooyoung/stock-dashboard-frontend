@@ -34,8 +34,14 @@ export default function OAuthLinkCallbackPage() {
   }, [navigate]);
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <p style={{ color: 'var(--text-2)', fontSize: 15 }}>계정 연동 처리 중...</p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-hero">
+          <div className="auth-hero-emoji">🔗</div>
+          <h2 className="auth-hero-title">계정 연동 처리 중...</h2>
+          <p className="auth-hero-sub">잠시만 기다려 주세요.</p>
+        </div>
+      </div>
     </div>
   );
 }

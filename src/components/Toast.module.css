@@ -79,3 +79,10 @@
     transform: translateX(100%);
   }
 }
+
+.toast.paused { cursor: pointer; }
+.progress {
+  transform-origin: left;
+  opacity: 1;
+}
+.progress-paused { opacity: 0.3; }

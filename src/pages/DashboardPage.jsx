@@ -19,6 +19,7 @@ import { useStockPrices, useWatchlist, useToggleWatchlist, QUERY_KEYS } from '..
 import useAuthStore from '../store/authStore';
 import api from '../api/axiosInstance';
 import styles from '../styles/pages/DashboardPage.module.css';
+import utils from '../styles/inline-utils.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
@@ -127,7 +128,7 @@ export default function DashboardPage() {
         <div className={styles['bulk-bar']}>
           {bulkStatus && bulkStatus.status === 'running' ? (
             <div className={styles['bulk-progress']}>
-              <span className="spinner" style={{ width: 12, height: 12 }} />
+              <span className={`spinner ${utils['spinner-tiny']}`} />
               <span>
                 COLLECTING&nbsp;
                 {bulkStatus.total > 0

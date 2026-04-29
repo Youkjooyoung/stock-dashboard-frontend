@@ -1,0 +1,22 @@
+.progress-wrap {
+  margin: 14px 24px 0;
+}
+
+.progress-bar-dynamic {
+  width: var(--progress, 0%);
+}
+
+.step-labels {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 24px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  letter-spacing: -0.2px;
+}
+
+.step-labels .active {
+  color: var(--c-toss-blue);
+  font-weight: 700;
+}

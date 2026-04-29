@@ -4,6 +4,7 @@ import api from '../api/axiosInstance';
 import useAuthStore from '../store/authStore';
 import { useToast } from '../hooks/useToast';
 import styles from '../styles/pages/AdminPage.module.css';
+import utils from '../styles/inline-utils.module.css';
 
 const NAV_ITEMS = [
   { id: 'stats', label: '대시보드 통계', icon: '📊' },
@@ -251,7 +252,7 @@ export default function AdminPage() {
                             </div>
                             <div className={styles.adminCard}>
                                 <div className={styles.cardTitle}>계정 잠금 <span>🔒</span></div>
-                                <div className={styles.cardValue} style={{ color: stats?.lockedUsers > 0 ? 'red' : 'inherit' }}>{stats?.lockedUsers ?? '-'}</div>
+                                <div className={`${styles.cardValue} ${stats?.lockedUsers > 0 ? utils['danger-color'] : ''}`}>{stats?.lockedUsers ?? '-'}</div>
                             </div>
                         </div>
 
@@ -261,7 +262,7 @@ export default function AdminPage() {
                             </div>
                             <div className={styles.tableWrapper}>
                                 {topList.length === 0 ? (
-                                    <p style={{ textAlign: 'center', padding: '20px' }}>데이터가 없습니다.</p>
+                                    <p className={utils['empty-pad-sm']}>데이터가 없습니다.</p>
                                 ) : (
                                     <table className={styles.adminTable}>
                                         <thead>
@@ -333,9 +334,9 @@ export default function AdminPage() {
 
                         <div className={styles.tableWrapper}>
                             {loading ? (
-                                <p style={{ textAlign: 'center', padding: '40px' }}>데이터를 불러오는 중입니다...</p>
+                                <p className={utils['empty-pad']}>데이터를 불러오는 중입니다...</p>
                             ) : filteredAndSortedUsers.length === 0 ? (
-                                <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-3)' }}>
+                                <p className={utils['empty-pad']}>
                                     조건에 맞는 회원이 없습니다.
                                 </p>
                             ) : (
@@ -425,7 +426,7 @@ export default function AdminPage() {
 
                         <div className={styles.tableWrapper}>
                             {stocksLoading ? (
-                                <p style={{ textAlign: 'center', padding: '40px' }}>데이터를 불러오는 중입니다...</p>
+                                <p className={utils['empty-pad']}>데이터를 불러오는 중입니다...</p>
                             ) : (
                                 <table className={styles.adminTable}>
                                     <thead>
@@ -489,7 +490,7 @@ export default function AdminPage() {
                         </div>
                         <div className={styles.tableWrapper}>
                             {alertsLoading ? (
-                                <p style={{ textAlign: 'center', padding: '40px' }}>데이터를 불러오는 중입니다...</p>
+                                <p className={utils['empty-pad']}>데이터를 불러오는 중입니다...</p>
                             ) : (
                                 <table className={styles.adminTable}>
                                     <thead>
@@ -535,7 +536,7 @@ export default function AdminPage() {
                         </div>
                         <div className={styles.tableWrapper}>
                             {chatsLoading ? (
-                                <p style={{ textAlign: 'center', padding: '40px' }}>데이터를 불러오는 중입니다...</p>
+                                <p className={utils['empty-pad']}>데이터를 불러오는 중입니다...</p>
                             ) : (
                                 <table className={styles.adminTable}>
                                     <thead>
@@ -553,7 +554,7 @@ export default function AdminPage() {
                                                 <td>{c.msgId || c.MSG_ID}</td>
                                                 <td>{c.userEmail || c.USER_EMAIL || '익명'}</td>
                                                 <td>{c.ticker || c.TICKER || '전체'}</td>
-                                                <td style={{ maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={c.content || c.CONTENT}>
+                                                <td className={utils['cell-truncate']} title={c.content || c.CONTENT}>
                                                     {c.content || c.CONTENT}
                                                 </td>
                                                 <td>{(c.createdAt || c.CREATED_AT) ? new Date(c.createdAt || c.CREATED_AT).toLocaleString('ko-KR') : '-'}</td>
@@ -569,7 +570,7 @@ export default function AdminPage() {
             default:
                 return (
                     <div className={styles.adminCard}>
-                        <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>해당 탭의 기능이 아직 준비되지 않았습니다.</div>
+                        <div className={utils['empty-pad']}>해당 탭의 기능이 아직 준비되지 않았습니다.</div>
                     </div>
                 );
         }

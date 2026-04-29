@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { marked } from 'marked';
 import 'github-markdown-css/github-markdown.css';
 import styles from '../styles/pages/DocsPreviewPage.module.css';
+import utils from '../styles/inline-utils.module.css';
 
 const DOC_LIST = [
   { filename: 'portfolio-intro.md', label: '📋 프로젝트 소개서' },
@@ -68,8 +69,7 @@ export default function DocsPreviewPage() {
       <main className={styles['docs-main']}>
         <div
           ref={contentRef}
-          className="markdown-body"
-          style={{ padding: '2rem', maxWidth: '900px', margin: '0 auto' }}
+          className={`markdown-body ${utils['docs-markdown-pad']}`}
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </main>

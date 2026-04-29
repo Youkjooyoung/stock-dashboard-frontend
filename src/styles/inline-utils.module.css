@@ -1,0 +1,103 @@
+.text-center {
+  text-align: center;
+}
+
+.text-tertiary {
+  color: var(--text-tertiary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.fw-bold {
+  font-weight: 700;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.cell-truncate {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empty-pad {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+}
+
+.empty-pad-sm {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-secondary);
+}
+
+.spinner-tiny {
+  width: 12px;
+  height: 12px;
+}
+
+.dynamic-bar-h {
+  height: var(--bar-h, 50%);
+}
+
+.dynamic-bar-w {
+  width: var(--bar-w, 50%);
+}
+
+.dynamic-bg {
+  background: var(--bg-color);
+}
+
+.dynamic-border-left {
+  border-left-color: var(--accent-color, var(--c-toss-blue));
+}
+
+.danger-color {
+  color: var(--c-up);
+}
+
+.section-mt-20 { margin-top: 20px; }
+.section-mt-16 { margin-top: 16px; }
+.section-mt-14 { margin-top: 14px; }
+.section-mt-12 { margin-top: 12px; }
+.section-mt-6  { margin-top: 6px; }
+.section-mb-12 { margin-bottom: 12px; }
+.section-mb-16 { margin-bottom: 16px; }
+.section-mb-6  { margin-bottom: 6px; }
+.section-margin-0 { margin: 0; }
+
+.docs-markdown-pad {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.delete-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.avatar-preview-caption {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.label-block {
+  margin-bottom: 6px;
+  display: block;
+}

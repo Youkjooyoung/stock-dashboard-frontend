@@ -67,7 +67,13 @@
 
 .chart-canvas-wrap {
   position: relative;
-  height: 220px;
+  height: 320px;
+}
+
+@media (max-width: 768px) {
+  .chart-canvas-wrap {
+    height: 360px;
+  }
 }
 
 .chart-empty {
@@ -93,7 +99,7 @@
 }
 
 .chart-skeleton-canvas {
-  min-height: 220px;
+  min-height: 320px;
 }
 
 .chart-skeleton-bars {
@@ -108,4 +114,19 @@
   flex: 1;
   border-radius: 3px 3px 0 0;
   min-height: 20px;
+}
+
+.chart-skeleton-rows {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  height: 100%;
+  padding: 6px 4px 6px 60px;
+}
+
+.chart-skeleton-row {
+  height: 14px;
+  border-radius: 3px;
+  min-width: 30%;
 }

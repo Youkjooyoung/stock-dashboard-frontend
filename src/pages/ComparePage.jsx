@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import api from '../api/axiosInstance';
 import styles from '../styles/pages/ComparePage.module.css';
+import utils from '../styles/inline-utils.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
@@ -160,7 +161,7 @@ export default function ComparePage() {
         {tickers.length > 0 && (
           <div className={styles['ticker-tags']}>
             {tickers.map((t, i) => (
-              <span key={t} className={styles['ticker-tag']} style={{ background: COLORS[i] }}>
+              <span key={t} className={`${styles['ticker-tag']} ${utils['dynamic-bg']}`} style={{ '--bg-color': COLORS[i] }}>
                 {t}
                 <button className={styles['ticker-tag-remove']} onClick={() => removeTicker(t)}>✕</button>
               </span>
@@ -198,7 +199,7 @@ export default function ComparePage() {
 
             <div className={styles['compare-stats']}>
               {statsData.map(s => (
-                <div key={s.ticker} className={styles['compare-stat-card']} style={{ borderLeftColor: s.color }}>
+                <div key={s.ticker} className={`${styles['compare-stat-card']} ${utils['dynamic-border-left']}`} style={{ '--accent-color': s.color }}>
                   <p className={styles['stat-ticker']}>{s.ticker}</p>
                   <p className={styles['stat-name']}>{s.name}</p>
                   <div className={styles['stat-row']}>

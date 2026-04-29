@@ -19,6 +19,7 @@ import AiAnalysis from '../components/AiAnalysis';
 import IdentityVerifyModal from '../components/IdentityVerifyModal';
 import { formatShortDate } from '../utils/dateUtils';
 import styles from '../styles/pages/ProfilePage.module.css';
+import utils from '../styles/inline-utils.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
@@ -334,13 +335,13 @@ export default function ProfilePage() {
                 <h3 className={styles['profile-modal-title']}>프로필 사진 변경</h3>
                 <button className={styles['profile-modal-close']} onClick={handleAvatarCancel}>✕</button>
               </div>
-              <div className={styles['profile-modal-body']} style={{ textAlign: 'center' }}>
+              <div className={`${styles['profile-modal-body']} ${utils['text-center']}`}>
                 <img
                   src={avatarPreview}
                   alt="preview"
-                  style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border)' }}
+                  className={utils['avatar-preview']}
                 />
-                <p style={{ marginTop: 12, fontSize: 13, color: 'var(--text-2)' }}>
+                <p className={utils['avatar-preview-caption']}>
                   이 사진으로 변경하시겠습니까?
                 </p>
               </div>
@@ -433,15 +434,14 @@ export default function ProfilePage() {
                   탈퇴 후 <strong>2주간 보류 상태</strong>로 유지되며, 이후 영구 삭제됩니다.<br/>
                   2주 내 재가입 시 계정을 복구할 수 있습니다.
                 </p>
-                <div style={{ marginTop: 14 }}>
-                  <label className="form-label" style={{ marginBottom: 6, display: 'block' }}>탈퇴 사유</label>
+                <div className={utils['section-mt-14']}>
+                  <label className={`form-label ${utils['label-block']}`}>탈퇴 사유</label>
                   <textarea
-                    className="form-input"
+                    className={`form-input ${utils['delete-textarea']}`}
                     placeholder="탈퇴 사유를 입력해주세요"
                     value={deleteReason}
                     onChange={e => { setDeleteReason(e.target.value); setDeleteMsg(''); }}
                     rows={3}
-                    style={{ resize: 'vertical', minHeight: 80 }}
                   />
                 </div>
                 {deleteMsg && <p className={`${styles['nick-modal-msg']} ${styles.error}`}>{deleteMsg}</p>}
@@ -472,7 +472,7 @@ export default function ProfilePage() {
               </div>
               <div className={styles['profile-avatar-edit-btn']}>✏</div>
             </div>
-            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
+            <input ref={fileRef} type="file" accept="image/*" className={utils['hidden-input']} onChange={handleAvatarChange} />
 
             <div className={styles['profile-meta']}>
               <div className={styles['profile-nickname-row']}>
@@ -536,7 +536,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className={styles['social-section']}>
-                  <div className="section-title" style={{ marginTop: 20 }}>소셜 계정 연동</div>
+                  <div className={`section-title ${utils['section-mt-20']}`}>소셜 계정 연동</div>
                   {socialMsg && (
                     <p className={`${styles['social-msg']} ${styles[socialMsgType]}`}>{socialMsg}</p>
                   )}
@@ -676,7 +676,7 @@ export default function ProfilePage() {
                       }
                     }}
                   />
-                  <div style={{ marginTop: 20 }}>
+                  <div className={utils['section-mt-20']}>
                     {[...rateList].sort((a, b) => b.rate - a.rate).map((s, i) => {
                       const cls  = s.rate > 0 ? 'up' : s.rate < 0 ? 'down' : 'zero';
                       const sign = s.rate > 0 ? '▲' : s.rate < 0 ? '▼' : '-';
@@ -830,7 +830,7 @@ export default function ProfilePage() {
 
                 {portfolio.length > 0 && (
                   <div className={styles['pf-chart-wrap']}>
-                    <div className="section-title" style={{ marginBottom: 12 }}>종목별 손익 (손익 큰 순)</div>
+                    <div className={`section-title ${utils['section-mb-12']}`}>종목별 손익 (손익 큰 순)</div>
                     <Bar
                       data={{
                         labels: chartOrdered.map(p => p.stockName),
@@ -871,7 +871,7 @@ export default function ProfilePage() {
 
                 {portfolio.length > 0 && (
                   <div className={styles['pf-chart-wrap']}>
-                    <div className="section-title" style={{ marginBottom: 12 }}>투자금 vs 평가금 비교</div>
+                    <div className={`section-title ${utils['section-mb-12']}`}>투자금 vs 평가금 비교</div>
                     <Bar
                       data={{
                         labels: chartOrdered.map(p => p.stockName),
@@ -912,7 +912,7 @@ export default function ProfilePage() {
                 {portfolio.length > 0 && (
                   <div className={styles['pf-charts-row']}>
                     <div className={styles['pf-chart-wrap']}>
-                      <div className="section-title" style={{ marginBottom: 12 }}>종목별 수익률</div>
+                      <div className={`section-title ${utils['section-mb-12']}`}>종목별 수익률</div>
                       <Bar
                         data={{
                           labels: chartOrdered.map(p => p.stockName),
@@ -939,7 +939,7 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className={styles['pf-chart-wrap']}>
-                      <div className="section-title" style={{ marginBottom: 12 }}>포트폴리오 구성 (투자금 기준)</div>
+                      <div className={`section-title ${utils['section-mb-12']}`}>포트폴리오 구성 (투자금 기준)</div>
                       <Doughnut
                         data={{
                           labels: enriched.map(p => p.stockName),
@@ -963,7 +963,7 @@ export default function ProfilePage() {
                 )}
 
                 <div className={styles['pf-header']}>
-                  <div className="section-title" style={{ margin: 0 }}>보유 종목 ({portfolio.length})</div>
+                  <div className={`section-title ${utils['section-margin-0']}`}>보유 종목 ({portfolio.length})</div>
                   <div className={styles['pf-header-actions']}>
                     {portfolio.length > 1 && (
                       <>
@@ -1056,7 +1056,7 @@ export default function ProfilePage() {
                                 </p>
                               </>
                             ) : (
-                              <p className={styles['pf-item-cur']} style={{ color: 'var(--text-3)' }}>현재가 없음</p>
+                              <p className={`${styles['pf-item-cur']} ${utils['text-tertiary']}`}>현재가 없음</p>
                             )}
                             <button
                               className={styles['btn-pf-delete']}
@@ -1081,7 +1081,7 @@ export default function ProfilePage() {
             );
             return (
               <>
-                <div className="section-title" style={{ marginBottom: 16 }}>포트폴리오 AI 분석</div>
+                <div className={`section-title ${utils['section-mb-16']}`}>포트폴리오 AI 분석</div>
                 {portfolio.length === 0 ? (
                   <div className={styles['profile-empty']}>
                     포트폴리오 탭에서 종목을 추가하면 AI 분석을 받을 수 있습니다.

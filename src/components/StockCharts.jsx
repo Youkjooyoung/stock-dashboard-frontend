@@ -2,6 +2,7 @@ import { useMemo, useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import styles from '../styles/components/StockCharts.module.css';
+import utils from '../styles/inline-utils.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -22,15 +23,22 @@ function useThemeAttr() {
   return theme;
 }
 
+function readToken(name, fallback) {
+  if (typeof window === 'undefined') return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
+
 function buildOptions({ isPercent = false, signed = false, dark = false } = {}) {
-  const tickX    = dark ? '#A4A8B0' : '#6B6F78';
-  const tickY    = dark ? '#C7CAD1' : '#A4A8B0';
-  const gridLine = dark ? 'rgba(232,230,222,0.08)' : 'rgba(11,13,16,0.05)';
+  const tickName  = readToken('--text-secondary', dark ? '#A4A8B0' : '#6B6F78');
+  const tickValue = readToken('--text-tertiary', dark ? '#C7CAD1' : '#A4A8B0');
+  const gridLine  = readToken('--divider', dark ? 'rgba(232,230,222,0.08)' : 'rgba(11,13,16,0.05)');
   return {
     responsive: true,
     maintainAspectRatio: false,
+    indexAxis: 'y',
     animation: { duration: 520, easing: 'easeOutCubic' },
-    layout: { padding: { top: 4, right: 4, bottom: 0, left: 0 } },
+    layout: { padding: { top: 4, right: 12, bottom: 0, left: 0 } },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -55,28 +63,29 @@ function buildOptions({ isPercent = false, signed = false, dark = false } = {}) 
       }
     },
     scales: {
-      x: {
+      y: {
         grid: { display: false },
         border: { display: false },
         ticks: {
-          font: { size: 11, weight: '500' },
-          color: tickX,
-          maxRotation: 0,
+          font: { size: 11, weight: '600' },
+          color: tickName,
           padding: 6,
           autoSkip: false,
+          crossAlign: 'far',
           callback: function (value) {
             const label = this.getLabelForValue(value);
-            return label.length > 4 ? label.slice(0, 4) + '…' : label;
+            return label.length > 8 ? label.slice(0, 8) + '…' : label;
           }
         }
       },
-      y: {
+      x: {
         grid: { color: gridLine, drawTicks: false },
         border: { display: false },
         ticks: {
           font: { size: 10, family: "'JetBrains Mono', ui-monospace, Consolas, monospace" },
-          color: tickY,
+          color: tickValue,
           padding: 8,
+          maxRotation: 0,
           callback: v => {
             if (isPercent) {
               const sign = signed && v > 0 ? '+' : '';
@@ -97,10 +106,10 @@ function makeDataset(rows, valueKey, color) {
       data: rows.map(r => r[valueKey]),
       backgroundColor: color,
       hoverBackgroundColor: color,
-      borderRadius: 5,
+      borderRadius: 4,
       borderSkipped: false,
-      barPercentage: 0.68,
-      categoryPercentage: 0.88,
+      barPercentage: 0.78,
+      categoryPercentage: 0.84,
     }]
   };
 }
@@ -114,12 +123,12 @@ function ChartSkeleton() {
             <div className={`skeleton ${styles['chart-skeleton-title']}`} />
           </div>
           <div className={`${styles['chart-canvas-wrap']} ${styles['chart-skeleton-canvas']}`}>
-            <div className={styles['chart-skeleton-bars']}>
+            <div className={styles['chart-skeleton-rows']}>
               {[...Array(10)].map((_, j) => (
                 <div
                   key={j}
-                  className={`skeleton ${styles['chart-skeleton-bar']}`}
-                  style={{ height: `${30 + Math.random() * 60}%` }}
+                  className={`skeleton ${styles['chart-skeleton-row']} ${utils['dynamic-bar-w']}`}
+                  style={{ '--bar-w': `${40 + Math.random() * 55}%` }}
                 />
               ))}
             </div>
@@ -152,8 +161,10 @@ export default function StockCharts({ stocks, loading }) {
 
   if (loading || !stocks || stocks.length === 0) return <ChartSkeleton />;
 
-  const volumeColor = dark ? 'rgba(148,163,184,0.92)' : 'rgba(11,13,16,0.85)';
-  const priceColor  = dark ? 'rgba(100,116,139,0.88)' : 'rgba(60,64,73,0.80)';
+  const volumeColor = readToken('--text', dark ? '#F2F4F6' : '#191F28');
+  const priceColor  = readToken('--text-secondary', dark ? '#B0B8C1' : '#4E5968');
+  const upColor     = readToken('--c-up', dark ? '#FF5C6A' : '#F04452');
+  const downColor   = readToken('--c-down', dark ? '#4D8EFA' : '#3182F6');
 
   const charts = [
     {
@@ -172,7 +183,7 @@ export default function StockCharts({ stocks, loading }) {
       title: '상승률 TOP 10',
       badge: 'GAINERS',
       badgeColor: 'up',
-      data: makeDataset(topGainers, 'rate', 'rgba(232,51,74,0.88)'),
+      data: makeDataset(topGainers, 'rate', upColor),
       options: buildOptions({ isPercent: true, signed: true, dark }),
       empty: topGainers.length === 0 && '상승 종목 없음',
     },
@@ -180,7 +191,7 @@ export default function StockCharts({ stocks, loading }) {
       title: '하락률 TOP 10',
       badge: 'LOSERS',
       badgeColor: 'down',
-      data: makeDataset(topLosers, 'rate', 'rgba(31,111,235,0.88)'),
+      data: makeDataset(topLosers, 'rate', downColor),
       options: buildOptions({ isPercent: true, signed: true, dark }),
       empty: topLosers.length === 0 && '하락 종목 없음',
     },
@@ -192,7 +203,7 @@ export default function StockCharts({ stocks, loading }) {
         <div key={i} className={styles['chart-box']}>
           <div className={styles['chart-header']}>
             <h2 className={styles['chart-title']}>{c.title}</h2>
-            <span className={`${styles['chart-badge']} ${c.badgeColor ? styles[`badge-${c.badgeColor}`] : ''}`}>
+            <span className={`chart-badge ${c.badgeColor || ''}`}>
               {c.badge}
             </span>
           </div>
