@@ -34,3 +34,9 @@ dist-ssr
 # 빌드/배포 산출물
 docs-export.tar.gz
 *.tar.gz
+
+#클로드 디자인 Toss 예시 시안
+claude-design-reference/
+
+# 로컬 개인 설정 (Claude Code 등)
+.claude/settings.local.json
