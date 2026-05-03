@@ -3,9 +3,8 @@ dist/
 .git/
 .idea/
 .vscode/
-.claude/
 .env
 .env.local
 .env.*.local
 README.md
-CLAUDE.md
+AGENTS.md
