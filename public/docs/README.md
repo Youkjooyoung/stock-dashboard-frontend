@@ -17,7 +17,7 @@
 | **실시간 시세** | WebSocket/STOMP로 주식 시세 실시간 수신 |
 | **포트폴리오 관리** | 매수가·수량·손익 계산, 차트 시각화 |
 | **목표가 알림** | PRICE_ALERT 기반 목표가 도달 알림 |
-| **AI 종목 분석** | Anthropic Claude API 기반 종목 분석 리포트 |
+| **AI 종목 분석** | OpenAI Responses API 기반 종목 분석 리포트 |
 | **소셜 로그인** | 카카오·구글 OAuth2, 기존 계정 자동 연동 |
 | **보안 본인인증** | PortOne V1 기반 회원가입·비밀번호 변경·탈퇴 |
 
@@ -30,7 +30,7 @@
 | **Backend** | Java 21, Spring Boot 3.3.10, MyBatis 3.0.3 |
 | **Database** | MySQL 8.0, Redis 7 (캐시) |
 | **인증/보안** | Spring Security 6, JWT (jjwt 0.12.6), AES-256 |
-| **외부 연동** | PortOne V1, Resend API, AWS S3, Anthropic API |
+| **외부 연동** | PortOne V1, Resend API, AWS S3, OpenAI API |
 | **실시간** | WebSocket/STOMP, SockJS |
 | **Frontend** | React 19.2, Vite 8.0 |
 | **상태 관리** | Zustand 5.0, @tanstack/react-query 5.95 |
@@ -62,7 +62,7 @@ graph TB
         Google["구글 OAuth2"]
         PortOne["PortOne V1"]
         S3["AWS S3"]
-        Anthropic["Anthropic API"]
+        OpenAI["OpenAI API"]
         Resend["Resend API"]
     end
 
@@ -74,7 +74,7 @@ graph TB
     Spring --> Google
     Spring --> PortOne
     Spring --> S3
-    Spring --> Anthropic
+    Spring --> OpenAI
     Spring --> Resend
 ```
 
@@ -152,7 +152,7 @@ npm run dev
 | `spring.data.redis.host` | Redis 호스트 | `localhost` |
 | `portone.api.key` | PortOne API 키 | — |
 | `aws.s3.bucket` | S3 버킷명 | — |
-| `anthropic.api.key` | Anthropic API 키 | — |
+| `openai.api.key` | OpenAI API 키 | — |
 | `resend.api.key` | Resend API 키 | — |
 
 ### 프론트엔드 (`.env.local`)

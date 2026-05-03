@@ -597,7 +597,7 @@ PortOne 본인인증 검증.
 
 ### POST /api/ai/analyze
 
-AI 종목 분석 (Anthropic Claude API).
+AI 종목 분석 (OpenAI Responses API).
 
 **인증 필요**
 
@@ -611,7 +611,7 @@ AI 종목 분석 (Anthropic Claude API).
 
 **Response 200**
 ```json
-{ "analysis": "Anthropic API 응답 텍스트..." }
+{ "analysis": "OpenAI API 응답 텍스트..." }
 ```
 
 ---
