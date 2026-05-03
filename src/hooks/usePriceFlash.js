@@ -45,6 +45,8 @@ export default function usePriceFlash(stocks, duration = 600) {
       prevRef.current.set(id, curr);
     }
 
+    // The flash map is derived from incoming stock ticks and must sync when prices change.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (changed) setFlashMap(next);
   }, [stocks, duration]);
 
