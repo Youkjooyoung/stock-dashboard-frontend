@@ -30,3 +30,10 @@
 - Run `npm run build` before deployment.
 - After completing frontend work, commit and push the changes, then verify the frontend GitHub Actions deployment result.
 - Verify `VITE_API_BASE_URL`, `VITE_WS_URL`, and `VITE_PORTONE_IMP_KEY` before uploading the built assets.
+
+## Latest Verified State
+- Date: 2026-05-04
+- Site logo/title, AI wording, and OpenAI documentation are current.
+- WebSocket hooks are stabilized for callback freshness and reconnect behavior.
+- Vite vendor chunking is package-aware; the docs-only Mermaid chunk is lazy-loaded through `/docs`.
+- Required final checks before handoff: `npm run lint`, `npm run test:run`, `npm run build`, GitHub Actions deploy success.

@@ -8,9 +8,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   plugins: [react({ jsxRuntime: 'automatic' })],
-  esbuild: {
-    jsx: 'automatic',
-  },
   test: {
     globals: true,
     environment: 'jsdom',
@@ -42,20 +39,47 @@ export default defineConfig({
     global: 'globalThis',
   },
   build: {
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+            const normalized = id.replace(/\\/g, '/');
+            const packagePath = normalized.split('/node_modules/')[1] || '';
+
+            if (packagePath.startsWith('react/') ||
+                packagePath.startsWith('react-dom/') ||
+                packagePath.startsWith('react-router-dom/')) {
               return 'vendor-react';
             }
-            if (id.includes('chart.js') || id.includes('react-chartjs-2') || id.includes('recharts')) {
+            if (packagePath.startsWith('chart.js/') ||
+                packagePath.startsWith('react-chartjs-2/') ||
+                packagePath.startsWith('lightweight-charts/')) {
               return 'vendor-chart';
             }
-            if (id.includes('@stomp') || id.includes('sockjs')) {
+            if (packagePath.startsWith('@stomp/') ||
+                packagePath.startsWith('sockjs-client/')) {
               return 'vendor-stomp';
             }
-            return 'vendor';
+            if (packagePath.startsWith('mermaid/') ||
+                packagePath.startsWith('@mermaid-js/')) {
+              return 'vendor-docs-mermaid';
+            }
+            if (packagePath.startsWith('marked/') ||
+                packagePath.startsWith('github-markdown-css/')) {
+              return 'vendor-docs-markdown';
+            }
+            if (packagePath.startsWith('@tanstack/react-query/') ||
+                packagePath.startsWith('axios/') ||
+                packagePath.startsWith('zustand/')) {
+              return 'vendor-data';
+            }
+
+            const parts = packagePath.split('/');
+            const packageName = packagePath.startsWith('@')
+              ? `${parts[0]}-${parts[1]}`
+              : parts[0];
+            return `vendor-${packageName.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
           }
         },
       },

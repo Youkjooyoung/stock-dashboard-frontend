@@ -10,6 +10,7 @@ const DOC_LIST = [
   { filename: 'api-reference.md',   label: '🔌 API 명세' },
   { filename: 'architecture.md',    label: '🏗 아키텍처' },
   { filename: 'erd.md',             label: '🗄 ERD' },
+  { filename: 'maintenance-2026-05-04.md', label: 'Maintenance 2026-05-04' },
 ];
 
 export default function DocsPreviewPage() {
