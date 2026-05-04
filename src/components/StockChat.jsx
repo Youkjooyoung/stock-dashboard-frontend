@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import useStomp from '../hooks/useStomp';
 import api from '../api/axiosInstance';
 import styles from '../styles/components/StockChat.module.css';
@@ -26,7 +26,7 @@ export default function StockChat({ ticker, stockName }) {
       .catch(() => {});
   }, [ticker]);
 
-  const clientRef = useStomp(`/topic/chat/${ticker}`, {
+  const chatSocketOptions = useMemo(() => ({
     connectHeaders: { Authorization: `Bearer ${token}` },
     reconnectDelay: 3000,
     onMessage: (msg) => {
@@ -35,7 +35,9 @@ export default function StockChat({ ticker, stockName }) {
     },
     onConnect: () => setConnected(true),
     onDisconnect: () => setConnected(false),
-  });
+  }), [token]);
+
+  const clientRef = useStomp(`/topic/chat/${ticker}`, chatSocketOptions);
 
   useEffect(() => {
     const el = listRef.current;

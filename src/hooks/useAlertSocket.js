@@ -5,6 +5,11 @@ import { API_BASE_URL } from '../config/env';
 
 export default function useAlertSocket(userId, onAlert) {
   const clientRef = useRef(null);
+  const onAlertRef = useRef(onAlert);
+
+  useEffect(() => {
+    onAlertRef.current = onAlert;
+  }, [onAlert]);
 
   useEffect(() => {
     if (!userId) return;
@@ -16,7 +21,7 @@ export default function useAlertSocket(userId, onAlert) {
       onConnect: () => {
         client.subscribe(`/topic/alert/${userId}`, msg => {
           const data = JSON.parse(msg.body);
-          onAlert(data);
+          onAlertRef.current?.(data);
         });
       },
       reconnectDelay: 5000,

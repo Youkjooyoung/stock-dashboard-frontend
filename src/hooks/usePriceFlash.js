@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useReducer } from 'react';
 
 /**
  * 시세 tick 변동을 감지해 짧은 플래시 신호를 반환한다.
@@ -10,12 +10,13 @@ import { useRef, useEffect, useState } from 'react';
 export default function usePriceFlash(stocks, duration = 600) {
   const prevRef = useRef(new Map());
   const timersRef = useRef(new Map());
-  const [flashMap, setFlashMap] = useState(() => new Map());
+  const flashMapRef = useRef(new Map());
+  const [flashMap, setFlashMap] = useReducer((_, next) => next, new Map());
 
   useEffect(() => {
     if (!Array.isArray(stocks) || stocks.length === 0) return;
 
-    const next = new Map(flashMap);
+    const next = new Map(flashMapRef.current);
     let changed = false;
 
     for (const s of stocks) {
@@ -33,11 +34,10 @@ export default function usePriceFlash(stocks, duration = 600) {
         if (existing) clearTimeout(existing);
 
         const t = setTimeout(() => {
-          setFlashMap(m => {
-            const m2 = new Map(m);
-            m2.delete(id);
-            return m2;
-          });
+          const m2 = new Map(flashMapRef.current);
+          m2.delete(id);
+          flashMapRef.current = m2;
+          setFlashMap(m2);
           timersRef.current.delete(id);
         }, duration);
         timersRef.current.set(id, t);
@@ -45,9 +45,10 @@ export default function usePriceFlash(stocks, duration = 600) {
       prevRef.current.set(id, curr);
     }
 
-    // The flash map is derived from incoming stock ticks and must sync when prices change.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (changed) setFlashMap(next);
+    if (changed) {
+      flashMapRef.current = next;
+      setFlashMap(next);
+    }
   }, [stocks, duration]);
 
   useEffect(() => {

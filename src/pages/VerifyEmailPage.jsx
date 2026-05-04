@@ -36,7 +36,7 @@ export default function VerifyEmailPage() {
         setTimeout(() => navigate('/login'), 3000);
       })
       .catch(() => setStatus('error'));
-  }, []);
+  }, [navigate]);
 
   if (status === 'loading') {
     return (

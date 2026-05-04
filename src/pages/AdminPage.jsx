@@ -127,6 +127,7 @@ export default function AdminPage() {
         if (role !== 'ADMIN') { navigate('/'); return; }
         fetchStats();
         fetchTopWatchlist();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -134,6 +135,7 @@ export default function AdminPage() {
         if (activeTab === 'stocks' && stocks.length === 0) fetchStocks();
         if (activeTab === 'alerts' && alerts.length === 0) fetchAlerts();
         if (activeTab === 'chats' && chats.length === 0) fetchChats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab]);
 
     useEffect(() => {

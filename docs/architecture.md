@@ -28,7 +28,7 @@ graph TB
         Google["구글 OAuth2"]
         PortOne["PortOne V1\n(본인인증)"]
         S3["AWS S3\n(프로필 이미지)"]
-        Anthropic["Anthropic Claude\n(AI 분석)"]
+        OpenAI["OpenAI\n(AI 분석)"]
         Resend["Resend API\n(이메일)"]
         KRX["공공데이터 포털\n(주식 시세)"]
     end
@@ -49,7 +49,7 @@ graph TB
     Spring --> Google
     Spring --> PortOne
     Spring --> S3
-    Spring --> Anthropic
+    Spring --> OpenAI
     Spring --> Resend
     Spring --> KRX
     Spring -->|"/actuator/prometheus"| Prometheus

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../hooks/useToast';
@@ -50,11 +50,13 @@ export default function DashboardPage() {
   const { data: watchlist = [] } = useWatchlist();
   const toggleWatchMutation = useToggleWatchlist();
 
-  useStomp('/topic/prices', {
+  const priceSocketOptions = useMemo(() => ({
     reconnectDelay: 5000,
     sockjsOptions: { transports: ['websocket'] },
     onMessage: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stocks }),
-  });
+  }), [queryClient]);
+
+  useStomp('/topic/prices', priceSocketOptions);
 
   // ?�동갱신 ?�터�?(WebSocket 미연�????�백)
   useEffect(() => {

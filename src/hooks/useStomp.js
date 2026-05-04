@@ -3,8 +3,19 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { API_BASE_URL } from '../config/env';
 
-export default function useStomp(topic, { connectHeaders = {}, onMessage, onConnect, onDisconnect, reconnectDelay = 5000, sockjsOptions } = {}) {
+const EMPTY_HEADERS = {};
+
+export default function useStomp(topic, { connectHeaders = EMPTY_HEADERS, onMessage, onConnect, onDisconnect, reconnectDelay = 5000, sockjsOptions } = {}) {
   const clientRef = useRef(null);
+  const onMessageRef = useRef(onMessage);
+  const onConnectRef = useRef(onConnect);
+  const onDisconnectRef = useRef(onDisconnect);
+
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+    onConnectRef.current = onConnect;
+    onDisconnectRef.current = onDisconnect;
+  }, [onMessage, onConnect, onDisconnect]);
 
   useEffect(() => {
     if (!topic || !onMessage) return;
@@ -13,15 +24,15 @@ export default function useStomp(topic, { connectHeaders = {}, onMessage, onConn
       connectHeaders,
       reconnectDelay,
       onConnect: () => {
-        onConnect?.();
-        client.subscribe(topic, onMessage);
+        onConnectRef.current?.();
+        client.subscribe(topic, msg => onMessageRef.current?.(msg));
       },
-      onDisconnect,
+      onDisconnect: (...args) => onDisconnectRef.current?.(...args),
     });
     client.activate();
     clientRef.current = client;
     return () => client.deactivate();
-  }, [topic]);
+  }, [connectHeaders, onMessage, reconnectDelay, sockjsOptions, topic]);
 
   return clientRef;
 }
