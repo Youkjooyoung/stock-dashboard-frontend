@@ -50,7 +50,22 @@ Set these hosting stack outputs as GitHub repository **variables** (not secrets)
 After the first successful deployment, use the CloudFront distribution's
 **Switch to a plan** action and select the Free flat-rate plan. The template uses
 AWS managed cache and response-header policies so the distribution remains
-compatible with that plan.
+compatible with that plan. AWS creates and associates a Web ACL during the plan
+switch. Pass that Web ACL ARN back to later CloudFormation deployments through
+`WebAclArn` so the plan-managed association is preserved.
+
+```bash
+aws cloudformation deploy \
+  --region ap-northeast-2 \
+  --stack-name stock-dashboard-frontend-hosting \
+  --template-file infra/cloudformation/frontend-hosting.yml \
+  --capabilities CAPABILITY_IAM \
+  --parameter-overrides \
+    DomainName=jyyouk.shop \
+    CertificateArn=YOUR_US_EAST_1_CERTIFICATE_ARN \
+    WebAclArn=YOUR_CLOUDFRONT_PLAN_WEB_ACL_ARN \
+    GitHubRepository=Youkjooyoung/stock-dashboard-frontend
+```
 
 ## 3. Safe cutover
 

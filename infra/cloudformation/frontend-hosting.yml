@@ -10,11 +10,20 @@ Parameters:
     Type: String
     AllowedPattern: '^arn:aws:acm:us-east-1:[0-9]{12}:certificate/.+$'
     ConstraintDescription: CloudFront requires an ACM certificate issued in us-east-1.
+  WebAclArn:
+    Type: String
+    Default: ''
+    AllowedPattern: '^$|^arn:aws:wafv2:us-east-1:[0-9]{12}:global/webacl/.+$'
+    ConstraintDescription: The CloudFront pricing-plan Web ACL must use global scope in us-east-1.
+    Description: Web ACL created when the distribution joins a CloudFront flat-rate plan.
   GitHubRepository:
     Type: String
     Default: Youkjooyoung/stock-dashboard-frontend
     AllowedPattern: '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'
     Description: GitHub owner/repository allowed to deploy from the main branch.
+
+Conditions:
+  HasWebAcl: !Not [!Equals [!Ref WebAclArn, '']]
 
 Resources:
   FrontendBucket:
@@ -133,6 +142,7 @@ Resources:
             OriginAccessControlId: !GetAtt FrontendOriginAccessControl.Id
             S3OriginConfig:
               OriginAccessIdentity: ''
+        WebACLId: !If [HasWebAcl, !Ref WebAclArn, !Ref 'AWS::NoValue']
         ViewerCertificate:
           AcmCertificateArn: !Ref CertificateArn
           MinimumProtocolVersion: TLSv1.2_2021
