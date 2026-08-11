@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ACM certificate for the stock-dashboard frontend CloudFront distribution.
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: jyyouk.shop
+    Description: Frontend custom domain.
+  HostedZoneId:
+    Type: AWS::Route53::HostedZone::Id
+    Description: Public Route 53 hosted zone that owns DomainName.
+
+Resources:
+  FrontendCertificate:
+    Type: AWS::CertificateManager::Certificate
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      DomainName: !Ref DomainName
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !Ref HostedZoneId
+      Tags:
+        - Key: Project
+          Value: stock-dashboard
+        - Key: Environment
+          Value: production
+        - Key: ManagedBy
+          Value: CloudFormation
+
+Outputs:
+  CertificateArn:
+    Description: ACM certificate ARN. Pass this value to frontend-hosting.yml.
+    Value: !Ref FrontendCertificate
