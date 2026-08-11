@@ -47,6 +47,11 @@ Set these hosting stack outputs as GitHub repository **variables** (not secrets)
 - `CLOUDFRONT_DISTRIBUTION_ID` from `DistributionId`
 - `CLOUDFRONT_DOMAIN_NAME` from `DistributionDomainName`
 
+After the first successful deployment, use the CloudFront distribution's
+**Switch to a plan** action and select the Free flat-rate plan. The template uses
+AWS managed cache and response-header policies so the distribution remains
+compatible with that plan.
+
 ## 3. Safe cutover
 
 1. Run the frontend CI/CD workflow and verify the CloudFront domain, including

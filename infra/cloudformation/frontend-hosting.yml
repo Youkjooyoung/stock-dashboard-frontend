@@ -86,27 +86,6 @@ Resources:
         }
       Name: !Sub '${AWS::StackName}-spa-rewrite'
 
-  FrontendSecurityHeadersPolicy:
-    Type: AWS::CloudFront::ResponseHeadersPolicy
-    Properties:
-      ResponseHeadersPolicyConfig:
-        Name: !Sub '${AWS::StackName}-security-headers'
-        Comment: Baseline browser security headers for the stock-dashboard frontend
-        SecurityHeadersConfig:
-          ContentTypeOptions:
-            Override: true
-          FrameOptions:
-            FrameOption: DENY
-            Override: true
-          ReferrerPolicy:
-            ReferrerPolicy: strict-origin-when-cross-origin
-            Override: true
-          StrictTransportSecurity:
-            AccessControlMaxAgeSec: 31536000
-            IncludeSubdomains: true
-            Preload: false
-            Override: true
-
   FrontendDistribution:
     Type: AWS::CloudFront::Distribution
     DeletionPolicy: Retain
@@ -139,7 +118,9 @@ Resources:
           FunctionAssociations:
             - EventType: viewer-request
               FunctionARN: !GetAtt FrontendSpaRewriteFunction.FunctionARN
-          ResponseHeadersPolicyId: !Ref FrontendSecurityHeadersPolicy
+          # AWS managed SecurityHeadersPolicy. Managed policies are compatible
+          # with the CloudFront Free flat-rate plan; custom policies are not.
+          ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03
           TargetOriginId: frontend-s3-origin
           ViewerProtocolPolicy: redirect-to-https
         DefaultRootObject: index.html
@@ -152,7 +133,6 @@ Resources:
             OriginAccessControlId: !GetAtt FrontendOriginAccessControl.Id
             S3OriginConfig:
               OriginAccessIdentity: ''
-        PriceClass: PriceClass_100
         ViewerCertificate:
           AcmCertificateArn: !Ref CertificateArn
           MinimumProtocolVersion: TLSv1.2_2021
