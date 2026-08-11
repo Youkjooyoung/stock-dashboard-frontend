@@ -8,6 +8,7 @@ on:
 permissions:
   actions: read
   contents: read
+  id-token: write
 
 concurrency:
   group: production-frontend
@@ -15,7 +16,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy to EC2 (jyyouk.shop)
+    name: Deploy to S3 and CloudFront (jyyouk.shop)
     if: >-
       ${{
         github.event.workflow_run.conclusion == 'success' &&
@@ -28,19 +29,21 @@ jobs:
 
     env:
       DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
+      AWS_REGION: ap-northeast-2
+      AWS_ROLE_ARN: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+      FRONTEND_BUCKET: ${{ vars.AWS_FRONTEND_BUCKET }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+      CLOUDFRONT_DOMAIN_NAME: ${{ vars.CLOUDFRONT_DOMAIN_NAME }}
 
     steps:
-      - name: Validate deployment secrets
-        env:
-          DEPLOY_HOST: ${{ secrets.EC2_FRONTEND_HOST }}
-          DEPLOY_USER: ${{ secrets.EC2_FRONTEND_USER }}
-          DEPLOY_KEY: ${{ secrets.EC2_SSH_KEY }}
+      - name: Validate deployment configuration
         shell: bash
         run: |
           set -Eeuo pipefail
-          : "${DEPLOY_HOST:?Missing EC2_FRONTEND_HOST secret}"
-          : "${DEPLOY_USER:?Missing EC2_FRONTEND_USER secret}"
-          : "${DEPLOY_KEY:?Missing EC2_SSH_KEY secret}"
+          : "${AWS_ROLE_ARN:?Missing AWS_DEPLOY_ROLE_ARN repository variable}"
+          : "${FRONTEND_BUCKET:?Missing AWS_FRONTEND_BUCKET repository variable}"
+          : "${CLOUDFRONT_DISTRIBUTION_ID:?Missing CLOUDFRONT_DISTRIBUTION_ID repository variable}"
+          : "${CLOUDFRONT_DOMAIN_NAME:?Missing CLOUDFRONT_DOMAIN_NAME repository variable}"
 
       - name: Download verified frontend bundle
         uses: actions/download-artifact@v4
@@ -51,93 +54,64 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Validate downloaded bundle
-        run: test -s deploy-artifact/frontend-dist.tar.gz
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -s deploy-artifact/frontend-dist.tar.gz
+          mkdir -p deploy-artifact/dist
+          tar -xzf deploy-artifact/frontend-dist.tar.gz -C deploy-artifact/dist
+          test -s deploy-artifact/dist/index.html
 
-      - name: Upload bundle to EC2 staging directory
-        uses: appleboy/scp-action@v1.0.0
+      - name: Configure short-lived AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
-          host: ${{ secrets.EC2_FRONTEND_HOST }}
-          username: ${{ secrets.EC2_FRONTEND_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          source: deploy-artifact/frontend-dist.tar.gz
-          target: ~/stock-dashboard-frontend-deploy/${{ env.DEPLOY_SHA }}
-          strip_components: 1
-          timeout: 30s
-          command_timeout: 3m
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-session-name: stock-frontend-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Activate frontend release and verify health
-        uses: appleboy/ssh-action@v1.2.5
-        env:
-          DEPLOY_SHA: ${{ env.DEPLOY_SHA }}
-        with:
-          host: ${{ secrets.EC2_FRONTEND_HOST }}
-          username: ${{ secrets.EC2_FRONTEND_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          timeout: 30s
-          command_timeout: 5m
-          envs: DEPLOY_SHA
-          script: |
-            set -Eeuo pipefail
+      - name: Publish verified frontend bundle
+        shell: bash
+        run: |
+          set -Eeuo pipefail
 
-            deploy_root="$HOME/stock-dashboard-frontend-deploy"
-            archive="$deploy_root/$DEPLOY_SHA/frontend-dist.tar.gz"
-            release_root="/var/www/stock-dashboard-releases"
-            release_dir="$release_root/$DEPLOY_SHA"
-            current_path="/var/www/stock-dashboard"
-            next_link="${current_path}.next"
-            previous_release=""
+          aws s3 sync deploy-artifact/dist "s3://${FRONTEND_BUCKET}" \
+            --delete \
+            --cache-control "public,max-age=300"
 
-            test -s "$archive"
-            sudo mkdir -p "$release_dir"
-            sudo tar -xzf "$archive" -C "$release_dir"
-            sudo test -s "$release_dir/index.html"
-            sudo nginx -t
+          aws s3 cp deploy-artifact/dist/index.html \
+            "s3://${FRONTEND_BUCKET}/index.html" \
+            --content-type "text/html; charset=utf-8" \
+            --cache-control "no-store,no-cache,must-revalidate" \
+            --metadata-directive REPLACE
 
-            if [ -L "$current_path" ]; then
-              previous_release="$(readlink -f "$current_path")"
-            elif [ -d "$current_path" ]; then
-              previous_release="$release_root/legacy-$(date -u +%Y%m%d%H%M%S)"
-              sudo mv "$current_path" "$previous_release"
-            elif [ -e "$current_path" ]; then
-              echo "$current_path exists but is not a directory or symlink."
-              exit 1
-            fi
+          if [ -d deploy-artifact/dist/assets ]; then
+            aws s3 sync deploy-artifact/dist/assets \
+              "s3://${FRONTEND_BUCKET}/assets" \
+              --delete \
+              --cache-control "public,max-age=31536000,immutable"
+          fi
 
-            sudo ln -sfn "$release_dir" "$next_link"
-            sudo mv -Tf "$next_link" "$current_path"
-            sudo systemctl reload nginx
+      - name: Invalidate and verify CloudFront
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          invalidation_id="$(aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --paths '/*' \
+            --query 'Invalidation.Id' \
+            --output text)"
 
-            health_ok() {
-              curl -kfsS --max-time 10 \
-                --resolve jyyouk.shop:443:127.0.0.1 \
-                https://jyyouk.shop/ \
-                -o /dev/null
-            }
+          aws cloudfront wait invalidation-completed \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --id "${invalidation_id}"
 
-            if health_ok; then
-              echo "Frontend health check passed."
-              rm -f "$archive"
-              rmdir "$deploy_root/$DEPLOY_SHA" 2>/dev/null || true
-              exit 0
-            fi
+          curl -fsS --retry 5 --retry-delay 5 --max-time 20 \
+            "https://${CLOUDFRONT_DOMAIN_NAME}/" \
+            -o /dev/null
 
-            echo "Frontend health check failed; attempting rollback."
-            if [ -n "$previous_release" ] && [ -d "$previous_release" ]; then
-              sudo ln -sfn "$previous_release" "$next_link"
-              sudo mv -Tf "$next_link" "$current_path"
-              sudo nginx -t
-              sudo systemctl reload nginx
-
-              if health_ok; then
-                echo "Rollback completed successfully."
-                exit 1
-              fi
-            fi
-
-            echo "Rollback failed or no previous release was available."
-            exit 1
+          curl -fsS --retry 5 --retry-delay 5 --max-time 20 \
+            "https://${CLOUDFRONT_DOMAIN_NAME}/login" \
+            -o /dev/null
 
       - name: Verify public frontend endpoint
         run: curl -fsS --max-time 15 https://jyyouk.shop/ -o /dev/null
