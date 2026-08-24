@@ -110,16 +110,18 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
       <header className="header">
         <div className="header-inner">
 
-          <div className="header-logo" onClick={() => navigate('/')}>
+          <button type="button" className="header-logo" onClick={() => navigate('/')} aria-label="주식 대시보드 홈">
             <LogoMark size={26} />
             <span className="header-logo-text">주식<span>대시보드</span></span>
-          </div>
+          </button>
 
-          <nav className="header-subnav">
+          <nav className="header-subnav" aria-label="주요 메뉴">
             {NAV_ITEMS.map(item => (
               <button
+                type="button"
                 key={item.path}
                 className={`header-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                aria-current={location.pathname === item.path ? 'page' : undefined}
                 onClick={() => navigate(item.path)}>
                 {item.label}
               </button>
@@ -130,8 +132,10 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
 
             {onToggleRefresh && (
               <button
+                type="button"
                 className={`header-pill ${autoRefresh ? 'live' : ''}`}
                 onClick={onToggleRefresh}
+                aria-pressed={autoRefresh}
                 title={autoRefresh ? '자동갱신 중지' : '자동갱신 시작'}>
                 <span className="dot" />
                 LIVE
@@ -141,6 +145,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
             <TweaksPanel />
 
             <button
+              type="button"
               className="header-pill"
               onClick={() => setDark(d => !d)}
               title={dark ? '라이트 모드로 전환' : '다크 모드로 전환'}
@@ -160,10 +165,13 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
 
             <div className={styles['header-bell-wrap']} ref={alertRef}>
               <button
+                type="button"
                 className="header-bell"
                 onClick={handleBellClick}
-                title="알림 확인 (클릭시 초기화)"
-                aria-label="알림">
+                title="알림 목록 열기"
+                aria-label="알림"
+                aria-expanded={isAlertOpen}
+                aria-controls="header-alert-list">
                 <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M3 6a5 5 0 0 1 10 0c0 3 1.5 4 1.5 4H1.5S3 9 3 6z"/>
                   <path d="M6.5 13a1.5 1.5 0 0 0 3 0"/>
@@ -176,18 +184,20 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
               </button>
 
               {isAlertOpen && (
-                <div className={styles['alert-dropdown']}>
+                <div id="header-alert-list" className={styles['alert-dropdown']} role="region" aria-label="수신 알림">
                   <div className={styles['alert-dropdown-header']}>
                     <span>알림 목록</span>
                     {triggeredAlerts.length > 0 && (
                       <div className={styles['alert-dropdown-header-actions']}>
                         <button
+                          type="button"
                           className={styles['alert-header-btn']}
                           onClick={markAllAsRead}
                           title="모두 읽음 처리">
                           모두 읽음
                         </button>
                         <button
+                          type="button"
                           className={`${styles['alert-header-btn']} ${styles['alert-header-btn-danger']}`}
                           onClick={deleteAllAlerts}
                           title="모두 삭제">
@@ -216,9 +226,9 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
                             </div>
                             <div className={styles['alert-item-actions']}>
                               {!isRead && (
-                                <button className={styles['alert-action-btn']} onClick={(e) => markAsRead(e, alertId)}>✓</button>
+                                <button type="button" className={styles['alert-action-btn']} onClick={(e) => markAsRead(e, alertId)} aria-label={`${a.stockName || a.STOCK_NAME} 알림 읽음 처리`}>✓</button>
                               )}
-                              <button className={`${styles['alert-action-btn']} ${styles.delete}`} onClick={(e) => deleteAlert(e, alertId)}>✕</button>
+                              <button type="button" className={`${styles['alert-action-btn']} ${styles.delete}`} onClick={(e) => deleteAlert(e, alertId)} aria-label={`${a.stockName || a.STOCK_NAME} 알림 삭제`}>✕</button>
                             </div>
                           </div>
                         );
@@ -236,14 +246,17 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
               {displayName}
             </div>
 
-            <button className="header-logout" onClick={handleLogout}>
+            <button type="button" className="header-logout" onClick={handleLogout}>
               로그아웃
             </button>
 
             <button
+              type="button"
               className={`${styles['header-hamburger']} ${mobileOpen ? styles.open : ''}`}
               onClick={() => setMobileOpen(p => !p)}
-              aria-label="메뉴 열기/닫기">
+              aria-label="메뉴 열기/닫기"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation">
               <span className={styles['hamburger-line']} />
               <span className={styles['hamburger-line']} />
               <span className={styles['hamburger-line']} />
@@ -252,12 +265,14 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
         </div>
       </header>
 
-      <div className={`${styles['mobile-menu']} ${mobileOpen ? styles.open : ''}`}>
+      <div id="mobile-navigation" className={`${styles['mobile-menu']} ${mobileOpen ? styles.open : ''}`}>
         <div className={styles['mobile-menu-inner']}>
           {NAV_ITEMS.map(item => (
             <button
+              type="button"
               key={item.path}
               className={`${styles['mobile-nav-item']} ${location.pathname === item.path ? styles.active : ''}`}
+              aria-current={location.pathname === item.path ? 'page' : undefined}
               onClick={() => handleNav(item.path)}>
               {item.label}
             </button>
@@ -266,19 +281,23 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
           <div className={styles['mobile-menu-actions']}>
             {onToggleRefresh && (
               <button
+                type="button"
                 className={`header-pill ${autoRefresh ? 'live' : ''}`}
-                onClick={onToggleRefresh}>
+                onClick={onToggleRefresh}
+                aria-pressed={autoRefresh}>
                 <span className="dot" />
                 LIVE
               </button>
             )}
             <button
+              type="button"
               className="header-pill"
-              onClick={() => setDark(d => !d)}>
+              onClick={() => setDark(d => !d)}
+              aria-label={dark ? '라이트 모드로 전환' : '다크 모드로 전환'}>
               {dark ? 'DARK' : 'LIGHT'}
             </button>
             <TweaksPanel />
-            <button className="header-logout" onClick={handleLogout}>
+            <button type="button" className="header-logout" onClick={handleLogout}>
               로그아웃
             </button>
           </div>

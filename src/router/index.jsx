@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import AppLayout from '../components/AppLayout';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { RouteLoading } from '../components/PageState';
 
 const LoginPage            = lazy(() => import('../pages/LoginPage'));
 const SignupPage           = lazy(() => import('../pages/SignupPage'));
@@ -16,11 +17,12 @@ const AdminPage            = lazy(() => import('../pages/AdminPage'));
 const ComparePage          = lazy(() => import('../pages/ComparePage'));
 const ChangePasswordPage   = lazy(() => import('../pages/ChangePasswordPage'));
 const DocsPreviewPage      = lazy(() => import('../pages/DocsPreviewPage'));
+const NotFoundPage         = lazy(() => import('../pages/NotFoundPage'));
 
 export default function AppRouter() {
     return (
         <BrowserRouter>
-            <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>로딩 중...</div>}>
+            <Suspense fallback={<RouteLoading />}>
                 <Routes>
                     <Route path="/login"         element={<LoginPage />} />
                     <Route path="/signup"        element={<SignupPage />} />
@@ -52,6 +54,7 @@ export default function AppRouter() {
                             </ErrorBoundary>
                         } />
                     </Route>
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </Suspense>
         </BrowserRouter>

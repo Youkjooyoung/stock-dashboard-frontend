@@ -156,6 +156,7 @@
 }
 
 .autocomplete-item {
+  width: 100%;
   padding: 9px 14px;
   cursor: pointer;
   display: flex;
@@ -164,6 +165,11 @@
   border-bottom: 1px solid var(--border);
   font-size: 13px;
   transition: background var(--transition);
+  background: transparent;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  text-align: left;
 }
 
 .autocomplete-item:last-child { border-bottom: none; }
@@ -343,8 +349,26 @@
 
 /* === 정렬 아이콘 === */
 .sortable {
-  cursor: pointer;
   user-select: none;
+}
+
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.stock-table th:first-child .sort-button,
+.stock-table th:nth-child(2) .sort-button,
+.stock-table th:nth-child(3) .sort-button {
+  justify-content: flex-start;
 }
 
 .sortable:hover {
@@ -378,6 +402,9 @@
   transition: transform 0.15s, color 0.15s;
   display: inline-block;
   line-height: 1;
+  padding: 4px;
+  border: 0;
+  background: transparent;
 }
 
 .watch-star:hover { transform: scale(1.2); }
@@ -708,6 +735,29 @@
   font-size: 10px;
   color: var(--text-3);
   letter-spacing: 0.02em;
+}
+
+.stock-card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.stock-card-detail {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.stock-card-detail:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .stock-cards-empty {

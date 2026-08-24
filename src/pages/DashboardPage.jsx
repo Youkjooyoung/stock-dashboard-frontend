@@ -14,6 +14,7 @@ import StockCharts from '../components/StockCharts';
 import StockModal from '../components/StockModal';
 import StockTable from '../components/StockTable';
 import SummaryCards from '../components/SummaryCards';
+import PageState from '../components/PageState';
 import { SkeletonCards, SkeletonTable } from '../components/StockListSkeleton';
 import { useStockPrices, useWatchlist, useToggleWatchlist, QUERY_KEYS } from '../hooks/useQueries';
 import useAuthStore from '../store/authStore';
@@ -44,6 +45,9 @@ export default function DashboardPage() {
   const {
     data: stocks = [],
     isLoading: stocksLoading,
+    isError: stocksError,
+    isFetching: stocksFetching,
+    dataUpdatedAt,
     refetch: refetchStocks,
   } = useStockPrices();
 
@@ -177,7 +181,25 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <main className={styles['dashboard-main']}>
+      <section className={styles['dashboard-main']} aria-busy={stocksLoading || stocksFetching}>
+        <div className={styles['dashboard-heading']}>
+          <div>
+            <p className={styles['dashboard-eyebrow']}>MARKET OVERVIEW</p>
+            <h1>오늘의 주식 시장</h1>
+            <p className={styles['dashboard-description']}>
+              관심 종목과 주요 지표를 한 화면에서 확인하세요.
+            </p>
+          </div>
+          <div className={styles['dashboard-sync']} role="status" aria-live="polite">
+            <span className={`${styles['sync-dot']} ${stocksFetching ? styles.fetching : ''}`} aria-hidden="true" />
+            {stocksFetching
+              ? '최신 시세 확인 중'
+              : dataUpdatedAt
+                ? `${new Date(dataUpdatedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 업데이트`
+                : '시세 대기 중'}
+          </div>
+        </div>
+
         {stocksLoading ? (
           <>
             <SkeletonCards />
@@ -189,6 +211,21 @@ export default function DashboardPage() {
             </div>
             <SkeletonTable />
           </>
+        ) : stocksError ? (
+          <PageState
+            tone="error"
+            title="시세 정보를 불러오지 못했어요"
+            description="네트워크 연결 또는 서버 상태를 확인한 뒤 다시 시도해 주세요."
+            actionLabel="다시 시도"
+            onAction={() => refetchStocks()}
+          />
+        ) : stocks.length === 0 ? (
+          <PageState
+            title="표시할 시세가 아직 없어요"
+            description="데이터 수집이 끝난 뒤 자동으로 표시됩니다. 잠시 후 다시 확인해 주세요."
+            actionLabel="새로고침"
+            onAction={() => refetchStocks()}
+          />
         ) : (
           <>
             <SummaryCards stocks={stocks} />
@@ -212,7 +249,7 @@ export default function DashboardPage() {
             />
           </>
         )}
-      </main>
+      </section>
 
       <StockModal
         stock={modal}

@@ -75,6 +75,12 @@ export default function StockTable({
   const handleSearch    = (val) => { onSearchChange(val); setPage(1); };
   const handleTabChange = (t)   => { onTabChange(t);      setPage(1); };
   const handlePageSize  = (e)   => { setPageSize(Number(e.target.value)); setPage(1); };
+  const handleRowKeyDown = (event, stock) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onRowClick(stock);
+    }
+  };
 
   const resetFilters = () => {
     setFilterMarket('all');
@@ -138,8 +144,8 @@ export default function StockTable({
 
   const SortIcon = ({ colKey }) => {
     if (!COLUMNS.find(c => c.key === colKey)?.sortable) return null;
-    if (sortKey !== colKey) return <span className={styles['sort-icon']}>⇅</span>;
-    return <span className={`${styles['sort-icon']} ${styles.active}`}>{sortDir === 'asc' ? '↑' : '↓'}</span>;
+    if (sortKey !== colKey) return <span className={styles['sort-icon']} aria-hidden="true">⇅</span>;
+    return <span className={`${styles['sort-icon']} ${styles.active}`} aria-hidden="true">{sortDir === 'asc' ? '↑' : '↓'}</span>;
   };
 
   return (
@@ -147,26 +153,36 @@ export default function StockTable({
 
       <div className={styles['table-toolbar']}>
         <div className={styles['table-toolbar-left']}>
-          <div className={styles['stock-tab-group']}>
+          <div className={styles['stock-tab-group']} role="tablist" aria-label="종목 목록">
             <button
+              type="button"
+              role="tab"
+              aria-selected={tab === 'all'}
               className={`${styles['stock-tab-btn']} ${tab === 'all' ? styles.active : ''}`}
               onClick={() => handleTabChange('all')}>
               전체
             </button>
             <button
+              type="button"
+              role="tab"
+              aria-selected={tab === 'watch'}
               className={`${styles['stock-tab-btn']} ${tab === 'watch' ? styles.active : ''}`}
               onClick={() => handleTabChange('watch')}>
               즐겨찾기 ★
             </button>
           </div>
           <button
+            type="button"
             className={`${styles['filter-toggle-btn']} ${filterOpen ? styles.active : ''} ${hasActiveFilter ? styles['has-filter'] : ''}`}
+            aria-expanded={filterOpen}
+            aria-controls="stock-filter-panel"
             onClick={() => setFilterOpen(p => !p)}>
             필터{hasActiveFilter ? ' ●' : ''}
           </button>
         </div>
         <div className={styles['table-toolbar-right']}>
           <button
+            type="button"
             className={styles['csv-export-btn']}
             onClick={() => exportCSV(filtered)}
             title="현재 목록 CSV 다운로드">
@@ -180,6 +196,7 @@ export default function StockTable({
           <div className={styles['page-size-wrap']}>
             <span className={styles['page-size-label']}>페이지당</span>
             <select
+              aria-label="페이지당 표시 개수"
               className={styles['page-size-select']}
               value={pageSize}
               onChange={handlePageSize}>
@@ -197,13 +214,14 @@ export default function StockTable({
       </div>
 
       {filterOpen && (
-        <div className={styles['filter-panel']}>
+        <div id="stock-filter-panel" className={styles['filter-panel']}>
           <div className={styles['filter-panel-inner']}>
             <div className={styles['filter-group']}>
               <label className={styles['filter-label']}>시장</label>
               <div className={styles['filter-btn-group']}>
                 {['all', 'KOSPI', 'KOSDAQ'].map(m => (
                   <button
+                    type="button"
                     key={m}
                     className={`${styles['filter-chip']} ${filterMarket === m ? styles.active : ''}`}
                     onClick={() => { setFilterMarket(m); setPage(1); }}>
@@ -217,6 +235,7 @@ export default function StockTable({
               <div className={styles['filter-range']}>
                 <input
                   type="number"
+                  aria-label="최소 등락률"
                   className={styles['filter-input']}
                   placeholder="최소"
                   value={filterRateMin}
@@ -225,6 +244,7 @@ export default function StockTable({
                 <span className={styles['filter-range-sep']}>~</span>
                 <input
                   type="number"
+                  aria-label="최대 등락률"
                   className={styles['filter-input']}
                   placeholder="최대"
                   value={filterRateMax}
@@ -236,6 +256,7 @@ export default function StockTable({
               <label className={styles['filter-label']}>거래량 최소</label>
               <input
                 type="number"
+                aria-label="최소 거래량"
                 className={`${styles['filter-input']} ${styles.wide}`}
                 placeholder="예: 100000"
                 value={filterVolMin}
@@ -243,22 +264,29 @@ export default function StockTable({
               />
             </div>
             {hasActiveFilter && (
-              <button className={styles['filter-reset-btn']} onClick={resetFilters}>초기화</button>
+              <button type="button" className={styles['filter-reset-btn']} onClick={resetFilters}>초기화</button>
             )}
           </div>
         </div>
       )}
 
       <table className={styles['stock-table']}>
+        <caption className="sr-only">종목별 시가, 종가, 고가, 저가, 거래량과 등락률</caption>
         <thead>
           <tr>
             {COLUMNS.map(col => (
               <th
                 key={col.key}
                 className={col.sortable ? styles.sortable : ''}
-                onClick={() => col.sortable && handleSort(col.key)}>
-                {col.label}
-                <SortIcon colKey={col.key} />
+                aria-sort={col.sortable && sortKey === col.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : undefined}>
+                {col.sortable ? (
+                  <button type="button" className={styles['sort-button']} onClick={() => handleSort(col.key)}>
+                    {col.label}
+                    <SortIcon colKey={col.key} />
+                  </button>
+                ) : (
+                  <span aria-label="즐겨찾기">{col.label}</span>
+                )}
               </th>
             ))}
           </tr>
@@ -270,7 +298,7 @@ export default function StockTable({
                 {tab === 'watch' ? '즐겨찾기한 종목이 없습니다.' : '검색 결과가 없습니다.'}
               </td>
             </tr>
-          ) : paginated.map((d, i) => {
+          ) : paginated.map((d) => {
             const open      = d.mkp  || 0;
             const close     = d.clpr || 0;
             const rate      = d.rate;
@@ -281,7 +309,14 @@ export default function StockTable({
             const flash     = flashMap.get(d.itemId);
             const flashCls  = flash === 'up' ? styles['flash-up'] : flash === 'down' ? styles['flash-down'] : '';
             return (
-              <tr key={i} onClick={() => onRowClick(d)} className={flashCls}>
+              <tr
+                key={d.itemId || d.srtnCd}
+                onClick={() => onRowClick(d)}
+                onKeyDown={(event) => handleRowKeyDown(event, d)}
+                className={flashCls}
+                tabIndex={0}
+                aria-label={`${d.itmsNm} 상세 보기`}
+              >
                 <td><span className={styles['stock-code']}>{d.srtnCd}</span></td>
                 <td><span className={styles['stock-name']}>{d.itmsNm}</span></td>
                 <td>
@@ -298,10 +333,17 @@ export default function StockTable({
                     <span className={styles['change-rate']}>({rate.toFixed(2)}%)</span>
                   </div>
                 </td>
-                <td onClick={e => { e.stopPropagation(); onToggleWatch(d.itemId); }}>
-                  <span className={`${styles['watch-star']} ${isWatched ? styles.active : styles.inactive}`}>
+                <td>
+                  <button
+                    type="button"
+                    className={`${styles['watch-star']} ${isWatched ? styles.active : styles.inactive}`}
+                    onClick={e => { e.stopPropagation(); onToggleWatch(d.itemId); }}
+                    onKeyDown={e => e.stopPropagation()}
+                    aria-label={`${d.itmsNm} ${isWatched ? '즐겨찾기 해제' : '즐겨찾기 추가'}`}
+                    aria-pressed={isWatched}
+                  >
                     {isWatched ? '★' : '☆'}
-                  </span>
+                  </button>
                 </td>
               </tr>
             );
@@ -314,7 +356,7 @@ export default function StockTable({
           <div className={styles['stock-cards-empty']}>
             {tab === 'watch' ? '즐겨찾기한 종목이 없습니다.' : '검색 결과가 없습니다.'}
           </div>
-        ) : paginated.map((d, i) => {
+        ) : paginated.map((d) => {
           const open      = d.mkp  || 0;
           const close     = d.clpr || 0;
           const rate      = d.rate;
@@ -325,18 +367,26 @@ export default function StockTable({
           const flash     = flashMap.get(d.itemId);
           const flashCls  = flash === 'up' ? styles['flash-up'] : flash === 'down' ? styles['flash-down'] : '';
           return (
-            <div key={i} className={`${styles['stock-card']} ${flashCls}`} onClick={() => onRowClick(d)}>
+            <article
+              key={d.itemId || d.srtnCd}
+              className={`${styles['stock-card']} ${flashCls}`}
+              onClick={() => onRowClick(d)}
+            >
               <div className={styles['stock-card-top']}>
                 <div className={styles['stock-card-info']}>
                   <span className={styles['stock-name']}>{d.itmsNm}</span>
                   <span className={styles['stock-code']}>{d.srtnCd}</span>
                   <span className="market-badge">{d.mrktCtg || 'KOSPI'}</span>
                 </div>
-                <span
+                <button
+                  type="button"
                   className={`${styles['watch-star']} ${isWatched ? styles.active : styles.inactive}`}
-                  onClick={e => { e.stopPropagation(); onToggleWatch(d.itemId); }}>
+                  onClick={e => { e.stopPropagation(); onToggleWatch(d.itemId); }}
+                  onKeyDown={e => e.stopPropagation()}
+                  aria-label={`${d.itmsNm} ${isWatched ? '즐겨찾기 해제' : '즐겨찾기 추가'}`}
+                  aria-pressed={isWatched}>
                   {isWatched ? '★' : '☆'}
-                </span>
+                </button>
               </div>
               <div className={styles['stock-card-bottom']}>
                 <div className={styles['stock-card-price']}>
@@ -345,9 +395,18 @@ export default function StockTable({
                     {sign} {Math.abs(diff).toLocaleString()} ({rate.toFixed(2)}%)
                   </span>
                 </div>
-                <div className={styles['stock-card-vol']}>거래량 {(d.trqu || 0).toLocaleString()}</div>
+                <div className={styles['stock-card-actions']}>
+                  <div className={styles['stock-card-vol']}>거래량 {(d.trqu || 0).toLocaleString()}</div>
+                  <button
+                    type="button"
+                    className={styles['stock-card-detail']}
+                    onClick={(event) => { event.stopPropagation(); onRowClick(d); }}
+                  >
+                    상세 보기
+                  </button>
+                </div>
               </div>
-            </div>
+            </article>
           );
         })}
       </div>
@@ -358,15 +417,15 @@ export default function StockTable({
             총 {filtered.length}개 ·&nbsp;
             {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)} 표시
           </span>
-          <div className={styles.pagination}>
-            <button className={styles['page-btn']} onClick={() => setPage(1)}                          disabled={page === 1}>«</button>
-            <button className={styles['page-btn']} onClick={() => setPage(p => Math.max(1, p - 1))}   disabled={page === 1}>‹</button>
+          <nav className={styles.pagination} aria-label="종목 목록 페이지">
+            <button type="button" aria-label="첫 페이지" className={styles['page-btn']} onClick={() => setPage(1)} disabled={page === 1}>«</button>
+            <button type="button" aria-label="이전 페이지" className={styles['page-btn']} onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>‹</button>
             {getPageNumbers().map(n => (
-              <button key={n} className={`${styles['page-btn']} ${n === page ? styles.active : ''}`} onClick={() => setPage(n)}>{n}</button>
+              <button type="button" key={n} aria-label={`${n}페이지`} aria-current={n === page ? 'page' : undefined} className={`${styles['page-btn']} ${n === page ? styles.active : ''}`} onClick={() => setPage(n)}>{n}</button>
             ))}
-            <button className={styles['page-btn']} onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>›</button>
-            <button className={styles['page-btn']} onClick={() => setPage(totalPages)}                 disabled={page === totalPages}>»</button>
-          </div>
+            <button type="button" aria-label="다음 페이지" className={styles['page-btn']} onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>›</button>
+            <button type="button" aria-label="마지막 페이지" className={styles['page-btn']} onClick={() => setPage(totalPages)} disabled={page === totalPages}>»</button>
+          </nav>
         </div>
       )}
     </div>

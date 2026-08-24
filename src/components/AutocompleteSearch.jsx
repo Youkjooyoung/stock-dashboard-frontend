@@ -104,24 +104,32 @@ export default function AutocompleteSearch({ stocks, value, onChange }) {
       <input
         className={styles['search-input']}
         placeholder="종목명 또는 코드 검색"
+        aria-label="종목 검색"
+        role="combobox"
+        aria-expanded={show && (showHistorySection || showSuggestSection)}
+        aria-controls="stock-search-options"
+        aria-autocomplete="list"
         value={value}
         onChange={e => handleChange(e.target.value)}
         onFocus={handleFocus}
         autoComplete="off"
       />
       {show && (showHistorySection || showSuggestSection) && (
-        <div className={styles['autocomplete-dropdown']}>
+        <div id="stock-search-options" className={styles['autocomplete-dropdown']} role="listbox" aria-label="종목 검색 결과">
           {showHistorySection && (
             <>
               <div className={styles['autocomplete-section-header']}>
                 <span>최근 검색</span>
-                <button className={styles['autocomplete-clear-btn']} onMouseDown={clearHistory}>지우기</button>
+                <button type="button" className={styles['autocomplete-clear-btn']} onClick={clearHistory}>지우기</button>
               </div>
-              {history.map((term, i) => (
-                <div
-                  key={i}
+              {history.map((term) => (
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  key={term}
                   className={`${styles['autocomplete-item']} ${styles['history-item']}`}
-                  onMouseDown={() => handleHistorySelect(term)}>
+                  onClick={() => handleHistorySelect(term)}>
                   <span className={styles['autocomplete-name']}>
                     <span className={styles['autocomplete-history-icon']} aria-hidden="true">
                       <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -131,18 +139,21 @@ export default function AutocompleteSearch({ stocks, value, onChange }) {
                     </span>
                     {term}
                   </span>
-                </div>
+                </button>
               ))}
             </>
           )}
-          {showSuggestSection && suggestions.map((s, i) => (
-            <div
-              key={i}
+          {showSuggestSection && suggestions.map((s) => (
+            <button
+              type="button"
+              role="option"
+              aria-selected="false"
+              key={s.itemId || s.srtnCd}
               className={styles['autocomplete-item']}
-              onMouseDown={() => handleSelect(s)}>
+              onClick={() => handleSelect(s)}>
               <span className={styles['autocomplete-name']}>{s.itmsNm}</span>
               <span className={styles['autocomplete-code']}>{s.srtnCd}</span>
-            </div>
+            </button>
           ))}
         </div>
       )}
