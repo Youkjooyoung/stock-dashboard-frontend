@@ -70,7 +70,7 @@ Access Token 만료 시 `/api/auth/refresh`로 재발급합니다.
   "phone": "01012345678",
   "address": "서울시 강남구",
   "addressDetail": "101호",
-  "residentNo": "901010-1234567"
+  "impUid": "imp_123456789012"
 }
 ```
 
@@ -264,12 +264,14 @@ PortOne 본인인증 검증.
 
 ### 소셜 계정 연동
 
+**인증 필요** (`Authorization: Bearer <token>`). 액세스 토큰을 URL 에 싣지 않도록 서버가 일회용 `state`(10분)를 발급한다.
+
 | 경로 | 설명 |
 |------|------|
-| `GET /api/auth/kakao/link?token=` | 기존 계정에 카카오 연동 시작 |
-| `GET /api/auth/google/link?token=` | 기존 계정에 구글 연동 시작 |
-| `GET /api/auth/kakao/link/callback?code=&token=` | 카카오 연동 콜백 |
-| `GET /api/auth/google/link/callback?code=&token=` | 구글 연동 콜백 |
+| `POST /api/auth/link/{provider}/start` | `provider` = `kakao` 또는 `google`. 응답 `{ "url": "<소셜 로그인 주소&state=...>" }` 로 이동 |
+| `POST /api/auth/link/callback` | Body `{ "code": "...", "state": "..." }`. 응답 `{ "success": true, "provider": "kakao" }` |
+
+> state 는 연동을 시작한 본인만 한 번 사용할 수 있다. 이미 다른 회원에게 연결된 소셜 계정이면 409.
 
 ---
 
@@ -375,20 +377,6 @@ PortOne 본인인증 검증.
   { "provider": "KAKAO", "providerEmail": "user@kakao.com" },
   { "provider": "GOOGLE", "providerEmail": "user@gmail.com" }
 ]
-```
-
----
-
-### POST /api/user/social/link
-
-소셜 계정 연동.
-
-**Request Body**
-```json
-{
-  "provider": "KAKAO",
-  "providerEmail": "user@kakao.com"
-}
 ```
 
 ---
@@ -626,24 +614,17 @@ AI 종목 분석 (OpenAI Responses API).
 
 ---
 
-### WebSocket — `/ws/stock`
+### WebSocket — `/ws` (SockJS + STOMP)
 
-**인증 불필요** (STOMP 연결)
+CONNECT 프레임의 `Authorization: Bearer <accessToken>` 헤더로 사용자를 확인한다. 토큰이 없으면 시세 채널만 구독할 수 있다.
 
-**연결**
-```javascript
-const client = new Client({
-  webSocketFactory: () => new SockJS('/ws/stock'),
-});
-client.activate();
-```
+| 채널 | 구독 조건 | 설명 |
+|------|-----------|------|
+| `/topic/prices` | 누구나 | 시세 수집 완료 알림 |
+| `/topic/chat/{ticker}` | 로그인 | 종목 채팅방 메시지 (이메일 없음, `senderId` 포함) |
+| `/user/queue/alert` | 로그인 | 본인에게만 오는 가격·급등락 알림 |
 
-**구독**
-```javascript
-client.subscribe('/topic/stock-price', (msg) => {
-  const price = JSON.parse(msg.body);
-});
-```
+채팅 전송은 `/app/chat/{ticker}` 에 `{ "content": "메시지" }` 를 보낸다. 보낸 사람은 서버가 정한다.
 
 ---
 

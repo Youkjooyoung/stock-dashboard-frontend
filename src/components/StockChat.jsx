@@ -12,7 +12,7 @@ export default function StockChat({ ticker, stockName }) {
 
   const email    = localStorage.getItem('userEmail') || '';
   const nickname = localStorage.getItem('kakaoNickname') || email.split('@')[0] || '익명';
-  const token    = localStorage.getItem('accessToken') || '';
+  const myUserId = localStorage.getItem('userId') || '';
 
   useEffect(() => {
     api.get('/user/info')
@@ -26,8 +26,8 @@ export default function StockChat({ ticker, stockName }) {
       .catch(() => {});
   }, [ticker]);
 
+  // 인증 헤더는 useStomp 가 접속 직전에 최신 토큰으로 넣는다.
   const chatSocketOptions = useMemo(() => ({
-    connectHeaders: { Authorization: `Bearer ${token}` },
     reconnectDelay: 3000,
     onMessage: (msg) => {
       const data = JSON.parse(msg.body);
@@ -35,7 +35,7 @@ export default function StockChat({ ticker, stockName }) {
     },
     onConnect: () => setConnected(true),
     onDisconnect: () => setConnected(false),
-  }), [token]);
+  }), []);
 
   const clientRef = useStomp(`/topic/chat/${ticker}`, chatSocketOptions);
 
@@ -47,10 +47,10 @@ export default function StockChat({ ticker, stockName }) {
   const sendMessage = () => {
     const content = input.trim();
     if (!content || !clientRef.current?.connected) return;
+    // 보낸 사람과 닉네임은 서버가 접속 때 인증한 사용자로 정한다(닉네임 위조 방지).
     clientRef.current.publish({
       destination: `/app/chat/${ticker}`,
-      headers: { Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ nickname, content }),
+      body: JSON.stringify({ content }),
     });
     setInput('');
   };
@@ -66,7 +66,8 @@ export default function StockChat({ ticker, stockName }) {
     } catch { return ''; }
   };
 
-  const isMyMessage = (msg) => msg.userEmail === email;
+  // 서버는 이메일 대신 공개용 senderId 만 내려준다.
+  const isMyMessage = (msg) => myUserId !== '' && String(msg.senderId) === myUserId;
 
   return (
     <div className={styles['chat-wrap']}>

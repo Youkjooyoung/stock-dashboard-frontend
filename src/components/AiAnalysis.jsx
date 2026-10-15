@@ -96,7 +96,7 @@ export default function AiAnalysis({ type, stock, portfolio, priceMap }) {
       const res = await api.post('/ai/analyze', { prompt }, { timeout: 60000 });
       setAnalysis(res.data.analysis || '');
     } catch (e) {
-      const msg = e.response?.data?.error || e.message || 'AI 분석 요청에 실패했습니다.';
+      const msg = e.response?.data?.message || e.response?.data?.error || 'AI 분석 요청에 실패했습니다.';
       setError(msg);
     } finally {
       setLoading(false);

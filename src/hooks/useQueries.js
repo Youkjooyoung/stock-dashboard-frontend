@@ -209,15 +209,6 @@ export function useSocialLinks() {
   });
 }
 
-// ── 소셜 계정 연동 뮤테이션 ────────────────────────────────
-export function useLinkSocial() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (payload) => api.post('/user/social/link', payload),
-    onSuccess:  () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.socialLinks }),
-  });
-}
-
 // ── 소셜 연동 해제 뮤테이션 ────────────────────────────────
 export function useUnlinkSocial() {
   const queryClient = useQueryClient();

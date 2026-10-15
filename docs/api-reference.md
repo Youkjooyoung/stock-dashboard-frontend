@@ -56,12 +56,6 @@ Access Token 만료 시 `/api/auth/refresh`로 재발급합니다.
 
 ---
 
-### POST /api/auth/register
-
-신규 회원 즉시 생성 (레거시/관리자용). 실제 사용자 회원가입 플로우는 `/api/auth/signup`을 사용.
-
----
-
 ### POST /api/auth/signup
 
 회원가입 (PortOne 본인인증 선행 필요).
@@ -76,7 +70,7 @@ Access Token 만료 시 `/api/auth/refresh`로 재발급합니다.
   "phone": "01012345678",
   "address": "서울시 강남구",
   "addressDetail": "101호",
-  "residentNo": "901010-1234567"
+  "impUid": "imp_123456789012"
 }
 ```
 
@@ -272,12 +266,14 @@ PortOne 본인인증 검증.
 
 ### 소셜 계정 연동
 
+**인증 필요** (`Authorization: Bearer <token>`). 액세스 토큰을 URL 에 싣지 않도록 서버가 일회용 `state`(10분)를 발급한다.
+
 | 경로 | 설명 |
 |------|------|
-| `GET /api/auth/kakao/link?token=` | 기존 계정에 카카오 연동 시작 |
-| `GET /api/auth/google/link?token=` | 기존 계정에 구글 연동 시작 |
-| `GET /api/auth/kakao/link/callback?code=&token=` | 카카오 연동 콜백 |
-| `GET /api/auth/google/link/callback?code=&token=` | 구글 연동 콜백 |
+| `POST /api/auth/link/{provider}/start` | `provider` = `kakao` 또는 `google`. 응답 `{ "url": "<소셜 로그인 주소&state=...>" }` 로 이동 |
+| `POST /api/auth/link/callback` | Body `{ "code": "...", "state": "..." }`. 응답 `{ "success": true, "provider": "kakao" }` |
+
+> state 는 연동을 시작한 본인만 한 번 사용할 수 있다. 이미 다른 회원에게 연결된 소셜 계정이면 409.
 
 ---
 
@@ -383,20 +379,6 @@ PortOne 본인인증 검증.
   { "provider": "KAKAO", "providerEmail": "user@kakao.com" },
   { "provider": "GOOGLE", "providerEmail": "user@gmail.com" }
 ]
-```
-
----
-
-### POST /api/user/social/link
-
-소셜 계정 연동.
-
-**Request Body**
-```json
-{
-  "provider": "KAKAO",
-  "providerEmail": "user@kakao.com"
-}
 ```
 
 ---
@@ -701,7 +683,7 @@ AI 종목 분석 (OpenAI Responses API).
 
 종목 채팅방 최근 **50건** 메시지 조회 (페이지네이션 없음).
 
-**인증 필요** (`Authorization: Bearer <token>`) — 응답에 `userEmail`이 포함되므로 PII 보호 차원에서 permitAll 대상에서 제외됨.
+**인증 필요** (`Authorization: Bearer <token>`). 응답에 이메일은 포함하지 않는다. 내 메시지인지는 `senderId`(회원 ID)로 판단한다.
 
 **Path Params**: `ticker` — 종목코드 (예: `005930`)
 
@@ -711,7 +693,7 @@ AI 종목 분석 (OpenAI Responses API).
   {
     "msgId": 123,
     "ticker": "005930",
-    "userEmail": "user@example.com",
+    "senderId": 42,
     "nickname": "길동이",
     "content": "실적 발표가 기대됩니다.",
     "createdAt": "2026-04-17T01:20:00.000Z"
@@ -723,42 +705,37 @@ AI 종목 분석 (OpenAI Responses API).
 
 ---
 
-### WebSocket — `/ws/stock` (STOMP)
+### WebSocket — `/ws` (SockJS + STOMP)
 
-**인증**: SockJS 연결은 permitAll, 메시지 publish 시 `Authorization: Bearer <token>` 헤더 필수 (채팅용).
+**인증**: CONNECT 프레임의 `Authorization: Bearer <accessToken>` 헤더로 사용자를 확인한다(`StompAuthChannelInterceptor`).
+토큰이 없으면 비로그인 세션이 되어 시세 채널만 구독할 수 있다. 클라이언트는 `/app/**` 로만 SEND 할 수 있다.
 
-**연결**
+| 채널 | 구독 조건 | 설명 |
+|------|-----------|------|
+| `/topic/prices` | 누구나 | 시세 수집 완료 알림 `{ "basDt": "20261014" }` |
+| `/topic/chat/{ticker}` | 로그인 | 종목 채팅방 메시지 |
+| `/user/queue/alert` | 로그인 | 본인에게만 오는 가격·급등락 알림 |
+
+**연결** (재접속 때마다 최신 토큰을 넣는다)
 ```javascript
 const client = new Client({
-  webSocketFactory: () => new SockJS('/ws/stock'),
+  webSocketFactory: () => new SockJS(`${API_BASE_URL}/ws`),
+  beforeConnect: () => { client.connectHeaders = authConnectHeaders(); },
 });
 client.activate();
 ```
 
-**① 실시간 시세 수신** (구독 전용, 서버가 스케줄러에서 브로드캐스트)
-```javascript
-client.subscribe('/topic/stock-price', (msg) => {
-  const price = JSON.parse(msg.body);
-});
-```
-
-**② 종목별 채팅** (양방향)
-
-- **구독**: `/topic/chat/{ticker}` — 해당 종목 채팅방 신규 메시지 수신
-- **전송**: `/app/chat/{ticker}` — `ChatController.@MessageMapping("/chat/{ticker}")`가 처리
-  - Headers: `Authorization: Bearer <accessToken>` (필수, JWT에서 email 추출)
-  - Payload: `{ "nickname": "길동이", "content": "메시지" }`
-  - 서버가 DB 저장 후 `/topic/chat/{ticker}`로 브로드캐스트
+**채팅 전송**: `/app/chat/{ticker}` — Payload `{ "content": "메시지" }` (200자까지).
+보낸 사람과 닉네임은 서버가 CONNECT 때 인증한 사용자로 정한다. 브로드캐스트 메시지에도 이메일은 없고 `senderId` 만 있다.
 
 ```javascript
 client.subscribe('/topic/chat/005930', (msg) => {
-  const chatMsg = JSON.parse(msg.body);
+  const chatMsg = JSON.parse(msg.body); // { msgId, ticker, senderId, nickname, content, createdAt }
 });
 
 client.publish({
   destination: '/app/chat/005930',
-  headers: { Authorization: `Bearer ${accessToken}` },
-  body: JSON.stringify({ nickname: '길동이', content: '안녕하세요' }),
+  body: JSON.stringify({ content: '안녕하세요' }),
 });
 ```
 

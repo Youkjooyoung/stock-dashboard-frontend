@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/env';
 import AddressSearch from './AddressSearch';
-import SecureKeypad from './SecureKeypad';
 import { useToast } from '../hooks/useToast';
 import styles from '../styles/components/SignupFormStep.toss.module.css';
 
@@ -50,14 +49,6 @@ function validatePassword(pw) {
     return null;
 }
 
-function validateResidentNo(v) {
-    const c = v.replace('-', '');
-    if (!/^\d{13}$/.test(c)) return false;
-    const w = [2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5];
-    const sum = w.reduce((acc, cur, i) => acc + cur * parseInt(c[i]), 0);
-    return (11 - (sum % 11)) % 10 === parseInt(c[12]);
-}
-
 export default function SignupFormStep({ certInfo, onComplete }) {
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -70,9 +61,6 @@ export default function SignupFormStep({ certInfo, onComplete }) {
         address: '', addressDetail: '', agreedTerms: false,
     });
     const [loading, setLoading]   = useState(false);
-    const [rrnBack, setRrnBack]   = useState('');
-    const [rrnFront, setRrnFront] = useState('');
-    const [showKeypad, setShowKeypad] = useState(false);
     const [showPw, setShowPw]     = useState(false);
     const [showPwC, setShowPwC]   = useState(false);
     const [touched, setTouched]   = useState({});
@@ -139,34 +127,9 @@ export default function SignupFormStep({ certInfo, onComplete }) {
         }
     };
 
-    const handleRrnFrontChange = (e) => {
-        const v = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
-        setRrnFront(v);
-        setTouched(prev => ({ ...prev, residentNo: true }));
-        const combined = v + rrnBack;
-        if (combined.length === 13) {
-            if (!validateResidentNo(combined)) setErrors(prev => ({ ...prev, residentNo: '유효하지 않은 주민등록번호입니다.' }));
-            else setErrors(prev => { const e = { ...prev }; delete e.residentNo; return e; });
-        } else {
-            setErrors(prev => { const e = { ...prev }; delete e.residentNo; return e; });
-        }
-    };
-
-    const handleRrnBackChange = (v) => {
-        setRrnBack(v);
-        setTouched(prev => ({ ...prev, residentNo: true }));
-        if (v.length === 7) {
-            const combined = rrnFront + v;
-            if (!validateResidentNo(combined)) setErrors(prev => ({ ...prev, residentNo: '유효하지 않은 주민등록번호입니다.' }));
-            else setErrors(prev => { const e = { ...prev }; delete e.residentNo; return e; });
-        } else {
-            setErrors(prev => { const e = { ...prev }; delete e.residentNo; return e; });
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setTouched({ email: true, password: true, passwordConfirm: true, nickname: true, residentNo: true, agreedTerms: true, address: true });
+        setTouched({ email: true, password: true, passwordConfirm: true, nickname: true, agreedTerms: true, address: true });
 
         const errs = {};
         if (!validateEmail(form.email))  errs.email = '올바른 이메일 형식이 아닙니다.';
@@ -180,8 +143,6 @@ export default function SignupFormStep({ certInfo, onComplete }) {
         const nickErr = validateNickname(form.nickname);
         if (nickErr) errs.nickname = nickErr;
 
-        if (rrnFront.length !== 6 || rrnBack.length !== 7 || !validateResidentNo(rrnFront + rrnBack))
-            errs.residentNo = '유효하지 않은 주민등록번호입니다.';
         if (!form.address)     errs.address     = '주소를 검색해 주세요.';
         if (!form.agreedTerms) errs.agreedTerms = '이용약관에 동의해주세요.';
 
@@ -206,7 +167,6 @@ export default function SignupFormStep({ certInfo, onComplete }) {
                 name:          certInfo.name,
                 phone:         certInfo.phone,
                 nickname:      form.nickname,
-                residentNo:    rrnFront + rrnBack,
                 address:       form.address,
                 addressDetail: form.addressDetail,
                 impUid:        certInfo.impUid,
@@ -239,9 +199,6 @@ export default function SignupFormStep({ certInfo, onComplete }) {
     const pwStrength  = getPasswordStrength(form.password);
     const pwMatch     = form.passwordConfirm.length > 0 && form.password === form.passwordConfirm;
     const pwMismatch  = form.passwordConfirm.length > 0 && form.password !== form.passwordConfirm;
-    const rrnComplete = rrnFront.length === 6 && rrnBack.length === 7;
-    const rrnHasError = !!errors.residentNo;
-    const rrnBackOk   = touched.residentNo && !errors.residentNo && rrnBack.length === 7;
 
     return (
         <>
@@ -405,44 +362,6 @@ export default function SignupFormStep({ certInfo, onComplete }) {
                     {errors.nickname && <p className="auth-error-msg">{errors.nickname}</p>}
                     {touched.nickname && !errors.nickname && form.nickname &&
                         <span className={styles['msg-ok']}>✓ 사용 가능한 닉네임입니다.</span>}
-                </div>
-
-                <div className="auth-field">
-                    <label className="auth-label">
-                        주민등록번호 <span className={styles.required}>*</span>
-                    </label>
-                    <div className={styles['rrn-row']}>
-                        <input
-                            className={`auth-input ${styles['rrn-front']} ${rrnHasError ? 'error' : ''}`}
-                            placeholder="앞 6자리"
-                            maxLength={6}
-                            value={rrnFront}
-                            onChange={handleRrnFrontChange}
-                        />
-                        <span className={styles['rrn-sep']}>-</span>
-                        <div
-                            className={`${styles['rrn-back-display']} ${rrnHasError ? styles.error : ''} ${rrnBackOk ? styles.success : ''}`}
-                            onClick={() => setShowKeypad(true)}
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowKeypad(true); }}
-                        >
-                            {Array.from({ length: 7 }, (_, i) => (
-                                <span key={i} className={i < rrnBack.length ? styles['rrn-dot-filled'] : styles['rrn-dot-empty']} />
-                            ))}
-                        </div>
-                    </div>
-                    {showKeypad && (
-                        <SecureKeypad
-                            value={rrnBack}
-                            onChange={handleRrnBackChange}
-                            onClose={() => setShowKeypad(false)}
-                        />
-                    )}
-                    {errors.residentNo && <p className="auth-error-msg">{errors.residentNo}</p>}
-                    {touched.residentNo && !errors.residentNo && rrnComplete &&
-                        <span className={styles['msg-ok']}>✓ 확인됐습니다.</span>}
-                    <p className={styles.hint}>주민등록번호는 암호화되어 안전하게 저장됩니다.</p>
                 </div>
 
                 <div className="auth-field">

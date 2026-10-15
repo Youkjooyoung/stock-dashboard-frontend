@@ -132,15 +132,20 @@ export default function ProfilePage() {
     }
   }, [location.search]);
 
-  const handleLinkKakao = () => {
-    const token = localStorage.getItem('accessToken');
-    window.location.href = `${api.defaults.baseURL}/auth/kakao/link?token=${token}`;
+  // 토큰을 URL 에 싣지 않는다. 서버가 일회용 state 를 붙인 소셜 로그인 주소를 돌려준다.
+  const startSocialLink = async (provider) => {
+    try {
+      const { data } = await api.post(`/auth/link/${provider}/start`);
+      window.location.href = data.url;
+    } catch {
+      setSocialMsg('소셜 계정 연동을 시작하지 못했습니다. 잠시 후 다시 시도해주세요.');
+      setSocialMsgType('error');
+    }
   };
 
-  const handleLinkGoogle = () => {
-    const token = localStorage.getItem('accessToken');
-    window.location.href = `${api.defaults.baseURL}/auth/google/link?token=${token}`;
-  };
+  const handleLinkKakao = () => startSocialLink('kakao');
+
+  const handleLinkGoogle = () => startSocialLink('google');
 
   const handleUnlinkSocial = async (provider) => {
     if (!window.confirm(`${provider === 'KAKAO' ? '카카오' : '구글'} 연동을 해제하시겠습니까?`)) return;
