@@ -70,7 +70,7 @@ Access Token 만료 시 `/api/auth/refresh`로 재발급합니다.
   "phone": "01012345678",
   "address": "서울시 강남구",
   "addressDetail": "101호",
-  "residentNo": "901010-1234567"
+  "impUid": "imp_123456789012"
 }
 ```
 

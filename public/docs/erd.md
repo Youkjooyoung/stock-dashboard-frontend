@@ -24,7 +24,6 @@ erDiagram
         varchar PHONE
         varchar ADDRESS
         varchar ADDRESS_DETAIL
-        varchar RESIDENT_NO "AES-256 암호화"
         tinyint EMAIL_VERIFIED
         varchar EMAIL_VERIFY_TOKEN
         int LOGIN_FAIL_CNT
@@ -126,7 +125,6 @@ erDiagram
 | `USER_ID` | INT PK | 자동 증가 기본키 |
 | `EMAIL` | VARCHAR UK | 로그인 ID, 중복 불가 |
 | `PASSWORD` | VARCHAR | BCrypt 해시 |
-| `RESIDENT_NO` | VARCHAR | AES-256-CBC 암호화 저장 |
 | `ROLE` | VARCHAR | `USER` / `ADMIN` |
 | `EMAIL_VERIFIED` | TINYINT | 이메일 인증 완료 여부 |
 | `LOGIN_FAIL_CNT` | INT | 연속 로그인 실패 횟수 (5회 → 잠금) |
@@ -192,7 +190,7 @@ KRX(한국거래소) 기준 종목 코드와 종목명. `MARKET`: `KOSPI`, `KOSD
 | 결정 | 이유 |
 |------|------|
 | `PORTFOLIO.TICKER` 비정규화 | STOCK_ITEM과 JOIN 없이 포트폴리오 조회 성능 확보 |
-| `USERS.RESIDENT_NO` AES-256 | 개인정보보호법 준수 — 주민등록번호 원문 저장 금지 |
+| 주민등록번호 미수집 | 개인정보 보호법 제24조의2 — 법령 근거 없는 수집 금지. 본인 확인은 PortOne 인증 결과(이름·휴대폰)로 대신하며 `RESIDENT_NO` 컬럼은 2026-10-15 마이그레이션으로 삭제 |
 | `USERS.DELETED_AT` 소프트 삭제 | 2주 복구 기간 보장, 데이터 분석 보존 |
 | `REFRESH_TOKEN` DB 저장 | 서버 사이드 무효화 (로그아웃·탈취 감지 대응) |
 | `CHAT_MESSAGE.TICKER` 비정규화 | 채팅 이력 독립 보존, 종목 삭제 영향 없음 |
