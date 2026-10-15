@@ -25,6 +25,17 @@
 - Keep user-facing Korean text readable and avoid mojibake.
 - Do not expose backend API keys, OAuth client secrets, JWT secrets, payment secrets, or AWS keys in frontend code.
 
+## Security Rules
+These rules come from the 2026-10-15 security review.
+- Never put access or refresh tokens in URLs. Social account linking calls POST `/auth/link/{provider}/start`, redirects to the returned URL, and finishes with POST `/auth/link/callback` (`code`, `state`).
+- WebSocket clients set headers in `beforeConnect` with `authConnectHeaders()` so every reconnect sends the latest token. Personal alerts subscribe to `/user/queue/alert`; publish only to `/app/**`.
+- Do not send identity fields (nickname, email, user ID) in chat or other messages; the server decides who the sender is.
+- Identify "my" items with public IDs (`senderId`, `userId`), never by comparing email addresses from shared responses.
+- Show the server's `message` field for errors (`err.response?.data?.message`); it is safe to display.
+- Keep API paths relative to the axios `baseURL` (`/api` is already included). Delete unused API modules instead of keeping stale copies.
+- Before release, run `npm audit --omit=dev`. Remaining dev-only advisories come from vitest 2 and are tracked for a vitest upgrade.
+- Components rendered in tests import `React` explicitly, because vitest 2 does not apply the automatic JSX runtime used by Vite 8.
+
 ## Deployment Notes
 - Production is served through AWS/Nginx.
 - Run `npm run build` before deployment.
