@@ -196,8 +196,10 @@ export default function FloatingAiChat() {
       const prompt = userText;
       const res = await api.post('/ai/analyze', { prompt }, { timeout: 60000 });
       setMessages(prev => [...prev, { role: 'ai', text: res.data.analysis || '분석 결과를 가져오지 못했습니다.' }]);
-    } catch {
-      setMessages(prev => [...prev, { role: 'ai', text: 'AI 분석 요청에 실패했습니다. 잠시 후 다시 시도해주세요.', error: true }]);
+    } catch (err) {
+      // 사용량 제한(429) 같은 서버 안내 문구가 있으면 그대로 보여준다.
+      const text = err.response?.data?.message || 'AI 분석 요청에 실패했습니다. 잠시 후 다시 시도해주세요.';
+      setMessages(prev => [...prev, { role: 'ai', text, error: true }]);
     } finally {
       setLoading(false);
     }

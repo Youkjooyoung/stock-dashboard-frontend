@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
 
@@ -10,26 +10,20 @@ export default function OAuthLinkCallbackPage() {
     if (isRequestSent.current) return;
     isRequestSent.current = true;
 
-    const params     = new URLSearchParams(window.location.search);
-    const code       = params.get('code');
-    const state      = params.get('state');
+    const params = new URLSearchParams(window.location.search);
+    const code   = params.get('code');
+    const state  = params.get('state');
+    // 주소창과 방문 기록에 code/state 가 남지 않도록 지운다.
+    window.history.replaceState(null, '', window.location.pathname);
 
     if (!code || !state) {
       navigate('/profile?linkError=true');
       return;
     }
 
-    const colonIdx = state.indexOf(':');
-    const provider = state.substring(0, colonIdx);
-    const token    = state.substring(colonIdx + 1);
-
-    if (!provider || !token) {
-      navigate('/profile?linkError=true');
-      return;
-    }
-
-    api.get(`/auth/${provider}/link/callback`, { params: { code, token } })
-      .then(() => navigate(`/profile?linked=${provider}`))
+    // state 는 서버가 연동 시작 때 발급한 일회용 값이다. 누가 요청했는지는 서버가 기억한다.
+    api.post('/auth/link/callback', { code, state })
+      .then(res => navigate(`/profile?linked=${res.data.provider}`))
       .catch(() => navigate('/profile?linkError=true'));
   }, [navigate]);
 
