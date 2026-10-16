@@ -1,19 +1,26 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import useAlertSocket from '../hooks/useAlertSocket';
 import useAlertStore from '../store/alertStore';
 import styles from '../styles/components/AlertNotification.module.css';
 
+// 서버가 보내는 알림은 두 종류다.
+// - BIG_MOVE   : 관심 종목이 시가 대비 10% 이상 움직임. direction 은 'UP' 또는 'DOWN'
+// - PRICE_ALERT: 사용자가 정한 목표가 도달. alertType 은 'ABOVE'(이상) 또는 'BELOW'(이하)
+const isUpAlert = (data) =>
+  data.type === 'BIG_MOVE' ? data.direction === 'UP' : data.alertType === 'ABOVE';
+
+// 브라우저 알림(창이 숨겨져 있을 때)에 쓸 제목과 내용
 function buildNotificationText(data) {
   if (data.type === 'BIG_MOVE') {
-    const isUp = data.direction === '급등';
+    const isUp = isUpAlert(data);
     const sign = isUp ? '▲' : '▼';
     return {
-      title: `${isUp ? '급등' : '급락'} ${data.stockName} ${data.direction}`,
+      title: `${isUp ? '급등' : '급락'} ${data.stockName}`,
       body: `${sign} ${Math.abs(Number(data.rate)).toFixed(2)}% · 현재가 ${Number(data.close).toLocaleString()}원`,
     };
   }
 
-  const isUp = data.alertType === 'ABOVE';
+  const isUp = isUpAlert(data);
   return {
     title: `${data.stockName} 목표가 도달`,
     body: `현재가 ${Number(data.currentPrice).toLocaleString()}원 (목표 ${Number(data.targetPrice).toLocaleString()}원 ${isUp ? '이상' : '이하'})`,
@@ -30,6 +37,8 @@ export default function AlertNotification({ userId }) {
     }
   }, []);
 
+  // 알림을 받으면 헤더 배지 수를 올리고, 화면 오른쪽에 6초 동안 띄운다.
+  // 다른 탭을 보고 있으면(document.hidden) 브라우저 알림도 보낸다.
   useAlertSocket(userId, (data) => {
     const id = Date.now();
     increment();
@@ -52,7 +61,7 @@ export default function AlertNotification({ userId }) {
     <div className={styles['alert-notifications']}>
       {alerts.map((alert) => {
         const isBigMove = alert.type === 'BIG_MOVE';
-        const isUp = isBigMove ? alert.direction === '급등' : alert.alertType === 'ABOVE';
+        const isUp = isUpAlert(alert);
 
         return (
           <div key={alert.id} className={`${styles['alert-toast']} ${isUp ? 'up' : 'down'}`}>
@@ -64,7 +73,7 @@ export default function AlertNotification({ userId }) {
                   {isUp ? '급등 알림!' : '급락 알림!'}
                 </div>
                 <div className={styles['alert-toast-body']}>
-                  <span className={styles['alert-toast-highlight']}>{alert.stockName}</span>이(가) 전일 대비
+                  <span className={styles['alert-toast-highlight']}>{alert.stockName}</span>이(가) 시가 대비
                 </div>
                 <div className={`${styles['alert-toast-rate']} ${isUp ? 'up' : 'down'}`}>
                   {isUp ? '▲' : '▼'} {Math.abs(Number(alert.rate)).toFixed(2)}% 변동
