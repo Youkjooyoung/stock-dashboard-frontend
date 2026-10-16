@@ -4,6 +4,8 @@ import usePriceFlash from '../hooks/usePriceFlash';
 import styles from '../styles/components/StockTable.module.css';
 import utils from '../styles/inline-utils.module.css';
 
+// 필터·정렬·페이지 상태를 sessionStorage 에 저장해 다른 페이지에 다녀와도 유지한다.
+// (브라우저 탭을 닫으면 지워진다.)
 const SS_KEY = 'stockTableState';
 
 function loadState() {
@@ -37,6 +39,7 @@ function exportCSV(data) {
     d.rate?.toFixed(2) || '0.00'
   ]);
   const csv = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(',')).join('\n');
+  // \uB9E8 \uC55E\uC758 \uFEFF(BOM)\uAC00 \uC788\uC5B4\uC57C \uC5D1\uC140\uC774 UTF-8 \uB85C \uC77D\uC5B4 \uD55C\uAE00\uC774 \uAE68\uC9C0\uC9C0 \uC54A\uB294\uB2E4.
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -92,6 +95,7 @@ export default function StockTable({
 
   const hasActiveFilter = filterMarket !== 'all' || filterRateMin !== '' || filterRateMax !== '' || filterVolMin !== '';
 
+  // 표에 보일 행: 검색(이름·코드·초성) → 등락률 계산(시가 대비 종가) → 시장·등락률·거래량 필터 → 정렬
   const filtered = useMemo(() => {
     return stocks
       .filter(d => {
@@ -133,6 +137,7 @@ export default function StockTable({
 
   const flashMap = usePriceFlash(paginated);
 
+  // 현재 페이지 앞뒤로 2개씩 페이지 번호를 보여준다. 예) 5페이지 → 3 4 5 6 7
   const getPageNumbers = () => {
     const delta = 2;
     const left  = Math.max(1, page - delta);

@@ -6,6 +6,8 @@ import AddressSearch from './AddressSearch';
 import { useToast } from '../hooks/useToast';
 import styles from '../styles/components/SignupFormStep.toss.module.css';
 
+// 공용 api(axiosInstance)는 10초 제한 시간이 있다. 가입·복구는 본인인증 조회와 메일 발송을 거쳐
+// 10초를 넘길 수 있어서 제한 시간 없는 axios 를 직접 쓴다. (로그인 전이라 토큰도 필요 없다.)
 const API = `${API_BASE_URL}/api/auth`;
 
 const STRENGTH_LABELS = ['', '약함', '보통', '강함', '매우 강함'];

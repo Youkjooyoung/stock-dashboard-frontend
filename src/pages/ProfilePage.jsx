@@ -41,6 +41,8 @@ function validateNickname(name) {
   return null;
 }
 
+// 닉네임은 30일에 한 번만 바꿀 수 있다. 남은 일수를 돌려준다(0 이면 지금 바꿀 수 있음).
+// 마지막 변경 시각은 이 브라우저(localStorage)에만 기록되고 서버는 검사하지 않는다.
 function getCooldownDays() {
   const last = localStorage.getItem('nicknameLastChanged');
   if (!last) return 0;
@@ -71,6 +73,8 @@ export default function ProfilePage() {
   const unlinkSocialMutation        = useUnlinkSocial();
 
   const email = userInfo?.email || localStorage.getItem('userEmail') || '';
+  // 소셜 가입 때 인증된 이메일을 받지 못하면 서버가 kakao_{id}@kakao.com 같은 임시 이메일을 만든다.
+  // 이런 이메일은 화면에 그대로 보여주지 않는다.
   const isKakaoOnlyEmail = email.startsWith('kakao_') || email.startsWith('google_');
 
   const provider  = localStorage.getItem('provider') || '';
@@ -319,6 +323,7 @@ export default function ProfilePage() {
     }
   };
 
+  // 즐겨찾기 종목별 등락률(%) = (종가 - 시가) / 시가 × 100. 시가가 0 이면 0 으로 둔다.
   const rateList = watchlist.map(s => {
     const open  = s.mkp  || 0;
     const close = s.clpr || 0;
@@ -742,10 +747,13 @@ export default function ProfilePage() {
 
           {/* ── 포트폴리오 탭 ── */}
           {activeTab === '포트폴리오' && (() => {
+            // 종목코드 → 최신 종가
             const priceMap = Object.fromEntries(
               stockPrices.map(s => [s.srtnCd, s.clpr || 0])
             );
 
+            // 보유 종목마다 투자금(매수가×수량), 평가금(현재가×수량), 손익, 수익률을 계산한다.
+            // 현재가가 없으면 매수가로 계산해서 손익 0 으로 보이고, hasPrice 로 표시한다.
             const enriched = portfolio.map(p => {
               const curPrice  = priceMap[p.ticker] ?? p.buyPrice;
               const hasPrice  = !!priceMap[p.ticker];

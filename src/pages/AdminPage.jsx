@@ -14,6 +14,34 @@ const NAV_ITEMS = [
   { id: 'chats', label: 'AI 채팅 이력', icon: '💬' },
 ];
 
+const ITEMS_PER_PAGE = 50;
+
+// 정렬 비교 함수. dir 이 'asc' 면 오름차순, 'desc' 면 내림차순.
+function compareValues(valA, valB, dir) {
+    if (valA < valB) return dir === 'asc' ? -1 : 1;
+    if (valA > valB) return dir === 'asc' ? 1 : -1;
+    return 0;
+}
+
+function getUserSortValue(user, key) {
+    if (key === 'userId')    return user.userId ?? 0;
+    if (key === 'email')     return (user.email || '').toLowerCase();
+    if (key === 'name')      return (user.name  || '').toLowerCase();
+    if (key === 'createdAt') return user.createdAt || '';
+    if (key === 'role')      return user.role || 'USER';
+    return '';
+}
+
+// 종목 목록 API 는 DB 컬럼 이름 그대로(TICKER, ITEM_NM 처럼 대문자) 내려준다.
+// 그래서 대문자 키를 먼저 보고, 없으면 소문자 키를 본다.
+function getStockSortValue(stock, key) {
+    if (key === 'ticker')    return stock.TICKER || stock.ticker || '';
+    if (key === 'name')      return stock.ITEM_NM || stock.itemNm || stock.name || '';
+    if (key === 'market')    return stock.MARKET || stock.market || '';
+    if (key === 'createdAt') return stock.CREATED_AT || stock.createdAt || '';
+    return '';
+}
+
 export default function AdminPage() {
     const navigate = useNavigate();
     const { role, logout } = useAuthStore();
@@ -42,8 +70,8 @@ export default function AdminPage() {
     const [stockSortKey, setStockSortKey] = useState('ticker');
     const [stockSortDir, setStockSortDir] = useState('asc');
     const [stockPage, setStockPage] = useState(1);
-    const ITEMS_PER_PAGE = 50;
 
+    // 회원 목록: 검색어 → 권한 → 상태 순서로 거른 뒤 정렬한다.
     const filteredAndSortedUsers = useMemo(() => {
         if (!users) return [];
         const q = userSearch.toLowerCase().trim();
@@ -65,21 +93,8 @@ export default function AdminPage() {
 
         if (!userSortKey) return filtered;
 
-        return [...filtered].sort((a, b) => {
-            const getField = (obj, key) => {
-                if (key === 'userId')    return obj.userId ?? 0;
-                if (key === 'email')     return (obj.email    || '').toLowerCase();
-                if (key === 'name')      return (obj.name     || '').toLowerCase();
-                if (key === 'createdAt') return obj.createdAt || '';
-                if (key === 'role')      return obj.role      || 'USER';
-                return '';
-            };
-            const valA = getField(a, userSortKey);
-            const valB = getField(b, userSortKey);
-            if (valA < valB) return userSortDir === 'asc' ? -1 : 1;
-            if (valA > valB) return userSortDir === 'asc' ?  1 : -1;
-            return 0;
-        });
+        return [...filtered].sort((a, b) =>
+            compareValues(getUserSortValue(a, userSortKey), getUserSortValue(b, userSortKey), userSortDir));
     }, [users, userSearch, userRoleFilter, userStatusFilter, userSortKey, userSortDir]);
 
     const paginatedUsers = useMemo(() => {
@@ -93,27 +108,15 @@ export default function AdminPage() {
         if (!stocks) return [];
         const q = stockSearch.toLowerCase();
         const filtered = stocks.filter(s => {
-            const t = String(s.TICKER || s.ticker || '').toLowerCase();
-            const n = String(s.ITEM_NM || s.itemNm || s.name || '').toLowerCase();
+            const t = String(getStockSortValue(s, 'ticker')).toLowerCase();
+            const n = String(getStockSortValue(s, 'name')).toLowerCase();
             return t.includes(q) || n.includes(q);
         });
 
         if (!stockSortKey) return filtered;
 
-        return filtered.sort((a, b) => {
-            const getField = (obj, key) => {
-                if (key === 'ticker') return obj.TICKER || obj.ticker || '';
-                if (key === 'name') return obj.ITEM_NM || obj.itemNm || obj.name || '';
-                if (key === 'market') return obj.MARKET || obj.market || '';
-                if (key === 'createdAt') return obj.CREATED_AT || obj.createdAt || '';
-                return '';
-            };
-            const valA = getField(a, stockSortKey);
-            const valB = getField(b, stockSortKey);
-            if (valA < valB) return stockSortDir === 'asc' ? -1 : 1;
-            if (valA > valB) return stockSortDir === 'asc' ? 1 : -1;
-            return 0;
-        });
+        return filtered.sort((a, b) =>
+            compareValues(getStockSortValue(a, stockSortKey), getStockSortValue(b, stockSortKey), stockSortDir));
     }, [stocks, stockSearch, stockSortKey, stockSortDir]);
 
     const paginatedStocks = useMemo(() => {
@@ -130,6 +133,7 @@ export default function AdminPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // 탭을 처음 열 때만 그 탭의 데이터를 불러온다.
     useEffect(() => {
         if (activeTab === 'users' && users.length === 0) fetchUsers();
         if (activeTab === 'stocks' && stocks.length === 0) fetchStocks();

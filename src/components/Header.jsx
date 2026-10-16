@@ -15,6 +15,9 @@ const NAV_ITEMS = [
   { label: '프로필', path: '/profile' },
 ];
 
+// 알림이 울린 시각. 아직 울리지 않은 알림은 등록 시각을 쓴다.
+const alertTime = (alert) => new Date(alert.triggeredAt || alert.createdAt);
+
 export default function Header({ autoRefresh, onToggleRefresh }) {
   const navigate  = useNavigate();
   const location  = useLocation();
@@ -35,14 +38,17 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
 
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const alertRef = useRef(null);
+  // 읽음 표시는 서버에 저장하지 않고 이 브라우저(localStorage)에 알림 ID 목록으로만 기억한다.
   const [readAlerts, setReadAlerts] = useState(() => {
     try { return JSON.parse(localStorage.getItem('readAlerts') || '[]'); }
     catch { return []; }
   });
 
-  const triggeredAlerts = alerts.filter(a => a.isTriggered === 'Y' || a.IS_TRIGGERED === 'Y')
-                                .sort((a, b) => new Date(b.triggeredAt || b.TRIGGERED_AT || b.createdAt || b.CREATED_AT) - new Date(a.triggeredAt || a.TRIGGERED_AT || a.createdAt || a.CREATED_AT));
+  // 목표가에 도달해 울린 알림만, 최근 것부터
+  const triggeredAlerts = alerts.filter(a => a.isTriggered === 'Y')
+                                .sort((a, b) => alertTime(b) - alertTime(a));
 
+  // 알림 창 바깥을 누르면 창을 닫는다.
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (alertRef.current && !alertRef.current.contains(e.target)) {
@@ -67,7 +73,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
   };
 
   const markAllAsRead = () => {
-    const allIds = triggeredAlerts.map(a => a.alertId || a.ALERT_ID);
+    const allIds = triggeredAlerts.map(a => a.alertId);
     const merged = Array.from(new Set([...readAlerts, ...allIds]));
     setReadAlerts(merged);
     localStorage.setItem('readAlerts', JSON.stringify(merged));
@@ -87,7 +93,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
     if (!window.confirm('수신된 모든 알림을 삭제할까요?')) return;
     try {
       await Promise.all(
-        triggeredAlerts.map(a => deleteAlertMutation.mutateAsync(a.alertId || a.ALERT_ID))
+        triggeredAlerts.map(a => deleteAlertMutation.mutateAsync(a.alertId))
       );
     } catch {
       showToast('일부 알림 삭제에 실패했습니다.', 'error');
@@ -211,7 +217,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
                       <div className={styles['alert-empty']}>수신된 알림이 없습니다.</div>
                     ) : (
                       triggeredAlerts.map(a => {
-                        const alertId = a.alertId || a.ALERT_ID;
+                        const alertId = a.alertId;
                         const isRead = readAlerts.includes(alertId);
                         return (
                           <div key={alertId} className={`${styles['alert-item']} ${isRead ? styles.read : ''}`}>
@@ -221,7 +227,7 @@ export default function Header({ autoRefresh, onToggleRefresh }) {
                                 목표가 {(a.targetPrice || a.TARGET_PRICE)?.toLocaleString()}원 {(a.alertType || a.ALERT_TYPE) === 'ABOVE' ? '이상' : '이하'} 도달!
                               </div>
                               <div className={styles['alert-item-time']}>
-                                {new Date(a.triggeredAt || a.TRIGGERED_AT || a.createdAt || a.CREATED_AT).toLocaleString('ko-KR')}
+                                {alertTime(a).toLocaleString('ko-KR')}
                               </div>
                             </div>
                             <div className={styles['alert-item-actions']}>

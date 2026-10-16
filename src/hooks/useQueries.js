@@ -1,8 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axiosInstance';
 
+// 로그인이 필요한 API 는 로그인하지 않았을 때 아예 요청하지 않는다(enabled: false).
 const isLoggedIn = () => !!localStorage.getItem('accessToken');
+
 // ── Query Keys ─────────────────────────────────────────────
+// React Query 가 캐시를 구분하는 이름. 데이터를 바꾼 뒤 같은 키를 무효화하면 화면이 새 데이터로 다시 그려진다.
 export const QUERY_KEYS = {
   stocks:          ['stocks'],
   stockDetail:     (ticker) => ['stocks', ticker],
@@ -57,8 +60,8 @@ export function useWatchlist() {
   return useQuery({
     queryKey: QUERY_KEYS.watchlist,
     queryFn:  () => api.get('/user/watchlist').then(r => r.data),
-	staleTime: 60 * 1000,
-    	enabled: isLoggedIn(),
+    staleTime: 60 * 1000,
+    enabled: isLoggedIn(),
   });
 }
 
@@ -67,8 +70,8 @@ export function useWatchlistDetail() {
   return useQuery({
     queryKey: QUERY_KEYS.watchlistDetail,
     queryFn:  () => api.get('/user/watchlist/detail').then(r => r.data),
-	 staleTime: 30 * 1000,
-	 enabled: isLoggedIn(),
+    staleTime: 30 * 1000,
+    enabled: isLoggedIn(),
   });
 }
 
@@ -116,8 +119,8 @@ export function useAlerts() {
   return useQuery({
     queryKey: QUERY_KEYS.alerts,
     queryFn:  () => api.get('/alert').then(r => r.data),
-	staleTime: 30 * 1000,
-    	enabled: isLoggedIn(),
+    staleTime: 30 * 1000,
+    enabled: isLoggedIn(),
   });
 }
 
@@ -153,8 +156,8 @@ export function useUserInfo() {
   return useQuery({
     queryKey: QUERY_KEYS.userInfo,
     queryFn:  () => api.get('/user/info').then(r => r.data),
-	staleTime: 30 * 1000,
-    	enabled: isLoggedIn(),
+    staleTime: 30 * 1000,
+    enabled: isLoggedIn(),
   });
 }
 
@@ -163,8 +166,8 @@ export function usePortfolio() {
   return useQuery({
     queryKey: QUERY_KEYS.portfolio,
     queryFn:  () => api.get('/portfolio').then(r => r.data),
-	staleTime: 30 * 1000,
-    	enabled: isLoggedIn(),
+    staleTime: 30 * 1000,
+    enabled: isLoggedIn(),
   });
 }
 
@@ -203,9 +206,8 @@ export function useSocialLinks() {
   return useQuery({
     queryKey: QUERY_KEYS.socialLinks,
     queryFn:  () => api.get('/user/social').then(r => r.data),
-	refetchOnWindowFocus: true,
-    	enabled: isLoggedIn(),
-
+    refetchOnWindowFocus: true,
+    enabled: isLoggedIn(),
   });
 }
 

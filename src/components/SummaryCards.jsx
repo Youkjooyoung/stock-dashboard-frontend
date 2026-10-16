@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import styles from '../styles/components/SummaryCards.module.css';
 
 export default function SummaryCards({ stocks }) {
+  // 전체 종목을 한 번 훑어서 상승·하락 종목 수, 평균 등락률, 거래량 1위, 상승률 1위를 구한다.
+  // 등락률은 (종가 - 시가) / 시가 × 100 이다.
   const stats = useMemo(() => {
     if (stocks.length === 0) return null;
 

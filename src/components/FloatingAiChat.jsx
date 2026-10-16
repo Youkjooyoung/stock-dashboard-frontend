@@ -145,6 +145,10 @@ export default function FloatingAiChat() {
 
   const toggleCat = (i) => setOpenCat(prev => prev === i ? null : i);
 
+  // 입력한 질문과 가장 비슷한 FAQ 답을 찾는다.
+  // 1) 물음표·띄어쓰기와 조사·어미에 자주 쓰이는 글자(은·는·이·가 등)를 한 글자씩 지우고 비교한다.
+  // 2) 한쪽이 다른 쪽을 포함하면 바로 그 답을 쓴다.
+  // 3) 아니면 2~6글자 조각이 FAQ 질문에 얼마나 들어 있는지로 점수를 매겨, 0.3 이상인 최고 점수 답을 쓴다.
   const findFaqAnswer = (text) => {
     const normalize = (s) => s.replace(/[?？.。\s은는이가을를에서으로의하나요어디서어떻게]/g, '').toLowerCase();
     const t = normalize(text);

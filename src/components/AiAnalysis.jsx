@@ -2,6 +2,7 @@ import { useState } from 'react';
 import api from '../api/axiosInstance';
 import styles from '../styles/components/AiAnalysis.module.css';
 
+// AI 에게 보낼 질문 문장을 화면의 데이터로 만든다. (서버는 받은 문장을 그대로 OpenAI 에 전달한다.)
 function buildStockPrompt(stock) {
   const changeSign = stock.vs > 0 ? '+' : '';
   return `다음 종목을 분석해 주세요.

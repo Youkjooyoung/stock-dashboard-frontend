@@ -10,6 +10,7 @@ export default function PhoneVerifyStep({ onCertified, onExistingFound }) {
     const navigate = useNavigate();
     const { showToast } = useToast();
 
+    // PortOne(아임포트) 본인인증 스크립트를 이 화면에 있을 때만 불러온다. window.IMP 가 생긴다.
     useEffect(() => {
         const script = document.createElement('script');
         script.src = 'https://cdn.iamport.kr/v1/iamport.js';
@@ -30,12 +31,15 @@ export default function PhoneVerifyStep({ onCertified, onExistingFound }) {
         }, async (rsp) => {
             if (!rsp.success) { showToast('본인인증이 실패했습니다.', 'error'); return; }
 
+            // 인증 결과(이름·전화번호)는 브라우저 값이 아니라 서버가 PortOne 에 직접 조회한 값을 쓴다.
+            // 서버가 PortOne 을 두 번 호출하므로 10초 제한이 있는 공용 api 대신 axios 를 쓴다.
             try {
                 const { data } = await axios.post(
                     `${API_BASE_URL}/api/auth/certify`,
                     { impUid: rsp.imp_uid },
                     { withCredentials: true }
                 );
+                // 같은 이름·전화번호로 가입한 회원이 있으면 새로 가입하지 않고 기존 계정 안내 화면으로 보낸다.
                 if (data.existingMember === true && typeof onExistingFound === 'function') {
                     onExistingFound({
                         name: data.name,

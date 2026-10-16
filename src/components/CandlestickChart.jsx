@@ -2,45 +2,43 @@ import { useEffect, useRef } from 'react';
 import { createChart, CandlestickSeries, HistogramSeries } from 'lightweight-charts';
 import styles from '../styles/components/CandlestickChart.module.css';
 
+// 'YYYYMMDD' → 'YYYY-MM-DD' (차트 라이브러리가 쓰는 날짜 형식)
 function toTime(basDt) {
   const s = String(basDt);
   return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
 }
 
-function aggregateWeekly(sorted) {
-  const weeks = {};
-  sorted.forEach(d => {
-    const date = new Date(toTime(d.basDt));
-    const day = date.getDay();
-    const monday = new Date(date);
-    monday.setDate(date.getDate() - (day === 0 ? 6 : day - 1));
-    const key = monday.toISOString().slice(0, 10);
-    if (!weeks[key]) {
-      weeks[key] = { time: key, open: d.mkp || 0, high: d.hipr || 0, low: d.lopr || 0, close: d.clpr || 0, vol: d.trqu || 0 };
-    } else {
-      weeks[key].high  = Math.max(weeks[key].high, d.hipr || 0);
-      weeks[key].low   = Math.min(weeks[key].low,  d.lopr || 0);
-      weeks[key].close = d.clpr || 0;
-      weeks[key].vol  += d.trqu || 0;
-    }
-  });
-  return Object.values(weeks).sort((a, b) => a.time.localeCompare(b.time));
+// 그 주 월요일 날짜를 주봉의 이름(키)으로 쓴다.
+function weekKey(basDt) {
+  const date = new Date(toTime(basDt));
+  const day = date.getDay();
+  const monday = new Date(date);
+  monday.setDate(date.getDate() - (day === 0 ? 6 : day - 1));
+  return monday.toISOString().slice(0, 10);
 }
 
-function aggregateMonthly(sorted) {
-  const months = {};
+// 그 달 1일 날짜를 월봉의 이름(키)으로 쓴다.
+function monthKey(basDt) {
+  const s = String(basDt);
+  return `${s.slice(0, 4)}-${s.slice(4, 6)}-01`;
+}
+
+// 일봉(날짜순 정렬)을 주봉·월봉으로 묶는다.
+// 시가 = 첫날 시가, 고가 = 가장 높은 값, 저가 = 가장 낮은 값, 종가 = 마지막 날 종가, 거래량 = 합계
+function aggregateCandles(sorted, getKey) {
+  const groups = {};
   sorted.forEach(d => {
-    const key = `${String(d.basDt).slice(0, 4)}-${String(d.basDt).slice(4, 6)}-01`;
-    if (!months[key]) {
-      months[key] = { time: key, open: d.mkp || 0, high: d.hipr || 0, low: d.lopr || 0, close: d.clpr || 0, vol: d.trqu || 0 };
+    const key = getKey(d.basDt);
+    if (!groups[key]) {
+      groups[key] = { time: key, open: d.mkp || 0, high: d.hipr || 0, low: d.lopr || 0, close: d.clpr || 0, vol: d.trqu || 0 };
     } else {
-      months[key].high  = Math.max(months[key].high, d.hipr || 0);
-      months[key].low   = Math.min(months[key].low,  d.lopr || 0);
-      months[key].close = d.clpr || 0;
-      months[key].vol  += d.trqu || 0;
+      groups[key].high  = Math.max(groups[key].high, d.hipr || 0);
+      groups[key].low   = Math.min(groups[key].low,  d.lopr || 0);
+      groups[key].close = d.clpr || 0;
+      groups[key].vol  += d.trqu || 0;
     }
   });
-  return Object.values(months).sort((a, b) => a.time.localeCompare(b.time));
+  return Object.values(groups).sort((a, b) => a.time.localeCompare(b.time));
 }
 
 export default function CandlestickChart({ data = [], period = '일', height = 300 }) {
@@ -56,12 +54,8 @@ export default function CandlestickChart({ data = [], period = '일', height = 3
       .sort((a, b) => String(a.basDt).localeCompare(String(b.basDt)));
 
     let chartData, volData;
-    if (period === '주') {
-      const agg = aggregateWeekly(sorted);
-      chartData = agg.map(d => ({ time: d.time, open: d.open, high: d.high, low: d.low, close: d.close }));
-      volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(226,76,75,0.4)' : 'rgba(59,122,217,0.4)' }));
-    } else if (period === '월') {
-      const agg = aggregateMonthly(sorted);
+    if (period === '주' || period === '월') {
+      const agg = aggregateCandles(sorted, period === '주' ? weekKey : monthKey);
       chartData = agg.map(d => ({ time: d.time, open: d.open, high: d.high, low: d.low, close: d.close }));
       volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(226,76,75,0.4)' : 'rgba(59,122,217,0.4)' }));
     } else {

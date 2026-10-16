@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../hooks/useToast';
@@ -60,9 +60,10 @@ export default function DashboardPage() {
     onMessage: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.stocks }),
   }), [queryClient]);
 
+  // 서버가 시세 수집을 마치면 /topic/prices 로 신호를 보낸다. 신호를 받으면 시세 목록을 다시 불러온다.
   useStomp('/topic/prices', priceSocketOptions);
 
-  // ?�동갱신 ?�터�?(WebSocket 미연�????�백)
+  // 자동 갱신: 웹소켓이 끊겼을 때를 대비해 30초마다 시세를 다시 불러온다.
   useEffect(() => {
     if (autoRefresh) {
       intervalRef.current = setInterval(() => refetchStocks(), 30000);
@@ -84,16 +85,9 @@ export default function DashboardPage() {
 
   const openModal = (stock) => setModal(stock);
 
-  async function startBulkCollect(years, skipExisting = false) {
-    const end   = new Date();
-    const start = new Date();
-    start.setFullYear(start.getFullYear() - years);
-    const params = { startDate: toYYYYMMDD(start), endDate: toYYYYMMDD(end), skipExisting };
-    await api.post('/stock/collect/history/all', null, { params });
-    setBulkOpen(false);
-    setBulkStatus({ status: 'running', current: 0, total: 0 });
-
-    // 진행 ?�태 ?�링
+  // 일괄 수집 진행 상태를 2초마다 확인하고, 끝나거나 오류가 나면 멈춘다.
+  const pollBulkStatus = useCallback(() => {
+    clearInterval(bulkPollRef.current);
     bulkPollRef.current = setInterval(async () => {
       try {
         const res = await api.get('/stock/collect/history/status');
@@ -103,6 +97,18 @@ export default function DashboardPage() {
         }
       } catch { clearInterval(bulkPollRef.current); }
     }, 2000);
+  }, []);
+
+  // 오늘부터 years 년 전까지 전체 종목의 과거 시세 수집을 시작한다(관리자 전용).
+  async function startBulkCollect(years, skipExisting = false) {
+    const end   = new Date();
+    const start = new Date();
+    start.setFullYear(start.getFullYear() - years);
+    const params = { startDate: toYYYYMMDD(start), endDate: toYYYYMMDD(end), skipExisting };
+    await api.post('/stock/collect/history/all', null, { params });
+    setBulkOpen(false);
+    setBulkStatus({ status: 'running', current: 0, total: 0 });
+    pollBulkStatus();
   }
 
   // 마운트 시 수집이 이미 진행 중이면 자동으로 폴링 시작 (ADMIN 전용 엔드포인트)
@@ -111,19 +117,11 @@ export default function DashboardPage() {
     api.get('/stock/collect/history/status').then(res => {
       if (res.data.status === 'running') {
         setBulkStatus(res.data);
-        bulkPollRef.current = setInterval(async () => {
-          try {
-            const r = await api.get('/stock/collect/history/status');
-            setBulkStatus(r.data);
-            if (r.data.status === 'done' || r.data.status === 'error') {
-              clearInterval(bulkPollRef.current);
-            }
-          } catch { clearInterval(bulkPollRef.current); }
-        }, 2000);
+        pollBulkStatus();
       }
     }).catch(() => {});
     return () => clearInterval(bulkPollRef.current);
-  }, [isAdmin]);
+  }, [isAdmin, pollBulkStatus]);
 
   return (
     <div>

@@ -48,6 +48,8 @@ export default function ComparePage() {
         )
       );
 
+      // 여러 종목의 날짜를 합쳐 X축으로 쓴다. 어떤 종목에 그날 데이터가 없으면 null 로 두고
+      // spanGaps 로 선을 이어 그린다.
       const allDates = [...new Set(
         results.flatMap(r => r.data.map(d => d.basDt))
       )].sort();
@@ -66,6 +68,7 @@ export default function ComparePage() {
         spanGaps: true,
       }));
 
+      // 종목별 요약: 기간 첫날 종가 대비 마지막 날 종가의 변화, 기간 중 최고가·최저가, 거래량 합계
       const stats = results.map((r, i) => {
         if (r.data.length === 0) return null;
         const first  = r.data[0];
