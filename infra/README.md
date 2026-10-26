@@ -13,7 +13,7 @@ aws cloudformation deploy \
   --region us-east-1 \
   --stack-name stock-dashboard-frontend-certificate \
   --template-file infra/cloudformation/frontend-certificate.yml \
-  --parameter-overrides DomainName=jyyouk.shop HostedZoneId=YOUR_HOSTED_ZONE_ID
+  --parameter-overrides DomainName=jyyouk.store HostedZoneId=YOUR_HOSTED_ZONE_ID
 ```
 
 Read the resulting certificate ARN:
@@ -35,7 +35,7 @@ aws cloudformation deploy \
   --template-file infra/cloudformation/frontend-hosting.yml \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
-    DomainName=jyyouk.shop \
+    DomainName=jyyouk.store \
     CertificateArn=YOUR_US_EAST_1_CERTIFICATE_ARN \
     GitHubRepository=Youkjooyoung/stock-dashboard-frontend
 ```
@@ -61,7 +61,7 @@ aws cloudformation deploy \
   --template-file infra/cloudformation/frontend-hosting.yml \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
-    DomainName=jyyouk.shop \
+    DomainName=jyyouk.store \
     CertificateArn=YOUR_US_EAST_1_CERTIFICATE_ARN \
     WebAclArn=YOUR_CLOUDFRONT_PLAN_WEB_ACL_ARN \
     GitHubRepository=Youkjooyoung/stock-dashboard-frontend
@@ -72,7 +72,7 @@ aws cloudformation deploy \
 1. Run the frontend CI/CD workflow and verify the CloudFront domain, including
    `/login` and an OAuth return route.
 2. UPSERT the Route 53 apex A and AAAA alias records to the new distribution.
-3. Verify `https://jyyouk.shop`, login, API calls, and OAuth callbacks.
+3. Verify `https://jyyouk.store`, login, API calls, and OAuth callbacks.
 4. Stop the old frontend EC2 instance. Keep the instance and Elastic IP during a
    short rollback window.
 5. After the rollback window, release the frontend Elastic IP and terminate the
@@ -87,3 +87,33 @@ If the CloudFront deployment fails after the DNS cutover, restore the previous
 Route 53 A record, start the frontend EC2 instance if it is stopped, and confirm
 the old Nginx endpoint is healthy. S3 versioning retains non-current objects for
 14 days, which also permits an application-only rollback without restoring EC2.
+
+## Domain migration (jyyouk.shop → jyyouk.store)
+
+While both domains are live, issue one certificate that covers both and keep the old
+domain as a second CloudFront alias:
+
+```bash
+aws cloudformation deploy \
+  --region us-east-1 \
+  --stack-name stock-dashboard-frontend-certificate-store \
+  --template-file infra/cloudformation/frontend-certificate.yml \
+  --parameter-overrides \
+    DomainName=jyyouk.store HostedZoneId=STORE_HOSTED_ZONE_ID \
+    AlternateDomainName=jyyouk.shop AlternateHostedZoneId=SHOP_HOSTED_ZONE_ID
+
+aws cloudformation deploy \
+  --region ap-northeast-2 \
+  --stack-name stock-dashboard-frontend-hosting \
+  --template-file infra/cloudformation/frontend-hosting.yml \
+  --capabilities CAPABILITY_IAM \
+  --parameter-overrides \
+    DomainName=jyyouk.store \
+    AlternateDomainName=jyyouk.shop \
+    CertificateArn=NEW_US_EAST_1_CERTIFICATE_ARN \
+    WebAclArn=YOUR_CLOUDFRONT_PLAN_WEB_ACL_ARN \
+    GitHubRepository=Youkjooyoung/stock-dashboard-frontend
+```
+
+After jyyouk.shop expires, redeploy both stacks without the `Alternate*` parameters
+(`AlternateDomainName=''`) so the certificate and aliases cover jyyouk.store only.

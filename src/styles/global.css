@@ -81,7 +81,7 @@ body::-webkit-scrollbar { width: 12px; height: 12px; background: var(--bg); }
   gap: 6px;
   padding: 9px 18px;
   border: 1px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-pill);
   font-size: 13px;
   font-weight: 600;
   font-family: var(--font-ui);
@@ -94,20 +94,23 @@ body::-webkit-scrollbar { width: 12px; height: 12px; background: var(--bg); }
   overflow: hidden;
 }
 
+/* 배민 button-primary: 검정 알약이 기본 */
 .btn-primary {
-  background: var(--c-toss-blue);
-  color: #fff;
-  border-color: var(--c-toss-blue);
+  background: var(--text);
+  color: var(--card);
+  border-color: var(--text);
 }
 .btn-primary:hover  { filter: brightness(0.95); }
+.btn:active:not(:disabled) { transform: scale(0.98); }
 .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
+/* 배민 button-ghost: 투명 + 1.5px 회색 보더 */
 .btn-outline {
   background: transparent;
-  color: var(--c-toss-blue);
-  border-color: var(--c-toss-blue);
+  color: var(--text);
+  border: 1.5px solid var(--border-strong);
 }
-.btn-outline:hover { background: var(--c-toss-blue-soft); }
+.btn-outline:hover { background: var(--bg-soft); }
 
 .btn-danger {
   background: var(--c-up);
@@ -133,19 +136,21 @@ body::-webkit-scrollbar { width: 12px; height: 12px; background: var(--bg); }
 .input {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--input-border);
   border-radius: var(--r-md);
   font-size: 14px;
   font-family: var(--font-ui);
-  background: var(--card);
+  background: var(--input-bg);
   color: var(--text);
-  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  transition: border-color var(--t-fast), background var(--t-fast);
   outline: none;
   line-height: 1.4;
 }
+/* 배민 text-field: focus 시 흰 배경 + 진한 보더 */
 .input:focus {
-  border-color: var(--c-toss-blue);
-  box-shadow: 0 0 0 3px var(--c-toss-blue-soft);
+  background: var(--card);
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 0 0.5px var(--input-border-focus);
 }
 .input::placeholder { color: var(--text-tertiary); }
 
@@ -161,7 +166,7 @@ body::-webkit-scrollbar { width: 12px; height: 12px; background: var(--bg); }
   font-weight: 600;
   line-height: 1.5;
 }
-.badge-green   { background: var(--c-toss-blue-soft); color: var(--c-toss-blue); }
+.badge-green   { background: var(--bm-mint-tint);     color: var(--bm-mint-700); }
 .badge-up      { background: var(--c-up-soft);        color: var(--c-up); }
 .badge-down    { background: var(--c-down-soft);      color: var(--c-down); }
 .badge-kakao   { background: var(--kakao);            color: var(--kakao-text); }
@@ -222,15 +227,16 @@ body::-webkit-scrollbar { width: 12px; height: 12px; background: var(--bg); }
 .form-label   { font-size: 13px; color: var(--text-secondary); font-weight: 500; display: block; margin-bottom: 6px; }
 .form-input   {
   width: 100%; padding: 10px 14px;
-  border: 1px solid var(--border); border-radius: var(--r-md);
+  border: 1px solid var(--input-border); border-radius: var(--r-md);
   font-size: 14px; font-family: var(--font-ui);
-  background: var(--card); color: var(--text);
-  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  background: var(--input-bg); color: var(--text);
+  transition: border-color var(--t-fast), background var(--t-fast);
   outline: none;
 }
 .form-input:focus {
-  border-color: var(--c-toss-blue);
-  box-shadow: 0 0 0 3px var(--c-toss-blue-soft);
+  background: var(--card);
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 0 0.5px var(--input-border-focus);
 }
 .form-input::placeholder { color: var(--text-tertiary); }
 
@@ -320,11 +326,12 @@ body::-webkit-scrollbar { width: 12px; height: 12px; background: var(--bg); }
   cursor: pointer;
   position: relative;
   transition: color var(--t-fast);
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
   margin-bottom: -1px;
 }
 .tab-btn:hover  { color: var(--text); }
-.tab-btn.active { color: var(--c-toss-blue); font-weight: 700; border-bottom-color: var(--c-toss-blue); }
+/* 배민 tab-bar: 활성 탭은 검정 글자 + 3px 밑줄 */
+.tab-btn.active { color: var(--text); font-weight: 700; border-bottom-color: var(--text); }
 
 .tab-box-group {
   display: flex;

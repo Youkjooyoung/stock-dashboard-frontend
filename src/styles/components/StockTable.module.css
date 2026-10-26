@@ -7,8 +7,9 @@
 
 .table-box {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
   overflow: hidden;
 }
 
@@ -35,23 +36,20 @@
   gap: 8px;
 }
 
-/* === 탭 그룹 === */
+/* === 탭 그룹 — 배민 tab-bar: 회색 글자, 활성은 검정 + 3px 밑줄 === */
 .stock-tab-group {
   display: flex;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+  gap: 4px;
 }
 
 .stock-tab-btn {
-  padding: 6px 14px;
+  padding: 6px 10px;
   border: none;
-  border-right: 1px solid var(--border);
-  background: var(--surface);
-  font-size: 12px;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  font-size: 14px;
   font-weight: 500;
-  color: var(--text-2);
+  color: var(--text-3);
   cursor: pointer;
   transition: background var(--transition), color var(--transition);
   font-family: var(--font-sans);
@@ -59,16 +57,13 @@
   white-space: nowrap;
 }
 
-.stock-tab-btn:last-child { border-right: none; }
-
 .stock-tab-btn:hover {
-  background: var(--surface-hover);
   color: var(--text-1);
 }
 
 .stock-tab-btn.active {
-  background: var(--accent);
-  color: var(--accent-text);
+  color: var(--text-1);
+  border-bottom-color: var(--text-1);
   font-weight: 700;
 }
 
@@ -108,21 +103,23 @@
   position: relative;
 }
 
+/* 배민 search-bar: 회색 알약 입력 */
 .search-input {
-  padding: 6px 12px 6px 32px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  padding: 6px 14px 6px 34px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
   font-size: 13px;
-  width: 220px;
+  width: 240px;
   outline: none;
-  transition: border-color var(--transition);
+  transition: border-color var(--transition), background var(--transition);
   font-family: var(--font-sans);
-  background: var(--surface);
+  background: var(--input-bg);
   color: var(--text-1);
-  height: 28px;
+  height: 36px;
 }
 
 .search-input:focus {
+  background: var(--surface);
   border-color: var(--border-focus);
 }
 
@@ -490,9 +487,9 @@
 }
 
 .page-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-text);
+  background: var(--text-1);
+  border-color: var(--text-1);
+  color: var(--surface);
   font-weight: 700;
 }
 
@@ -597,9 +594,9 @@
 }
 
 .filter-chip.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-text);
+  background: var(--text-1);
+  border-color: var(--text-1);
+  color: var(--surface);
 }
 
 .filter-range {

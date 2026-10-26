@@ -4,11 +4,22 @@ Description: ACM certificate for the stock-dashboard frontend CloudFront distrib
 Parameters:
   DomainName:
     Type: String
-    Default: jyyouk.shop
+    Default: jyyouk.store
     Description: Frontend custom domain.
   HostedZoneId:
     Type: AWS::Route53::HostedZone::Id
     Description: Public Route 53 hosted zone that owns DomainName.
+  AlternateDomainName:
+    Type: String
+    Default: ''
+    Description: Optional second domain served during a domain migration (e.g. jyyouk.shop).
+  AlternateHostedZoneId:
+    Type: String
+    Default: ''
+    Description: Route 53 hosted zone that owns AlternateDomainName.
+
+Conditions:
+  HasAlternate: !Not [!Equals [!Ref AlternateDomainName, '']]
 
 Resources:
   FrontendCertificate:
@@ -17,10 +28,16 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       DomainName: !Ref DomainName
+      SubjectAlternativeNames: !If [HasAlternate, [!Ref AlternateDomainName], !Ref 'AWS::NoValue']
       ValidationMethod: DNS
       DomainValidationOptions:
         - DomainName: !Ref DomainName
           HostedZoneId: !Ref HostedZoneId
+        - !If
+          - HasAlternate
+          - DomainName: !Ref AlternateDomainName
+            HostedZoneId: !Ref AlternateHostedZoneId
+          - !Ref 'AWS::NoValue'
       Tags:
         - Key: Project
           Value: stock-dashboard

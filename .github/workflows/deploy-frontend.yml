@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy to S3 and CloudFront (jyyouk.shop)
+    name: Deploy to S3 and CloudFront (jyyouk.store)
     if: >-
       ${{
         github.event.workflow_run.conclusion == 'success' &&
@@ -114,4 +114,4 @@ jobs:
             -o /dev/null
 
       - name: Verify public frontend endpoint
-        run: curl -fsS --max-time 15 https://jyyouk.shop/ -o /dev/null
+        run: curl -fsS --max-time 15 https://jyyouk.store/ -o /dev/null
