@@ -109,8 +109,8 @@ priceByTicker → 30분  (종목별 상세 — 중간 빈도)
 
 ## 링크
 
-- **서비스**: https://jyyouk.shop
-- **백엔드 API**: https://api.jyyouk.shop
+- **서비스**: https://jyyouk.store
+- **백엔드 API**: https://api.jyyouk.store
 - **README**: [README.md](README.md)
 - **API 명세**: [api-reference.md](api-reference.md)
 - **아키텍처**: [architecture.md](architecture.md)

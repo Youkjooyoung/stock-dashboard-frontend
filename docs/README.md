@@ -48,11 +48,11 @@
 
 ```mermaid
 graph TB
-    subgraph Client["클라이언트 (jyyouk.shop)"]
+    subgraph Client["클라이언트 (jyyouk.store)"]
         React["React 19.2 + Vite 8.0"]
     end
 
-    subgraph Backend["백엔드 (api.jyyouk.shop)"]
+    subgraph Backend["백엔드 (api.jyyouk.store)"]
         Spring["Spring Boot 3.3.10"]
         Redis[(Redis 7)]
     end
@@ -202,8 +202,8 @@ npm run dev
 
 | 구분 | 도메인 | IP |
 |------|--------|----|
-| 프론트엔드 | jyyouk.shop | 52.79.153.252 (AWS EC2) |
-| 백엔드 | api.jyyouk.shop | 3.37.153.11 (AWS EC2) |
+| 프론트엔드 | jyyouk.store | 52.79.153.252 (AWS EC2) |
+| 백엔드 | api.jyyouk.store | 3.37.153.11 (AWS EC2) |
 
 ---
 

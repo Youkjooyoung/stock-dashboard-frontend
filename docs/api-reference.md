@@ -1,6 +1,6 @@
 # API 명세서
 
-**Base URL**: `https://api.jyyouk.shop` (운영) / `https://localhost:8443` (로컬)
+**Base URL**: `https://api.jyyouk.store` (운영) / `https://localhost:8443` (로컬)
 
 ## 인증
 

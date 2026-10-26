@@ -5,7 +5,7 @@
 ```mermaid
 graph TB
     subgraph Client["클라이언트 레이어"]
-        Browser["브라우저\n(jyyouk.shop)"]
+        Browser["브라우저\n(jyyouk.store)"]
         React["React 19.2 + Vite 8.0\nZustand · React Query\nChart.js · lightweight-charts"]
     end
 
@@ -288,8 +288,8 @@ graph TB
 
 | 구분 | 서버 | 배포 방식 |
 |------|------|-----------|
-| 프론트엔드 | AWS EC2 (jyyouk.shop) | GitHub Actions → SCP → Nginx 원자 교체 |
-| 백엔드 | AWS EC2 (api.jyyouk.shop) | GitHub Actions → SSH → mvn package → systemctl restart |
+| 프론트엔드 | AWS EC2 (jyyouk.store) | GitHub Actions → SCP → Nginx 원자 교체 |
+| 백엔드 | AWS EC2 (api.jyyouk.store) | GitHub Actions → SSH → mvn package → systemctl restart |
 | DB | 백엔드 서버 내 MySQL | — |
 | 컨테이너 | Docker (백엔드) | Dockerfile + docker-compose.yml |
 | SSL | Let's Encrypt | Nginx + Certbot |
