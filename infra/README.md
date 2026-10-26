@@ -90,8 +90,23 @@ the old Nginx endpoint is healthy. S3 versioning retains non-current objects for
 
 ## Domain migration (jyyouk.shop → jyyouk.store)
 
-While both domains are live, issue one certificate that covers both and keep the old
-domain as a second CloudFront alias:
+> **Free flat-rate plan limit:** a distribution on the CloudFront Free plan cannot
+> hold aliases with different root domains (`Aliases with different root domains`).
+> The two-alias steps below need the Pro plan. On 2026-10-26 the migration was done
+> as a single-domain cutover instead:
+>
+> 1. Request the `us-east-1` certificate in the ACM console (DNS validation). The
+>    certificate stack with `AlternateHostedZoneId` failed twice, so it was not used.
+> 2. Update `stock-dashboard-frontend-hosting` with `DomainName=jyyouk.store`,
+>    `AlternateDomainName=''`, the new `CertificateArn` and the existing `WebAclArn`.
+> 3. Create the Route 53 apex A/AAAA alias records in the `jyyouk.store` zone.
+> 4. Update the backend OAuth redirect URIs and the Google/Kakao consoles, then
+>    redeploy the frontend so the bundle uses `https://api.jyyouk.store`.
+>
+> `jyyouk.shop` stopped serving the frontend at that point and expires on 2026-11-25.
+
+On the Pro plan, while both domains are live, issue one certificate that covers both
+and keep the old domain as a second CloudFront alias:
 
 ```bash
 aws cloudformation deploy \

@@ -40,7 +40,7 @@ These rules come from the 2026-10-15 security review.
 - Production is served through AWS/Nginx.
 - Run `npm run build` before deployment.
 - After completing frontend work, commit and push the changes, then verify the frontend GitHub Actions deployment result.
-- Verify `VITE_API_BASE_URL`, `VITE_WS_URL`, and `VITE_PORTONE_IMP_KEY` before uploading the built assets.
+- Verify `VITE_API_BASE_URL` and `VITE_PORTONE_IMP_KEY` before uploading the built assets. WebSocket uses `VITE_API_BASE_URL + '/ws'` (SockJS), so there is no separate WS URL.
 
 ## Latest Verified State
 - Date: 2026-05-04
