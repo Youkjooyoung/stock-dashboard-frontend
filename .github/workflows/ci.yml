@@ -44,7 +44,6 @@ jobs:
         env:
           VITE_API_BASE_URL: https://api.jyyouk.store
           VITE_PORTONE_IMP_KEY: ${{ secrets.VITE_PORTONE_IMP_KEY }}
-          VITE_WS_URL: ${{ secrets.VITE_WS_URL }}
 
       - name: Package deployable bundle
         shell: bash
