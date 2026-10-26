@@ -1,146 +1,182 @@
 /* ============================================================
-   TOSS DESIGN SYSTEM TOKENS — Stock Dashboard
-   Adapted from Toss (TDS) — Pretendard, Toss Blue, KR semantic colors
+   BAEMIN-STYLE DESIGN TOKENS — Stock Dashboard
+   배민 시각 언어(민트·한나/도현체·본화이트·알약)만 차용. 배민 도메인·카피는 쓰지 않음.
+   Chart.js·lightweight-charts가 토큰 값을 직접 읽으므로 oklch 대신 hex로 적는다.
    ============================================================ */
 
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/BMHANNAPro/BMHANNAPro.css');
+@import url('https://cdn.jsdelivr.net/gh/fonts-archive/BMDOHYEON/BMDOHYEON.css');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
   --font-ui: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  /* 한나·도현체는 16px 이상 제목에만 사용 (본문 크기에서는 가독성이 떨어짐) */
+  --font-display: 'BM HANNA Pro', 'BM JUA', var(--font-ui);
+  --font-display-bold: 'BM DOHYEON', var(--font-display);
+
+  /* Brand — oklch 원값은 design.md 기준 */
+  --bm-mint: #00FDD7;        /* oklch(0.88 0.18 178) */
+  --bm-mint-hover: #00B5A4;  /* oklch(0.69 0.13 184) */
+  --bm-mint-tint: #D2FFF5;   /* oklch(0.97 0.05 178) */
+  --bm-mint-700: #00847C;    /* oklch(0.55 0.10 188) — 흰 배경 위 글자용 */
+  --bm-ink: #121212;         /* oklch(0.18 0 0) — 순검정 대신 near-black */
+  --bm-navy: #2D1A6A;        /* oklch(0.30 0.13 286) */
+  --bm-orange: #F9725A;      /* oklch(0.71 0.17 32) */
+  --bm-pink: #FE3181;        /* oklch(0.66 0.24 4) */
 
   --r-sm: 8px;
   --r-md: 12px;
-  --r-lg: 14px;
+  --r-lg: 16px;
   --r-xl: 16px;
   --r-2xl: 20px;
   --r-pill: 999px;
 
-  --t-fast: 120ms cubic-bezier(.22,.61,.36,1);
-  --t-med: 220ms cubic-bezier(.22,.61,.36,1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-fast: 120ms var(--ease-out);
+  --t-med: 200ms var(--ease-out);
 
-  --c-up: #F04452;
-  --c-up-soft: rgba(240, 68, 82, 0.10);
-  --c-up-strong: #D1313F;
-  --c-down: #3182F6;
-  --c-down-soft: rgba(49, 130, 246, 0.10);
-  --c-down-strong: #1B64DA;
-  --c-flat: #8B95A1;
+  --shadow-sticker: 0 6px 0 var(--bm-ink);
 
-  --c-toss-blue: #3182F6;
-  --c-toss-blue-soft: rgba(49, 130, 246, 0.08);
+  /* 등락: 한국 관례(빨강↑·파랑↓) 유지, 배민 red·frozen 계열 */
+  --c-up: #F9262A;           /* oklch(0.63 0.24 27) */
+  --c-up-soft: rgba(249, 38, 42, 0.10);
+  --c-up-strong: #D40C1A;
+  --c-down: #0073CF;         /* frozen oklch(0.69 0.18 240)을 흰 배경 대비용으로 어둡게 */
+  --c-down-soft: rgba(0, 115, 207, 0.10);
+  --c-down-strong: #005BA6;
+  --c-flat: #717171;
+
+  /* 이름은 기존 컴포넌트 호환용(Toss 시절)이고 값은 배민 딥민트 */
+  --c-toss-blue: var(--bm-mint-700);
+  --c-toss-blue-soft: var(--bm-mint-tint);
 }
 
-/* ---------- Light theme — Toss whites & slate grays ---------- */
+/* ---------- Light theme — 본화이트 & near-black ---------- */
 :root,
 [data-theme='light'] {
-  --bg: #F2F4F6;
+  --bg: #F5F5F5;
   --bg-elev: #FFFFFF;
-  --bg-soft: #F2F4F6;
-  --bg-table-stripe: #F9FAFB;
-  --bg-hover: #F2F4F6;
+  --bg-soft: #F2F2F2;
+  --bg-table-stripe: #FAFAFA;
+  --bg-hover: #EBEBEB;
 
   --card: #FFFFFF;
-  --card-border: rgba(0, 27, 55, 0.06);
-  --card-shadow: 0 1px 2px rgba(0, 27, 55, 0.04);
-  --card-shadow-hover: 0 4px 16px rgba(0, 27, 55, 0.08);
+  --card-border: #EBEBEB;
+  --card-shadow: 0 1px 2px rgba(18, 18, 18, 0.04);
+  --card-shadow-hover: 0 4px 12px rgba(18, 18, 18, 0.06);
 
-  --text: #191F28;
-  --text-secondary: #4E5968;
-  --text-tertiary: #8B95A1;
-  --text-quaternary: #B0B8C1;
+  --text: #121212;
+  --text-secondary: #383838;
+  --text-tertiary: #717171;
+  --text-quaternary: #A1A1A1;
   --text-inverse: #FFFFFF;
 
-  --border: rgba(0, 27, 55, 0.08);
-  --border-strong: rgba(0, 27, 55, 0.14);
-  --divider: rgba(0, 27, 55, 0.06);
+  --border: #EBEBEB;
+  --border-strong: #D4D4D4;
+  --divider: #EBEBEB;
 
-  --chip-bg: #F2F4F6;
-  --chip-bg-active: #191F28;
+  --chip-bg: #F2F2F2;
+  --chip-bg-active: #121212;
   --chip-text-active: #FFFFFF;
 
-  --input-bg: #F2F4F6;
-  --input-border: transparent;
-  --input-border-focus: #3182F6;
+  --input-bg: #F2F2F2;
+  --input-border: #D4D4D4;
+  --input-border-focus: #121212;
 
-  --logo-mark-bg: #3182F6;
-  --logo-mark-line: #FFFFFF;
-  --logo-mark-dot: #FFFFFF;
+  --logo-mark-bg: var(--bm-mint);
+  --logo-mark-line: #121212;
+  --logo-mark-dot: #121212;
 
-  --tooltip-bg: #191F28;
+  --tooltip-bg: #121212;
   --tooltip-text: #FFFFFF;
 
-  --kospi: #F04452;
-  --kosdaq: #3182F6;
+  --kospi: #F9262A;
+  --kosdaq: #0073CF;
 
-  --warning-bg: rgba(240, 68, 82, 0.06);
-  --warning-border: rgba(240, 68, 82, 0.20);
-  --warning-text: #D1313F;
+  --warning-bg: rgba(249, 38, 42, 0.06);
+  --warning-border: rgba(249, 38, 42, 0.20);
+  --warning-text: #D40C1A;
 
-  --success: #1F883D;
-  --success-soft: rgba(31, 136, 61, 0.10);
+  --success: #00847C;
+  --success-soft: rgba(0, 132, 124, 0.10);
+
+  --header-bg: var(--bm-mint);
+  --header-text: #121212;
+  --header-chip: #FFFFFF;
+  --header-chip-hover: rgba(255, 255, 255, 0.72);
+  --header-hover: rgba(18, 18, 18, 0.08);
+  --header-line: transparent;
 }
 
-/* ---------- Dark theme — Toss night ---------- */
+/* ---------- Dark theme ---------- */
 [data-theme='dark'] {
-  --bg: #17171C;
-  --bg-elev: #1F2026;
-  --bg-soft: #2B2D34;
-  --bg-table-stripe: #1F2026;
-  --bg-hover: #2B2D34;
+  --bg: #141414;
+  --bg-elev: #1E1E1E;
+  --bg-soft: #2A2A2A;
+  --bg-table-stripe: #1E1E1E;
+  --bg-hover: #2A2A2A;
 
-  --card: #1F2026;
+  --card: #1E1E1E;
   --card-border: rgba(255, 255, 255, 0.06);
   --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
-  --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.40);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.40);
 
-  --text: #F2F4F6;
-  --text-secondary: #B0B8C1;
-  --text-tertiary: #6B7684;
-  --text-quaternary: #4E5968;
-  --text-inverse: #17171C;
+  --text: #F2F2F2;
+  --text-secondary: #B5B5B5;
+  --text-tertiary: #8A8A8A;
+  --text-quaternary: #5C5C5C;
+  --text-inverse: #141414;
 
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.16);
   --divider: rgba(255, 255, 255, 0.06);
 
-  --chip-bg: #2B2D34;
-  --chip-bg-active: #F2F4F6;
-  --chip-text-active: #17171C;
+  --chip-bg: #2A2A2A;
+  --chip-bg-active: #F2F2F2;
+  --chip-text-active: #141414;
 
-  --input-bg: #2B2D34;
-  --input-border: transparent;
-  --input-border-focus: #4D8EFA;
+  --input-bg: #2A2A2A;
+  --input-border: rgba(255, 255, 255, 0.12);
+  --input-border-focus: var(--bm-mint);
 
-  --logo-mark-bg: #4D8EFA;
-  --logo-mark-line: #FFFFFF;
-  --logo-mark-dot: #FFFFFF;
+  --logo-mark-bg: var(--bm-mint);
+  --logo-mark-line: #121212;
+  --logo-mark-dot: #121212;
 
-  --tooltip-bg: #0A0B0E;
-  --tooltip-text: #F2F4F6;
+  --tooltip-bg: #0A0A0A;
+  --tooltip-text: #F2F2F2;
 
-  --c-up: #FF5C6A;
-  --c-up-soft: rgba(255, 92, 106, 0.14);
-  --c-down: #4D8EFA;
-  --c-down-soft: rgba(77, 142, 250, 0.14);
-  --c-toss-blue: #4D8EFA;
-  --c-toss-blue-soft: rgba(77, 142, 250, 0.14);
+  --c-up: #FF5A5F;
+  --c-up-soft: rgba(255, 90, 95, 0.14);
+  --c-down: #3DA5FF;
+  --c-down-soft: rgba(61, 165, 255, 0.14);
+  --c-toss-blue: var(--bm-mint-hover);
+  --c-toss-blue-soft: rgba(0, 253, 215, 0.12);
 
-  --kospi: #FF5C6A;
-  --kosdaq: #4D8EFA;
+  --kospi: #FF5A5F;
+  --kosdaq: #3DA5FF;
 
-  --warning-bg: rgba(255, 92, 106, 0.10);
-  --warning-border: rgba(255, 92, 106, 0.25);
-  --warning-text: #FF7A86;
+  --warning-bg: rgba(255, 90, 95, 0.10);
+  --warning-border: rgba(255, 90, 95, 0.25);
+  --warning-text: #FF7A7E;
 
-  --success: #4ED39A;
-  --success-soft: rgba(78, 211, 154, 0.12);
+  --success: #2EE6C9;
+  --success-soft: rgba(46, 230, 201, 0.12);
+
+  /* 다크에서 민트 풀블리드는 눈부셔서 어두운 표면 + 민트 하단 라인으로 대체 */
+  --header-bg: #1E1E1E;
+  --header-text: #F2F2F2;
+  --header-chip: #2A2A2A;
+  --header-chip-hover: #333333;
+  --header-hover: rgba(255, 255, 255, 0.06);
+  --header-line: var(--bm-mint);
 }
 
 /* ============================================================
-   LEGACY ALIAS — Warm Sand 시절 토큰을 토스 토큰으로 매핑
+   LEGACY ALIAS — Warm Sand·Toss 시절 토큰을 현재 토큰으로 매핑
    기존 컴포넌트 CSS 깨짐 방지용. Phase 4 이후에도 유지.
    ============================================================ */
 :root,
@@ -177,12 +213,12 @@
   --accent-soft:      var(--c-toss-blue-soft);
 
   --primary:          var(--c-toss-blue);
-  --primary-dark:     var(--c-down-strong);
+  --primary-dark:     var(--bm-mint-hover);
   --primary-light:    var(--c-toss-blue-soft);
   --primary-soft:     var(--c-toss-blue-soft);
   --primary-text:     #FFFFFF;
   --primary-bg:       var(--c-toss-blue-soft);
-  --primary-hover:    var(--c-down-strong);
+  --primary-hover:    var(--bm-mint-hover);
 
   --danger:           var(--c-up);
   --danger-light:     var(--c-up-soft);
@@ -255,11 +291,11 @@ input, select, textarea { font-family: inherit; }
 }
 
 @keyframes live-pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(240,68,82,0.5); }
-  50% { opacity: 0.85; box-shadow: 0 0 0 6px rgba(240,68,82,0); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(249,38,42,0.5); }
+  50% { opacity: 0.85; box-shadow: 0 0 0 6px rgba(249,38,42,0); }
 }
-@keyframes flash-up { 0% { background: rgba(240,68,82,0.18); } 100% { background: transparent; } }
-@keyframes flash-down { 0% { background: rgba(49,130,246,0.18); } 100% { background: transparent; } }
+@keyframes flash-up { 0% { background: rgba(249,38,42,0.18); } 100% { background: transparent; } }
+@keyframes flash-down { 0% { background: rgba(0,115,207,0.18); } 100% { background: transparent; } }
 @keyframes fade-in {
   from { transform: translateY(4px); }
   to { transform: translateY(0); }

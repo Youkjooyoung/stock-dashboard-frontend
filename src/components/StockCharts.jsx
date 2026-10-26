@@ -161,10 +161,10 @@ export default function StockCharts({ stocks, loading }) {
 
   if (loading || !stocks || stocks.length === 0) return <ChartSkeleton />;
 
-  const volumeColor = readToken('--text', dark ? '#F2F4F6' : '#191F28');
+  const volumeColor = readToken('--text', dark ? '#F2F2F2' : '#121212');
   const priceColor  = readToken('--text-secondary', dark ? '#B0B8C1' : '#4E5968');
-  const upColor     = readToken('--c-up', dark ? '#FF5C6A' : '#F04452');
-  const downColor   = readToken('--c-down', dark ? '#4D8EFA' : '#3182F6');
+  const upColor     = readToken('--c-up', dark ? '#FF5A5F' : '#F9262A');
+  const downColor   = readToken('--c-down', dark ? '#3DA5FF' : '#0073CF');
 
   const charts = [
     {

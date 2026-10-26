@@ -59,17 +59,17 @@ export default function CandlestickChart({ data = [], period = '일', height = 3
     if (period === '주') {
       const agg = aggregateWeekly(sorted);
       chartData = agg.map(d => ({ time: d.time, open: d.open, high: d.high, low: d.low, close: d.close }));
-      volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(226,76,75,0.4)' : 'rgba(59,122,217,0.4)' }));
+      volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(249,38,42,0.4)' : 'rgba(0,115,207,0.4)' }));
     } else if (period === '월') {
       const agg = aggregateMonthly(sorted);
       chartData = agg.map(d => ({ time: d.time, open: d.open, high: d.high, low: d.low, close: d.close }));
-      volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(226,76,75,0.4)' : 'rgba(59,122,217,0.4)' }));
+      volData   = agg.map(d => ({ time: d.time, value: d.vol, color: d.close >= d.open ? 'rgba(249,38,42,0.4)' : 'rgba(0,115,207,0.4)' }));
     } else {
       chartData = sorted.map(d => ({ time: toTime(d.basDt), open: d.mkp||0, high: d.hipr||0, low: d.lopr||0, close: d.clpr||0 }));
       volData   = sorted.map(d => ({
         time:  toTime(d.basDt),
         value: d.trqu || 0,
-        color: (d.clpr || 0) >= (d.mkp || 0) ? 'rgba(226,76,75,0.4)' : 'rgba(59,122,217,0.4)',
+        color: (d.clpr || 0) >= (d.mkp || 0) ? 'rgba(249,38,42,0.4)' : 'rgba(0,115,207,0.4)',
       }));
     }
 
@@ -124,8 +124,8 @@ export default function CandlestickChart({ data = [], period = '일', height = 3
       handleScroll: { mouseWheel: true, pressedMouseMove: true },
     });
 
-    const upColor   = isDark ? '#f03e3e' : '#e24c4b';
-    const downColor = isDark ? '#339af0' : '#3b7ad9';
+    const upColor   = isDark ? '#FF5A5F' : '#F9262A';
+    const downColor = isDark ? '#3DA5FF' : '#0073CF';
 
     const candleSeries = chart.addSeries(CandlestickSeries, {
       upColor,
